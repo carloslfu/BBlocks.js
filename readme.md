@@ -1,6 +1,6 @@
 # BB.js - BlockBuilder (alpha version)
 
-BB.js is lightweight, flexible and simplist graphical library for build blocks. This proyect is inspired in [Blockly][blockly-git].
+BB.js is lightweight, flexible and simplist graphical library for build block based GUIs. This proyect is inspired in [Blockly][blockly-git].
 
 The main idea is make a graphical library with some advanced features for use in a block editor. This library will replace Blockly in [blocklify][blocklify-git].
 
