@@ -1,4 +1,4 @@
-# BB.js - BlockBuilder
+# BB.js - BlockBuilder (alpha version)
 
 BB.js is lightweight, flexible and simplist graphical library for build blocks. This proyect is inspired in [Blockly][blockly-git].
 
@@ -6,13 +6,13 @@ The main idea is make a graphical library with some advanced features for use in
 
 ## Features
 
-- PointerEvents support (uses [PEP][pep-git] pollyfills).
+- PointerEvents support (uses [PEP][pep-git] polyfills).
 - SVG based (uses [SVG.js][svgjs-git]).
 - All is nestable.
 
 ## Features that will be implemented
 
-- Pointer Gestures (zoom, pan, hold).
+- Pointer Gestures (zoom, pan, hold ...).
 - SVG text field.
 - SVG contextmenu.
 - Custom menus.
