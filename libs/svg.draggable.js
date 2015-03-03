@@ -1,28 +1,30 @@
 // svg.draggable.js 0.1.0 - Copyright (c) 2014 Wout Fierens - Licensed under the MIT license
 // extended by Florian Loch
-// added PEP support by Carlos Galarza (carloslfu@gmail.com)
+// added PEP support and some modifications by: Carlos Galarza (carloslfu@gmail.com)
 ;(function() {
 
   SVG.extend(SVG.Element, {
     // Make element draggable
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    draggable: function(constraint) {
-      var start, drag, end
+    draggable: function(constraint, attachTo) {
+      var startDrag, drag, endDrag
         , element = this
-        , parent  = this.parent._parent(SVG.Nested) || this._parent(SVG.Doc)
-      
+        , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
+      if (!attachTo) {
+        attachTo = element;
+      }
       /* remove draggable if already present */
-      if (typeof this.fixed === 'function')
-        this.fixed()
+      if (typeof this.fixedDrag === 'function')
+        this.fixedDrag();
       
       /* ensure constraint object */
       constraint = constraint || {}
       
       /* start dragging */
-      start = function(event) {
+      startDrag = function(event) {
         event = event || window.event
-        
+
         /* invoke any callbacks */
         if (element.beforedrag)
           element.beforedrag(event)
@@ -44,10 +46,10 @@
         }
         
         /* store event */
-        element.startEvent = event
+        element.startEventDrag = event
         
         /* store start position */
-        element.startPosition = {
+        element.startPositionDrag = {
           x:        box.x
         , y:        box.y
         , width:    box.width
@@ -58,35 +60,36 @@
         
         /* add while and end events to window */
         window.addEventListener('pointermove', drag);
-        window.addEventListener('pointerup', end);
+        window.addEventListener('pointerup', endDrag);
         
         /* invoke any callbacks */
         if (element.dragstart)
-          element.dragstart({ x: 0, y: 0, zoom: element.startPosition.zoom }, event)
+          element.dragstart({ x: 0, y: 0, zoom: element.startPositionDrag.zoom }, event)
         
         /* prevent selection dragging */
-        event.preventDefault ? event.preventDefault() : event.returnValue = false
+        event.preventDefault ? event.preventDefault() : event.returnValue = false;
+        event.stopPropagation();
       }
       
       /* while dragging */
       drag = function(event) {
         event = event || window.event
         
-        if (element.startEvent) {
+        if (element.startEventDrag) {
           /* calculate move position */
           var x, y
-            , rotation  = element.startPosition.rotation
-            , width     = element.startPosition.width
-            , height    = element.startPosition.height
+            , rotation  = element.startPositionDrag.rotation
+            , width     = element.startPositionDrag.width
+            , height    = element.startPositionDrag.height
             , delta     = {
-                x:    event.pageX - element.startEvent.pageX,
-                y:    event.pageY - element.startEvent.pageY,
-                zoom: element.startPosition.zoom
+                x:    event.pageX - element.startEventDrag.pageX,
+                y:    event.pageY - element.startEventDrag.pageY,
+                zoom: element.startPositionDrag.zoom
               }
           
           /* caculate new position [with rotation correction] */
-          x = element.startPosition.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPosition.zoom
-          y = element.startPosition.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPosition.zoom
+          x = element.startPositionDrag.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionDrag.zoom;
+          y = element.startPositionDrag.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionDrag.zoom;
           
           /* move the element to its new position, if possible by constraint */
           if (typeof constraint === 'function') {
@@ -121,43 +124,45 @@
           if (element.dragmove)
             element.dragmove(delta, event)
         }
+        event.stopPropagation();
       }
       
       /* when dragging ends */
-      end = function(event) {
+      endDrag = function(event) {
         event = event || window.event
         
         /* calculate move position */
         var delta = {
-          x:    event.pageX - element.startEvent.pageX
-        , y:    event.pageY - element.startEvent.pageY
-        , zoom: element.startPosition.zoom
+          x:    event.pageX - element.startEventDrag.pageX
+        , y:    event.pageY - element.startEventDrag.pageY
+        , zoom: element.startPositionDrag.zoom
         }
         
         /* reset store */
-        element.startEvent    = null
-        element.startPosition = null
+        element.startEventDrag    = null
+        element.startPositionDrag = null
 
         /* remove while and end events to window */
         window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', end);
+        window.removeEventListener('pointerup', endDrag);
 
         /* invoke any callbacks */
         if (element.dragend)
           element.dragend(delta, event)
+        event.stopPropagation();
       }
       
       /* bind mousedown event */
-      element.node.addEventListener('pointerdown', start);
+      attachTo.node.addEventListener('pointerdown', startDrag);
       
       /* disable draggable */
-      element.fixed = function() {
-        element.node.removeEventListener('pointerdown', start);
+      element.fixedDrag = function() {
+        attachTo.node.removeEventListener('pointerdown', startDrag);
         
         window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', end);
+        window.removeEventListener('pointerup', endDrag);
         
-        start = drag = end = null
+        startDrag = drag = endDrag = null
         
         return element
       }

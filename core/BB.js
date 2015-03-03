@@ -15,6 +15,6 @@ BB.Object.prototype.add = function(type, name, options) {
       break;
     case 'Workspace':
       this.children.push(new BB.Workspace(name, this, options));
-      break;
+      return this.children[this.children.length-1];
   }
 };

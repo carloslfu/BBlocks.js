@@ -1,4 +1,4 @@
-// svg.pannable.js based on svg.draggable.js 0.1.0 by Wout Fierens
+// svg.pannable.js based on svg.pangable.js 0.1.0 by Wout Fierens
 // Autor: Carlos Galarza (carloslfu@gmail.com)
 ;(function() {
 
@@ -6,157 +6,168 @@
     // Make element a pannable area
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    pannable: function(constraint) {
-      var start, drag, end
+    pannable: function(constraint, attachTo, exceptions) { // exceptions are no pannable elements
+      var startPan, pan, endPan
         , element = this
         , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested)
       
-      /* remove draggable if already present */
-      if (typeof this.fixed === 'function')
-        this.fixed()
+      /* remove pangable if already present */
+      if (typeof this.fixedPan === 'function')
+        this.fixedPan()
       
       /* ensure constraint object */
       constraint = constraint || {}
       
       /* start panning */
-      start = function(event) {
+      startPan = function(event) {
         event = event || window.event
-        
+
         /* invoke any callbacks */
-        if (element.beforedrag)
-          element.beforedrag(event)
-        
-        /* get element bounding box */
-        var box = element.bbox()
-        
-        if (element instanceof SVG.G) {
-          box.x = element.x()
-          box.y = element.y()
-          
-        } else if (element instanceof SVG.Nested) {
-          box = {
-            x:      element.x()
-          , y:      element.y()
-          , width:  element.width()
-          , height: element.height()
-          }
-        }
+        if (element.beforepan)
+          element.beforepan(event)
         
         /* store event */
-        element.startEvent = event
-        
-        /* store start position */
-        element.startPosition = {
-          x:        box.x
-        , y:        box.y
-        , width:    box.width
-        , height:   box.height
-        , zoom:     parent.viewbox().zoom
-        , rotation: element.transform('rotation') * Math.PI / 180
-        }
-        
+        element.startEventPan = event
+
+        /* get children bounding boxes */
+        element.startPositionsPan = [];
+        element.each(function (i, children) {
+          var child = this;
+          var box = child.bbox()
+          
+          if (child instanceof SVG.G) {
+            box.x = child.x()
+            box.y = child.y()
+            
+          } else if (child instanceof SVG.Nested) {
+            box = {
+              x:      child.x()
+            , y:      child.y()
+            , width:  child.width()
+            , height: child.height()
+            }
+          }
+          
+          /* store start position */
+          element.startPositionsPan[i] = {
+            x:        box.x
+          , y:        box.y
+          , width:    box.width
+          , height:   box.height
+          , zoom:     parent.viewbox().zoom
+          , rotation: element.transform('rotation') * Math.PI / 180
+          }
+        });
         /* add while and end events to window */
-        window.addEventListener('pointermove', drag);
-        window.addEventListener('pointerup', end);
+        window.addEventListener('pointermove', pan);
+        window.addEventListener('pointerup', endPan);
         
         /* invoke any callbacks */
-        if (element.dragstart)
-          element.dragstart({ x: 0, y: 0, zoom: element.startPosition.zoom }, event)
+        if (element.panstart)
+          element.panstart({zoom: element.startPositionsPan}, event)
         
         /* prevent selection panning */
-        event.preventDefault ? event.preventDefault() : event.returnValue = false
+        event.preventDefault ? event.preventDefault() : event.returnValue = false;
+        event.stopPropagation();
       }
       
       /* while panning */
-      drag = function(event) {
+      pan = function(event) {
         event = event || window.event
         
-        if (element.startEvent) {
-          /* calculate move position */
-          var x, y
-            , rotation  = element.startPosition.rotation
-            , width     = element.startPosition.width
-            , height    = element.startPosition.height
-            , delta     = {
-                x:    event.pageX - element.startEvent.pageX,
-                y:    event.pageY - element.startEvent.pageY,
-                zoom: element.startPosition.zoom
+        if (element.startEventPan) {
+          /* calculate move position for all children*/
+          element.each(function (i, children) {
+            if (exceptions.indexOf(this) == -1) {
+              var child = this;
+              var x, y
+                , rotation  = element.startPositionsPan[i].rotation
+                , width     = element.startPositionsPan[i].width
+                , height    = element.startPositionsPan[i].height
+                , delta     = {
+                    x:    event.pageX - element.startEventPan.pageX,
+                    y:    event.pageY - element.startEventPan.pageY,
+                    zoom: element.startPositionsPan[i].zoom
+                  }
+              
+              /* caculate new position [with rotation correction] */
+              x = element.startPositionsPan[i].x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionsPan[i].zoom;
+              y = element.startPositionsPan[i].y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionsPan[i].zoom;
+              
+              /* move the child to its new position, if possible by constraint */
+              if (typeof constraint === 'function') {
+                var coord = constraint(x, y)
+
+                if (typeof coord === 'object') {
+                  if (typeof coord.x != 'boolean' || coord.x)
+                    child.x(typeof coord.x === 'number' ? coord.x : x)
+                  if (typeof coord.y != 'boolean' || coord.y)
+                    child.y(typeof coord.y === 'number' ? coord.y : y)
+
+                } else if (typeof coord === 'boolean' && coord) {
+                  child.move(x, y)
+                }
+
+              } else if (typeof constraint === 'object') {
+                /* keep child within constrained box */
+                if (constraint.minX != null && x < constraint.minX)
+                  x = constraint.minX
+                else if (constraint.maxX != null && x > constraint.maxX - width)
+                  x = constraint.maxX - width
+                
+                if (constraint.minY != null && y < constraint.minY)
+                  y = constraint.minY
+                else if (constraint.maxY != null && y > constraint.maxY - height)
+                  y = constraint.maxY - height
+
+                child.move(x, y)          
               }
-          
-          /* caculate new position [with rotation correction] */
-          x = element.startPosition.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPosition.zoom
-          y = element.startPosition.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPosition.zoom
-          
-          /* move the element to its new position, if possible by constraint */
-          if (typeof constraint === 'function') {
-            var coord = constraint(x, y)
 
-            if (typeof coord === 'object') {
-              if (typeof coord.x != 'boolean' || coord.x)
-                element.x(typeof coord.x === 'number' ? coord.x : x)
-              if (typeof coord.y != 'boolean' || coord.y)
-                element.y(typeof coord.y === 'number' ? coord.y : y)
-
-            } else if (typeof coord === 'boolean' && coord) {
-              element.move(x, y)
+              /* invoke any callbacks */
+              if (element.panmove)
+                element.panmove(delta, event)
             }
-
-          } else if (typeof constraint === 'object') {
-            /* keep element within constrained box */
-            if (constraint.minX != null && x < constraint.minX)
-              x = constraint.minX
-            else if (constraint.maxX != null && x > constraint.maxX - width)
-              x = constraint.maxX - width
-            
-            if (constraint.minY != null && y < constraint.minY)
-              y = constraint.minY
-            else if (constraint.maxY != null && y > constraint.maxY - height)
-              y = constraint.maxY - height
-
-            element.move(x, y)          
-          }
-
-          /* invoke any callbacks */
-          if (element.dragmove)
-            element.dragmove(delta, event)
+          });
         }
+        event.stopPropagation();
       }
       
       /* when panning ends */
-      end = function(event) {
+      endPan = function(event) {
         event = event || window.event
         
         /* calculate move position */
         var delta = {
-          x:    event.pageX - element.startEvent.pageX
-        , y:    event.pageY - element.startEvent.pageY
-        , zoom: element.startPosition.zoom
+          x:    event.pageX - element.startEventPan.pageX
+        , y:    event.pageY - element.startEventPan.pageY
+        , zoom: parent.viewbox().zoom
         }
         
         /* reset store */
-        element.startEvent    = null
-        element.startPosition = null
+        element.startEventPan    = null
+        element.startPositionsPan = null
 
         /* remove while and end events to window */
-        window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', end);
+        window.removeEventListener('pointermove', pan);
+        window.removeEventListener('pointerup', endPan);
 
         /* invoke any callbacks */
-        if (element.dragend)
-          element.dragend(delta, event)
+        if (element.panend)
+          element.panend(delta, event)
+        event.stopPropagation();
       }
       
       /* bind mousedown event */
-      element.node.addEventListener('pointerdown', start);
+      attachTo.node.addEventListener('pointerdown', startPan);
       
-      /* disable draggable */
-      element.fixed = function() {
-        element.node.removeEventListener('pointerdown', start);
+      /* disable panable */
+      element.fixedPan = function() {
+        attachTo.node.removeEventListener('pointerdown', startPan);
         
-        window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', end);
+        window.removeEventListener('pointermove', pan);
+        window.removeEventListener('pointerup', endPan);
         
-        start = drag = end = null
+        startPan = pan = endPan = null
         
         return element
       }
