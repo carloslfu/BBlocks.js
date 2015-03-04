@@ -9,6 +9,16 @@ BB.Workspace = function(name, workspace, options) {
   this.border = null;
   this.background = null;
   this.hasBorder = true;
+  this.paletteColors = {
+    background: {
+      nested: '#eee',
+      main: '#fff'
+    },
+    border: {
+      nested: '#dd0',
+      main: '#ddd'
+    },
+  };
 	if (!workspace) {
 		return;
 	}
@@ -56,13 +66,14 @@ BB.Workspace.prototype.render = function() {
     this.root.move(this.x, this.y);
     this.root.size(this.width, this.height);
     // styling
-    var color = this.nested ? '#eee' : '#fff';
-    this.background = this.root.rect(this.width, this.height).fill(color);
+    var bgColor = this.paletteColors.background[this.nested ? 'nested' : 'main'];
+    var borderColor = this.paletteColors.border[this.nested ? 'nested' : 'main'];
+    this.background = this.root.rect(this.width, this.height).fill(bgColor);
     if (this.hasBorder) {
       if (this.nested) {
-        this.border = this.root.rect(this.width, this.height).stroke({ color: '#dd0', opacity: 1, width: 4 }).fill('none').radius(5);
+        this.border = this.root.rect(this.width, this.height).stroke({ color: borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
       } else {
-        this.root.attr('style', 'border: 1px solid #ddd;');
+        this.root.attr('style', 'border: 1px solid ' + borderColor + ';');
       }
     } else {
       this.border = this.root.rect(this.width, this.height).stroke({ color: '#fff', opacity: 1, width: 4 }).fill('none').radius(5);
@@ -74,5 +85,6 @@ BB.Workspace.prototype.render = function() {
     } else {
       this.root.pannable(null ,this.background, [this.background]);
     }
+    this.root.text(this.level + '');
 	}
 };
