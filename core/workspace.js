@@ -3,23 +3,14 @@
 //A workspace is an SVG document that can contain Blocks or Workspaces
 BB.Workspace = function(name, workspace, options) {
 	this.name = name;
+  this.children = [];
   this.width = '100%';
   this.height = '100%';
   this.x = 0;
   this.y = 0;
+  this.container = null; // contains attached elements(border) and SVG document
   this.border = null;
   this.background = null;
-  this.hasBorder = true;
-  this.paletteColors = {
-    background: {
-      nested: '#eee',
-      main: '#fff'
-    },
-    border: {
-      nested: '#dd0',
-      main: '#ddd'
-    },
-  };
 	if (!workspace) {
 		return;
 	}
@@ -29,12 +20,11 @@ BB.Workspace = function(name, workspace, options) {
 	// options
 	if (!options) {
     //default options
-    this.render();
 		return;
 	}
 	if (options.render) {
-		this.render();
-	}
+    this.render();
+  }
   if (options.width) {
     this.width = options.width;
   }
@@ -47,8 +37,11 @@ BB.Workspace = function(name, workspace, options) {
   if (options.y) {
     this.y = options.y;
   }
-  if (options.hasOwnProperty('hasBorder')) {
-    this.hasBorder = options.hasBorder;
+  if (options.stylingFunction) {
+    this.stylingFunction = options.stylingFunction;
+  }
+  if (options.paletteColors) {
+    this.paletteColors = options.paletteColors;
   }
 };
 
@@ -56,42 +49,75 @@ BB.Workspace = function(name, workspace, options) {
 BB.Workspace.prototype = new BB.Object("Workspace");
 BB.Workspace.prototype.constructor = BB.Workspace;
 
+BB.Workspace.prototype.paletteColors = {
+  background: {
+    nested: '#fff',
+    main: '#fff'
+  },
+  border: {
+    nested: '#1B65A6',
+    main: '#ddd'
+  },
+};
+
 BB.Workspace.prototype.render = function() {
 	if (!this.rendered) {
 		this.rendered = true;
 		// allows nested workspaces
     this.nested =!(typeof(this.workspace) === 'string');
-		this.root = this.nested ? this.workspace.root.nested() : SVG(this.workspace);
-    //position and size
-    this.root.move(this.x, this.y);
+    if (this.nested) {
+      this.container = this.workspace.root.group();
+      this.container.move(this.x, this.y); //poition of nested workspace
+    }
+		this.root = this.nested ? this.container.nested() : SVG(this.workspace).fixSubPixelOffset();
     this.root.size(this.width, this.height);
     // styling
-    var bgColor = this.paletteColors.background[this.nested ? 'nested' : 'main'];
-    var borderColor = this.paletteColors.border[this.nested ? 'nested' : 'main'];
-    this.background = this.root.rect(this.width, this.height).fill(bgColor);
-    if (this.hasBorder) {
-      if (this.nested) {
-        this.border = this.root.rect(this.width, this.height).stroke({ color: borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
-      } else {
-        this.root.attr('style', 'border: 1px solid ' + borderColor + ';');
-      }
+    this.bgColor = this.paletteColors.background[this.nested ? 'nested' : 'main'];
+    this.borderColor = this.paletteColors.border[this.nested ? 'nested' : 'main'];
+    if (this.stylingFunction) {
+      this.stylingFunction();
+    }
+    this.background = this.root.rect(this.width, this.height).fill(this.bgColor);
+    if (this.nested) {
+      this.dragBox = this.workspace.root.rect(10, 10).stroke({ color: this.borderColor, opacity: 1, width: 1 }).fill('#369E58').radius(1).move(-5, -5);
+      this.resizeBox = this.workspace.root.rect(10, 10).stroke({ color: this.borderColor, opacity: 1, width: 1 }).fill('#808080').radius(1).move(this.width-5, this.height-5);
+      this.border = this.workspace.root.rect(this.width, this.height).stroke({ color: this.borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
+      this.container.add(this.border);
+      this.container.add(this.dragBox);
+      this.container.add(this.resizeBox);
     } else {
-      this.border = this.root.rect(this.width, this.height).stroke({ color: borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
+      this.root.attr('style', 'border: 1px solid ' + this.borderColor + ';');
     }
     this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspace
     if (this.nested) {
-      this.root.draggable(null ,this.border);
-      this.root.pannable(null ,this.background, [this.background, this.border]);
+      this.container.draggable(null ,[this.dragBox, this.border]);
       var el = this; //for the next closure
-      this.root.dragstart = function() {
-        el.toTop(); //focus workspace
+      this.container.dragstart = function() {
+        el.toTopPropagate(); //focus workspace
       };
       this.root.panstart = function() {
-        el.toTop(); //focus workspace
+        el.toTopPropagate(); //focus workspace
       };
-    } else {
-      this.root.pannable(null ,this.background, [this.background]);
     }
-    this.root.text(this.level + '');
+    this.childContainer = this.root.group();
+    this.childContainer.add(this.root.text(this.level + ''));
+    for (var i = 0; i < this.children.length; i++) {
+      this.children[i].render();
+      this.childContainer.add(this.children[i].container);
+    }
+    this.childContainer.pannable(null ,[this.background], [this.background]);
 	}
 };
+
+BB.Workspace.prototype.toScale = function(scale) {
+  var dScale = scale/this.scale;
+  this.childContainer.scale(scale);
+  this.scale = scale;
+  this.notifyScaling(dScale);
+};
+BB.Workspace.prototype.notifyScaling = function(dScale) {
+  this.absoluteScale *= dScale;
+  this.children.forEach(function(el) {
+    el.notifyScaling(dScale);
+  });
+}

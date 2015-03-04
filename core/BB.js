@@ -6,7 +6,6 @@ var BB = {};
 // prototype for Workspace and Blocks
 BB.Object = function(type) {
   this.type_ = type;
-  this.children = [];
   this.nested = false;
   this.level = 0; //level of nesting 0 - main Object
 };
@@ -22,13 +21,21 @@ BB.Object.prototype.add = function(type, name, options) {
   }
 };
 
+//this object to top of this parent Workspace
 BB.Object.prototype.toTop = function() {
+  if (this.nested) {
+    this.workspace.root.node.appendChild(this.container.node); // this in top of SVG
+  }
+}
+
+//this object to top of this parent Workspace and all parents
+BB.Object.prototype.toTopPropagate = function() {
   var obj = this;
   if (this.nested) {
-    this.root.node.parentNode.appendChild(this.root.node); // this in top of SVG
+    this.workspace.root.node.appendChild(this.container.node); // this in top of SVG
     while (obj.workspace.nested) { //parents in top of our respectives SVGs
       obj = obj.workspace;
-      obj.root.node.parentNode.appendChild(obj.root.node);
+      obj.workspace.root.node.appendChild(obj.container.node);
     }
   }
 }
