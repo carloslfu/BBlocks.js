@@ -1,5 +1,6 @@
 'use strict'
 
+//A workspace is an SVG document that can contain Blocks or Workspaces
 BB.Workspace = function(name, workspace, options) {
 	this.name = name;
   this.width = '100%';
@@ -25,7 +26,6 @@ BB.Workspace = function(name, workspace, options) {
 	this.workspace = workspace;
 	//woorkspace not rendered
 	this.rendered = false;
-  this.root = null;
 	// options
 	if (!options) {
     //default options
@@ -76,12 +76,19 @@ BB.Workspace.prototype.render = function() {
         this.root.attr('style', 'border: 1px solid ' + borderColor + ';');
       }
     } else {
-      this.border = this.root.rect(this.width, this.height).stroke({ color: '#fff', opacity: 1, width: 4 }).fill('none').radius(5);
+      this.border = this.root.rect(this.width, this.height).stroke({ color: borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
     }
     this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspace
     if (this.nested) {
       this.root.draggable(null ,this.border);
       this.root.pannable(null ,this.background, [this.background, this.border]);
+      var el = this; //for the next closure
+      this.root.dragstart = function() {
+        el.toTop(); //focus workspace
+      };
+      this.root.panstart = function() {
+        el.toTop(); //focus workspace
+      };
     } else {
       this.root.pannable(null ,this.background, [this.background]);
     }

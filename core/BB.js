@@ -3,6 +3,7 @@
 //namespace for BB
 var BB = {};
 
+// prototype for Workspace and Blocks
 BB.Object = function(type) {
   this.type_ = type;
   this.children = [];
@@ -20,3 +21,14 @@ BB.Object.prototype.add = function(type, name, options) {
       return this.children[this.children.length-1];
   }
 };
+
+BB.Object.prototype.toTop = function() {
+  var obj = this;
+  if (this.nested) {
+    this.root.node.parentNode.appendChild(this.root.node); // this in top of SVG
+    while (obj.workspace.nested) { //parents in top of our respectives SVGs
+      obj = obj.workspace;
+      obj.root.node.parentNode.appendChild(obj.root.node);
+    }
+  }
+}

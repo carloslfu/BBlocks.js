@@ -1,5 +1,6 @@
 'use strict'
 
+// A Block is an svg group that do any behavior, this can contain other Blocks or Workspaces
 BB.Block = function(name, options, workspace) {
 	this.name = name;
 	if (!options) {
