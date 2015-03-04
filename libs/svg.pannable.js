@@ -6,17 +6,20 @@
     // Make element a pannable area
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    pannable: function(constraint, attachTo, exceptions) { // exceptions are no pannable elements
+    pannable: function(constraint, attachToEls, exceptions) { // exceptions are no pannable elements
       var startPan, pan, endPan
         , element = this
-        , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested)
-      
+        , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
+
+      if (!attachToEls) {
+        attachToEls = [element];
+      }
       /* remove pangable if already present */
       if (typeof this.fixedPan === 'function')
-        this.fixedPan()
+        this.fixedPan();
       
       /* ensure constraint object */
-      constraint = constraint || {}
+      constraint = constraint || {};
       
       /* start panning */
       startPan = function(event) {
@@ -24,10 +27,10 @@
 
         /* invoke any callbacks */
         if (element.beforepan)
-          element.beforepan(event)
+          element.beforepan(event);
         
         /* store event */
-        element.startEventPan = event
+        element.startEventPan = event;
 
         /* get children bounding boxes */
         element.startPositionsPan = [];
@@ -158,11 +161,15 @@
       }
       
       /* bind mousedown event */
-      attachTo.node.addEventListener('pointerdown', startPan);
+      attachToEls.forEach(function(el) {
+        el.node.addEventListener('pointerdown', startPan);
+      });
       
       /* disable panable */
       element.fixedPan = function() {
-        attachTo.node.removeEventListener('pointerdown', startPan);
+        attachToEls.forEach(function(el) {
+          el.node.removeEventListener('pointerdown', startPan);
+        });
         
         window.removeEventListener('pointermove', pan);
         window.removeEventListener('pointerup', endPan);

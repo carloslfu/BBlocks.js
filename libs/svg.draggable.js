@@ -7,12 +7,13 @@
     // Make element draggable
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    draggable: function(constraint, attachTo) {
+    draggable: function(constraint, attachToEls) {
       var startDrag, drag, endDrag
         , element = this
         , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
-      if (!attachTo) {
-        attachTo = element;
+
+      if (!attachToEls) {
+        attachToEls = [element];
       }
       /* remove draggable if already present */
       if (typeof this.fixedDrag === 'function')
@@ -153,12 +154,15 @@
       }
       
       /* bind mousedown event */
-      attachTo.node.addEventListener('pointerdown', startDrag);
+      attachToEls.forEach(function(el) {
+        el.node.addEventListener('pointerdown', startDrag);
+      });
       
       /* disable draggable */
       element.fixedDrag = function() {
-        attachTo.node.removeEventListener('pointerdown', startDrag);
-        
+        attachToEls.forEach(function(el) {
+          el.node.removeEventListener('pointerdown', startDrag);
+        });
         window.removeEventListener('pointermove', drag);
         window.removeEventListener('pointerup', endDrag);
         
