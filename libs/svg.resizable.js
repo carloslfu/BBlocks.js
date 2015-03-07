@@ -40,8 +40,6 @@
           box = {
             x:      element.x()
           , y:      element.y()
-          , width:  element.width()
-          , height: element.height()
           }
         }
         
@@ -52,8 +50,8 @@
         element.startPositionResize = {
           x:        box.x
         , y:        box.y
-        , width:    box.width
-        , height:   box.height
+        , width:    context.width
+        , height:   context.height
         , zoom:     context.workspace.absoluteScale
         , rotation: element.transform('rotation') * Math.PI / 180
         }
@@ -102,7 +100,7 @@
                 element.y(typeof coord.y === 'number' ? coord.y : y)
 
             } else if (typeof coord === 'boolean' && coord) {
-              context.resize(width + dx - 10, height + dy - 10) 
+              context.resize(width + dx, height + dy) 
             }
 
           } else if (typeof constraint === 'object') {
@@ -117,7 +115,7 @@
             else if (constraint.maxY != null && y > constraint.maxY - height)
               y = constraint.maxY - height
 
-            context.resize(width + dx - 10, height + dy - 10)          
+            context.resize(width + dx, height + dy)          
           }
 
           /* invoke any callbacks */
