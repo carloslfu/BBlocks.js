@@ -1,4 +1,4 @@
-// svg.pannable.js based on svg.pangable.js 0.1.0 by Wout Fierens
+// svg.pannable.js based on svg.draggable.js 0.1.0 by Wout Fierens
 // Autor: Carlos Galarza (carloslfu@gmail.com)
 ;(function() {
 
@@ -57,7 +57,7 @@
           , y:        box.y
           , width:    box.width
           , height:   box.height
-          , zoom:     parent.viewbox().zoom
+          , zoom:     element.absoluteZoom
           , rotation: element.transform('rotation') * Math.PI / 180
           }
         });

@@ -1,13 +1,12 @@
-// svg.draggable.js 0.1.0 - Copyright (c) 2014 Wout Fierens - Licensed under the MIT license
-// extended by Florian Loch
-// added PEP support and some modifications by: Carlos Galarza (carloslfu@gmail.com)
+// svg.resizable.js based on svg.draggable.js 0.1.0 by Wout Fierens
+// Autor: Carlos Galarza (carloslfu@gmail.com)
 ;(function() {
 
   SVG.extend(SVG.Element, {
-    // Make element draggable
+    // Make element resizable
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    draggable: function(constraint, attachToEls) {
+    resizable: function(constraint, attachToEls) {
       var startDrag, drag, endDrag
         , element = this
         , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
@@ -15,7 +14,7 @@
       if (!attachToEls) {
         attachToEls = [element];
       }
-      /* remove draggable if already present */
+      /* remove resizable if already present */
       if (typeof this.fixedDrag === 'function')
         this.fixedDrag();
       
@@ -55,7 +54,7 @@
         , y:        box.y
         , width:    box.width
         , height:   box.height
-        , zoom:     element.absoluteZoom
+        , zoom:     parent.viewbox().zoom
         , rotation: element.transform('rotation') * Math.PI / 180
         }
         
@@ -72,8 +71,8 @@
         event.stopPropagation();
       }
       
-      /* while dragging */
-      drag = function(event) {
+      /* while resizing */
+      resize = function(event) {
         event = event || window.event
         
         if (element.startEventDrag) {
@@ -85,7 +84,7 @@
             , delta     = {
                 x:    event.pageX - element.startEventDrag.pageX,
                 y:    event.pageY - element.startEventDrag.pageY,
-                zoom: element.startPositionDrag.zoom
+                zoom: element.startPositionResize.zoom
               }
           
           /* caculate new position [with rotation correction] */
@@ -129,23 +128,23 @@
       }
       
       /* when dragging ends */
-      endDrag = function(event) {
+      endResize = function(event) {
         event = event || window.event
         
         /* calculate move position */
         var delta = {
-          x:    event.pageX - element.startEventDrag.pageX
-        , y:    event.pageY - element.startEventDrag.pageY
-        , zoom: element.startPositionDrag.zoom
+          x:    event.pageX - element.startEventResize.pageX
+        , y:    event.pageY - element.startEventResize.pageY
+        , zoom: element.startPositionResize.zoom
         }
         
         /* reset store */
-        element.startEventDrag    = null
-        element.startPositionDrag = null
+        element.startEventResize    = null
+        element.startPositionResize = null
 
         /* remove while and end events to window */
-        window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', endDrag);
+        window.removeEventListener('pointermove', resize);
+        window.removeEventListener('pointerup', endResize);
 
         /* invoke any callbacks */
         if (element.dragend)
@@ -155,18 +154,18 @@
       
       /* bind mousedown event */
       attachToEls.forEach(function(el) {
-        el.node.addEventListener('pointerdown', startDrag);
+        el.node.addEventListener('pointerdown', startResize);
       });
       
-      /* disable draggable */
-      element.fixedDrag = function() {
+      /* disable resizable */
+      element.fixedResize = function() {
         attachToEls.forEach(function(el) {
-          el.node.removeEventListener('pointerdown', startDrag);
+          el.node.removeEventListener('pointerdown', startResize);
         });
-        window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', endDrag);
+        window.removeEventListener('pointermove', resize);
+        window.removeEventListener('pointerup', endResize);
         
-        startDrag = drag = endDrag = null
+        startResize = resize = endResize = null
         
         return element
       }

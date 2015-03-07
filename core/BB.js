@@ -24,7 +24,7 @@ BB.Object.prototype.add = function(type, name, options) {
 //this object to top of this parent Workspace
 BB.Object.prototype.toTop = function() {
   if (this.nested) {
-    this.workspace.root.node.appendChild(this.container.node); // this in top of SVG
+    this.workspace.childContainer.node.appendChild(this.container.node); // this in top of SVG
   }
 }
 
@@ -32,10 +32,10 @@ BB.Object.prototype.toTop = function() {
 BB.Object.prototype.toTopPropagate = function() {
   var obj = this;
   if (this.nested) {
-    this.workspace.root.node.appendChild(this.container.node); // this in top of SVG
+    this.workspace.childContainer.node.appendChild(this.container.node); // this in top of SVG
     while (obj.workspace.nested) { //parents in top of our respectives SVGs
       obj = obj.workspace;
-      obj.workspace.root.node.appendChild(obj.container.node);
+      obj.workspace.childContainer.node.appendChild(obj.container.node);
     }
   }
 }
