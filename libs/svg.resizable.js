@@ -6,8 +6,8 @@
     // Make element resizable
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    resizable: function(constraint, attachToEls) {
-      var startDrag, drag, endDrag
+    resizable: function(context, constraint, attachToEls) {
+      var startResize, resize, endResize
         , element = this
         , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
 
@@ -15,19 +15,19 @@
         attachToEls = [element];
       }
       /* remove resizable if already present */
-      if (typeof this.fixedDrag === 'function')
-        this.fixedDrag();
+      if (typeof this.fixedResize === 'function')
+        this.fixedResize();
       
       /* ensure constraint object */
       constraint = constraint || {}
       
-      /* start dragging */
-      startDrag = function(event) {
+      /* start resizing */
+      startResize = function(event) {
         event = event || window.event
 
         /* invoke any callbacks */
-        if (element.beforedrag)
-          element.beforedrag(event)
+        if (element.beforeresize)
+          element.beforeresize(event)
         
         /* get element bounding box */
         var box = element.bbox()
@@ -46,27 +46,27 @@
         }
         
         /* store event */
-        element.startEventDrag = event
+        element.startEventResize = event
         
         /* store start position */
-        element.startPositionDrag = {
+        element.startPositionResize = {
           x:        box.x
         , y:        box.y
         , width:    box.width
         , height:   box.height
-        , zoom:     parent.viewbox().zoom
+        , zoom:     context.workspace.absoluteScale
         , rotation: element.transform('rotation') * Math.PI / 180
         }
         
         /* add while and end events to window */
-        window.addEventListener('pointermove', drag);
-        window.addEventListener('pointerup', endDrag);
+        window.addEventListener('pointermove', resize);
+        window.addEventListener('pointerup', endResize);
         
         /* invoke any callbacks */
-        if (element.dragstart)
-          element.dragstart({ x: 0, y: 0, zoom: element.startPositionDrag.zoom }, event)
+        if (element.resizestart)
+          element.resizestart({ x: 0, y: 0, zoom: element.startPositionResize.zoom }, event)
         
-        /* prevent selection dragging */
+        /* prevent selection resizing */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
         event.stopPropagation();
       }
@@ -75,21 +75,21 @@
       resize = function(event) {
         event = event || window.event
         
-        if (element.startEventDrag) {
+        if (element.startEventResize) {
           /* calculate move position */
-          var x, y
-            , rotation  = element.startPositionDrag.rotation
-            , width     = element.startPositionDrag.width
-            , height    = element.startPositionDrag.height
+          var dx, dy
+            , rotation  = element.startPositionResize.rotation
+            , width     = element.startPositionResize.width
+            , height    = element.startPositionResize.height
             , delta     = {
-                x:    event.pageX - element.startEventDrag.pageX,
-                y:    event.pageY - element.startEventDrag.pageY,
+                x:    event.pageX - element.startEventResize.pageX,
+                y:    event.pageY - element.startEventResize.pageY,
                 zoom: element.startPositionResize.zoom
               }
           
           /* caculate new position [with rotation correction] */
-          x = element.startPositionDrag.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionDrag.zoom;
-          y = element.startPositionDrag.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionDrag.zoom;
+          dx = (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionResize.zoom;
+          dy = (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionResize.zoom;
           
           /* move the element to its new position, if possible by constraint */
           if (typeof constraint === 'function') {
@@ -102,7 +102,7 @@
                 element.y(typeof coord.y === 'number' ? coord.y : y)
 
             } else if (typeof coord === 'boolean' && coord) {
-              element.move(x, y)
+              context.resize(width + dx - 10, height + dy - 10) 
             }
 
           } else if (typeof constraint === 'object') {
@@ -117,17 +117,17 @@
             else if (constraint.maxY != null && y > constraint.maxY - height)
               y = constraint.maxY - height
 
-            element.move(x, y)          
+            context.resize(width + dx - 10, height + dy - 10)          
           }
 
           /* invoke any callbacks */
-          if (element.dragmove)
-            element.dragmove(delta, event)
+          if (element.resizemove)
+            element.resizemove(delta, event)
         }
         event.stopPropagation();
       }
       
-      /* when dragging ends */
+      /* when resizing ends */
       endResize = function(event) {
         event = event || window.event
         
@@ -147,8 +147,8 @@
         window.removeEventListener('pointerup', endResize);
 
         /* invoke any callbacks */
-        if (element.dragend)
-          element.dragend(delta, event)
+        if (element.resizeend)
+          element.resizeend(delta, event)
         event.stopPropagation();
       }
       

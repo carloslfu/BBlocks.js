@@ -5,7 +5,7 @@ var BB = {};
 
 // prototype for Workspace and Blocks
 BB.Object = function(type) {
-  this.type_ = type;
+  this.type = type;
   this.nested = false;
   this.level = 0; //level of nesting 0 - main Object
 };

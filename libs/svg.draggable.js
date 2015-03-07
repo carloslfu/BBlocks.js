@@ -7,7 +7,7 @@
     // Make element draggable
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    draggable: function(constraint, attachToEls) {
+    draggable: function(context, constraint, attachToEls) {
       var startDrag, drag, endDrag
         , element = this
         , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
@@ -55,7 +55,7 @@
         , y:        box.y
         , width:    box.width
         , height:   box.height
-        , zoom:     element.absoluteZoom
+        , zoom:     context.absoluteScale
         , rotation: element.transform('rotation') * Math.PI / 180
         }
         

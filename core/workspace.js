@@ -14,6 +14,8 @@ BB.Workspace = function(name, workspace, options) {
   this.scale = 1;
   this.border = null;
   this.background = null;
+  this.dragBox = null;
+  this.resizeBox = null;
 	if (!workspace) {
 		return;
 	}
@@ -93,27 +95,28 @@ BB.Workspace.prototype.render = function() {
     }
     this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspace
     this.childContainer = this.root.group();
-    this.childContainer.absoluteZoom = 1; // set absoluteScale of object to svg.js context for pannable elements
     this.childContainer.add(this.root.text(this.level + ''));
     for (var i = 0; i < this.children.length; i++) {
       this.children[i].render();
       this.childContainer.add(this.children[i].container);
     }
     if (this.nested) {
-      this.container.absoluteZoom = 1; // set absoluteScale of object to svg.js context for draggable elements
-      this.container.draggable(null ,[this.dragBox, this.border]);
+      this.container.draggable(this.workspace ,null ,[this.dragBox, this.border]);
+      this.container.resizable(this ,null ,[this.resizeBox]);
       var el = this; //for the next closure
       this.container.dragstart = function() {
+        el.toTopPropagate(); //focus workspace
+      };
+      this.container.resizestart = function() {
         el.toTopPropagate(); //focus workspace
       };
       this.childContainer.panstart = function() {
         el.toTopPropagate(); //focus workspace
       };
     }
-    this.childContainer.pannable(null ,[this.background], [this.background]);
+    this.childContainer.pannable(this ,null ,[this.background], [this.background]);
 	}
 };
-//TODO: separate workpace and block childs in workspaceChilds and blockChilds
 BB.Workspace.prototype.toScale = function(scale) {
   var dScale = scale/this.scale;
   this.childContainer.scale(scale);
@@ -122,10 +125,19 @@ BB.Workspace.prototype.toScale = function(scale) {
 };
 BB.Workspace.prototype.notifyScaling = function(dScale) { // this should be only for workspaces - last TODO
   this.absoluteScale *= dScale;
-  this.childContainer.absoluteZoom = this.absoluteScale; // set absoluteScale to svg.js context for pannable elements
+  this.absoluteScale = this.absoluteScale; // set absoluteScale to svg.js context for pannable elements
   var absoluteScale = this.absoluteScale; // keeps absoluteScale for the closure
   this.children.forEach(function(el) {
-    el.container.absoluteZoom = absoluteScale; // set absoluteScale of object to svg.js context for draggable elements
-    el.notifyScaling(dScale);
+    if (el.type == 'Workspace') { //only notify the workspaces
+      el.notifyScaling(dScale);
+    }
   });
-}
+};
+BB.Workspace.prototype.resize = function(width, height) {
+  this.width = width;
+  this.height = height;
+  this.border.size(width, height);
+  this.root.size(width, height);
+  this.background.size(width, height);
+  this.resizeBox.move(this.width-5, this.height-5);
+};
