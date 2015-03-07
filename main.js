@@ -12,6 +12,7 @@ var main = function() {
 	BB.Workspace.prototype.paletteColors.background.main = '#FFFFFF';
 	BB.Workspace.prototype.paletteColors.background.nested = '#EDEEEA';
 	BB.Workspace.prototype.paletteColors.border.nested = '#2B95FF';
+	// alternate palette colors for workspace backgrounds
 	BB.Workspace.prototype.stylingFunction = function() {
 		this.bgColor = this.paletteColors.background[(this.level % 2 == 1) ? 'nested' : 'main'];
 	};

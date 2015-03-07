@@ -8,6 +8,7 @@ The main idea is make a graphical library with some advanced features for use in
 
 - PointerEvents support (uses [PEP][pep-git] polyfills).
 - SVG based (uses [SVG.js][svgjs-git]).
+- Scalable, resizable and pannabble workspaces.
 - All is nestable.
 
 ## Features that will be implemented
