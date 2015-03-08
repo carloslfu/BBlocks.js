@@ -4,6 +4,9 @@ BB.js is lightweight, flexible and simplist graphical library for build block ba
 
 The main idea is make a graphical library with some advanced features for use in a block editor. This library will replace Blockly in [blocklify][blocklify-git] proyect.
 
+A [live demo][livedemo].
+[livedemo]: https://carloslfu.github.io/BB.js/test.html
+
 [![example1](https://github.com/carloslfu/BB.js/blob/master/BB.jpg)](BB.js)
 [![example2](https://github.com/carloslfu/BB.js/blob/master/BB_with_zoom.jpg)](BB.js zoomable)
 
