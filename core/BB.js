@@ -26,7 +26,7 @@ BB.Object.prototype.toTop = function() {
   if (this.nested) {
     this.workspace.childContainer.node.appendChild(this.container.node); // this in top of SVG
   }
-}
+};
 
 //this object to top of this parent Workspace and all parents
 BB.Object.prototype.toTopPropagate = function() {
@@ -38,4 +38,4 @@ BB.Object.prototype.toTopPropagate = function() {
       obj.workspace.childContainer.node.appendChild(obj.container.node);
     }
   }
-}
+};

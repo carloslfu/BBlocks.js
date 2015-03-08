@@ -9,12 +9,11 @@ var main = function() {
 	nested21 = nested2.add('Workspace', 'nested21', {width : 100, height: 100, x: 10, y: 10});
 	nested22 = nested2.add('Workspace', 'nested22', {width : 100, height: 100, x: 20, y: 20});
 	nested221 = nested22.add('Workspace', 'nested221', {width : 30, height: 30, x: 10, y: 10});
-	BB.Workspace.prototype.paletteColors.background.main = '#FFFFFF';
-	BB.Workspace.prototype.paletteColors.background.nested = '#EDEEEA';
-	BB.Workspace.prototype.paletteColors.border.nested = '#2B95FF';
-	// alternate palette colors for workspace backgrounds
+
+	//BB.Workspace.prototype.colorPalette = BB.colorPalettes.workspace.dark;
+	// alternate color palette for workspace backgrounds
 	BB.Workspace.prototype.stylingFunction = function() {
-		this.bgColor = this.paletteColors.background[(this.level % 2 == 1) ? 'nested' : 'main'];
+		this.bgColor = this.colorPalette.background[(this.level % 2 == 1) ? 'nested' : 'main'];
 	};
 	mainWorkspace.render();
 };

@@ -16,6 +16,9 @@ BB.Workspace = function(name, workspace, options) {
   this.background = null;
   this.dragBox = null;
   this.resizeBox = null;
+  this.scaleSpeed = 1.2;
+  this.minScale = 0.3;
+  this.maxScale = 10;
 	if (!workspace) {
 		return;
 	}
@@ -45,25 +48,14 @@ BB.Workspace = function(name, workspace, options) {
   if (options.stylingFunction) {
     this.stylingFunction = options.stylingFunction;
   }
-  if (options.paletteColors) {
-    this.paletteColors = options.paletteColors;
+  if (options.colorPalette) {
+    this.colorPalette = options.colorPalette;
   }
 };
 
 // Workspace inerits from Object
 BB.Workspace.prototype = new BB.Object("Workspace");
 BB.Workspace.prototype.constructor = BB.Workspace;
-
-BB.Workspace.prototype.paletteColors = {
-  background: {
-    nested: '#fff',
-    main: '#fff'
-  },
-  border: {
-    nested: '#1B65A6',
-    main: '#ddd'
-  },
-};
 
 BB.Workspace.prototype.render = function() {
 	if (!this.rendered) {
@@ -76,17 +68,27 @@ BB.Workspace.prototype.render = function() {
     }
 		this.root = this.nested ? this.container.nested() : SVG(this.workspace).fixSubPixelOffset();
     this.root.size(this.width, this.height);
+    if (!this.colorPalette) {
+      this.colorPalette = BB.colorPalettes.workspace.light; //default palette
+    }
     // styling
-    this.bgColor = this.paletteColors.background[this.nested ? 'nested' : 'main'];
-    this.borderColor = this.paletteColors.border[this.nested ? 'nested' : 'main'];
+    this.bgColor = this.colorPalette.background[this.nested ? 'nested' : 'main'];
+    this.borderColor = this.colorPalette.border[this.nested ? 'nested' : 'main'];
+    this.dragBoxColor = this.colorPalette.dragBoxColor;
+    this.resizeBoxColor = this.colorPalette.resizeBoxColor;
     if (this.stylingFunction) {
       this.stylingFunction();
     }
     this.background = this.root.rect(this.width, this.height).fill(this.bgColor);
     if (this.nested) {
-      this.dragBox = this.workspace.root.rect(10, 10).stroke({ color: this.borderColor, opacity: 1, width: 1 }).fill('#369E58').radius(1).move(-5, -5);
-      this.resizeBox = this.workspace.root.rect(10, 10).stroke({ color: this.borderColor, opacity: 1, width: 1 }).fill('#808080').radius(1).move(this.width-5, this.height-5);
-      this.border = this.workspace.root.rect(this.width, this.height).stroke({ color: this.borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
+      this.dragBox = this.workspace.root.rect(10, 10)
+                         .stroke({ color: this.borderColor, opacity: 1, width: 1 })
+                         .fill(this.dragBoxColor).radius(1).move(-5, -5);
+      this.resizeBox = this.workspace.root.rect(10, 10)
+                         .stroke({ color: this.borderColor, opacity: 1, width: 1 })
+                         .fill(this.resizeBoxColor).radius(1).move(this.width-5, this.height-5);
+      this.border = this.workspace.root.rect(this.width, this.height)
+                        .stroke({ color: this.borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
       this.container.add(this.border);
       this.container.add(this.dragBox);
       this.container.add(this.resizeBox);
@@ -115,6 +117,7 @@ BB.Workspace.prototype.render = function() {
       };
     }
     this.childContainer.pannable(this ,null ,[this.background], [this.background]);
+    this.childContainer.scalable(this ,null ,[this.background]);
 	}
 };
 BB.Workspace.prototype.toScale = function(scale) {
@@ -141,3 +144,27 @@ BB.Workspace.prototype.resize = function(width, height) {
   this.background.size(width, height);
   this.resizeBox.move(this.width-5, this.height-5);
 };
+
+/**
+ * Zooming the workspace centered in (x,y) coordinate with zooming in or out.
+ * @param {!number} x X coordinate of center.
+ * @param {!number} Y coordinate of center.
+ * @param {!number} type Type of zomming (-1 zooming out and 1 zooming in).
+ */
+BB.Workspace.prototype.zoom  = function(x ,y , type) {
+  var speed = this.scaleSpeed;
+  var center = this.root.node.createSVGPoint();
+  center.x = x;
+  center.y = y;
+  center = center.matrixTransform(this.childContainer.node.getCTM().inverse());
+  var x = center.x;
+  var y = center.y;
+  // scale factor
+  var dScale = (type == 1)?speed:1/speed;
+  var matrix = this.childContainer.node.getCTM().translate(-(x*(dScale-1)),-(y*(dScale-1))).scale(dScale);
+  // validate if scale is in a valid range
+  if (matrix.a >= this.minScale && matrix.a <= this.maxScale) {
+    this.toScale(matrix.a);
+    this.childContainer.move(matrix.e, matrix.f);
+  }
+}
