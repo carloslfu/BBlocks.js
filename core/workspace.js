@@ -97,7 +97,8 @@ BB.Workspace.prototype.render = function() {
     }
     this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspace
     this.childContainer = this.root.group();
-    this.childContainer.add(this.root.text(this.level + ''));
+    this.text = this.root.text(this.level + '');
+    this.childContainer.add(this.text);
     for (var i = 0; i < this.children.length; i++) {
       this.children[i].render();
       this.childContainer.add(this.children[i].container);
@@ -116,8 +117,8 @@ BB.Workspace.prototype.render = function() {
         el.toTopPropagate(); //focus workspace
       };
     }
-    this.childContainer.pannable(this ,null ,[this.background], [this.background]);
-    this.childContainer.scalable(this ,null ,[this.background]);
+    this.childContainer.pannable(this ,null ,[this.background, this.text], [this.background]);
+    this.childContainer.scalable(this ,null ,[this.background, this.text]);
 	}
 };
 BB.Workspace.prototype.toScale = function(scale) {
