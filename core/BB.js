@@ -10,15 +10,30 @@ BB.Object = function(type) {
   this.level = 0; //level of nesting 0 - main Object
 };
 
-BB.Object.prototype.add = function(type, name, options) {
-	switch(type) {
-    case 'Block':
-      break;
-    case 'Workspace':
-      this.children.push(new BB.Workspace(name, this, options));
-      this.children[this.children.length-1].level = this.level + 1;
-      return this.children[this.children.length-1];
+BB.Object.prototype.addWorkspace = function(name, options) {
+  if (this.type == 'Block') {
+    throw 'Blocks can\'t have Workspaces attached';
+    return; //blocks can't have Workspaces attached
   }
+  this.children.push(new BB.Workspace(name, this, options));
+  this.children[this.children.length-1].level = this.level + 1;
+  if (this.childAdded) {
+    this.childAdded(this.children[this.children.length-1]); //callback
+  }
+  return this.children[this.children.length-1];
+};
+
+BB.Object.prototype.addBlock = function(block) {
+  if (this.type == 'Block') {
+    throw 'Blocks can\'t have Workspaces attached';
+    return; //blocks can't have Workspaces attached
+  }
+  this.children.push(block);
+  this.children[this.children.length-1].workspace = this;
+  if (this.childAdded) {
+    this.childAdded(this.children[this.children.length-1]); //callback
+  }
+  return this.children[this.children.length-1];
 };
 
 //this object to top of this parent Workspace

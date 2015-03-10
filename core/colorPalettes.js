@@ -1,3 +1,5 @@
+//default palettes
+
 BB.colorPalettes = {
 	workspace: {
 		light: {
@@ -24,5 +26,13 @@ BB.colorPalettes = {
 		  dragBoxColor: '#369E58',
 		  resizeBoxColor: '#F0A509'
 		}
-	}
+	},
+  block: {
+    light: {
+      background: '#1DA53C'
+    },
+    dark: {
+      background: '#14925C'
+    }
+  }
 };

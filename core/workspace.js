@@ -30,9 +30,6 @@ BB.Workspace = function(name, workspace, options) {
     //default options
 		return;
 	}
-	if (options.render) {
-    this.render();
-  }
   if (options.width) {
     this.width = options.width;
   }
@@ -51,6 +48,9 @@ BB.Workspace = function(name, workspace, options) {
   if (options.colorPalette) {
     this.colorPalette = options.colorPalette;
   }
+	if (options.render) {
+    this.render();
+  }
 };
 
 // Workspace inerits from Object
@@ -59,14 +59,13 @@ BB.Workspace.prototype.constructor = BB.Workspace;
 
 BB.Workspace.prototype.render = function() {
 	if (!this.rendered) {
-		this.rendered = true;
-		// allows nested workspaces
+    // allows nested workspaces
     this.nested =!(typeof(this.workspace) === 'string');
     if (this.nested) {
       this.container = this.workspace.root.group();
-      this.container.move(this.x, this.y); //poition of nested workspace
+      this.container.move(this.x, this.y); //position of nested workspace
     }
-		this.root = this.nested ? this.container.nested() : SVG(this.workspace).fixSubPixelOffset();
+    this.root = this.nested ? this.container.nested() : SVG(this.workspace).fixSubPixelOffset();
     this.root.size(this.width, this.height);
     if (!this.colorPalette) {
       this.colorPalette = BB.colorPalettes.workspace.light; //default palette
@@ -79,6 +78,7 @@ BB.Workspace.prototype.render = function() {
     if (this.stylingFunction) {
       this.stylingFunction();
     }
+    // render elements
     this.background = this.root.rect(this.width, this.height).fill(this.bgColor);
     if (this.nested) {
       this.dragBox = this.workspace.root.rect(10, 10)
@@ -100,12 +100,13 @@ BB.Workspace.prototype.render = function() {
     this.text = this.root.text(this.level + '');
     this.childContainer.add(this.text);
     for (var i = 0; i < this.children.length; i++) {
-      this.children[i].render();
-      this.childContainer.add(this.children[i].container);
+      if (!this.children[i].rendered) {
+        this.children[i].render();
+      }
     }
     if (this.nested) {
-      this.container.draggable(this.workspace ,null ,[this.dragBox, this.border]);
-      this.container.resizable(this ,null ,[this.resizeBox]);
+      this.container.draggable(this.workspace, null, [this.dragBox, this.border]);
+      this.container.resizable(this, null, [this.resizeBox]);
       var el = this; //for the next closure
       this.container.dragstart = function() {
         el.toTopPropagate(); //focus workspace
@@ -116,10 +117,24 @@ BB.Workspace.prototype.render = function() {
       this.childContainer.panstart = function() {
         el.toTopPropagate(); //focus workspace
       };
+      this.workspace.childContainer.add(this.container);
     }
-    this.childContainer.pannable(this ,null ,[this.background, this.text], [this.background]);
-    this.childContainer.scalable(this ,null ,[this.background, this.text]);
-	}
+    this.childContainer.pannable(this, null, [this.background, this.text], [this.background]);
+    this.attachScalable = [this.background, this.text];
+    for (var i = 0; i < this.children.length; i++) {
+      if (this.children[i].type == 'Block') {
+        this.attachScalable.push(this.children[i]);
+      }
+    };
+    this.childContainer.scalable(this, null, this.attachScalable);
+		this.rendered = true;
+  }
+};
+BB.Workspace.prototype.childRendered = function(child) {
+  if (child.type == 'Block') {
+    this.attachScalable.push(child.container);
+    this.childContainer.scalable(this, null, this.attachScalable);
+  }
 };
 BB.Workspace.prototype.toScale = function(scale) {
   var dScale = scale/this.scale;
