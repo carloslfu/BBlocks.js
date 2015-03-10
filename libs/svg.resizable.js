@@ -88,7 +88,12 @@
           /* caculate new position [with rotation correction] */
           dx = (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionResize.zoom;
           dy = (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionResize.zoom;
-          
+          if (width + dx < 0) {
+            dx = 0;
+          }
+          if (height + dy < 0) {
+            dy = 0;
+          }
           /* move the element to its new position, if possible by constraint */
           if (typeof constraint === 'function') {
             var coord = constraint(x, y)
