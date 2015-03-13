@@ -10,12 +10,22 @@ BB.Object = function(type) {
   this.level = 0; //level of nesting 0 - main Object
 };
 
-BB.Object.prototype.addWorkspace = function(name, options) {
+BB.Object.prototype.addWorkspace = function(workspace, options) {
   if (this.type == 'Block') {
     throw 'Blocks can\'t have Workspaces attached';
     return; //blocks can't have Workspaces attached
   }
-  this.children.push(new BB.Workspace(name, this, options));
+  if (typeof(workspace) == 'string') {
+    this.children.push(new BB.Workspace(workspace, this, options));
+  } else if (typeof(workspace) == 'object'){
+    if (workspace.type != 'Workspace') {
+      throw 'The type of object must be Workspace';
+      return;
+    }
+    this.children.push(workspace);
+  } else {
+    throw 'This function only receives workspace name or Workspace object';
+  }
   this.children[this.children.length-1].level = this.level + 1;
   if (this.childAdded) {
     this.childAdded(this.children[this.children.length-1]); //callback
@@ -24,9 +34,9 @@ BB.Object.prototype.addWorkspace = function(name, options) {
 };
 
 BB.Object.prototype.addBlock = function(block) {
-  if (this.type == 'Block') {
-    throw 'Blocks can\'t have Workspaces attached';
-    return; //blocks can't have Workspaces attached
+  if (block.type != 'Block') {
+    throw 'The type of object must be Block';
+    return;
   }
   this.children.push(block);
   this.children[this.children.length-1].workspace = this;
