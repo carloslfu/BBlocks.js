@@ -3,17 +3,17 @@
 
 // custom block tests
 
-var test_blocks = {};
+var example_blocks = {};
 
 // Block inerits from Object
-test_blocks.test = function(id){
+example_blocks.test = function(id){
   BB.Block.call(this, "Block");
   this.id = id;
 };
 
-test_blocks.test.prototype = Object.create(BB.Block.prototype);
+example_blocks.test.prototype = Object.create(BB.Block.prototype);
 
-test_blocks.test.prototype.init = function(){
+example_blocks.test.prototype.init = function(){
   //TODO: make the field prototype
   var textFields = [];
   textFields[1] = this.workspace.root.text('print').font({
