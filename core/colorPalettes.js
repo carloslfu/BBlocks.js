@@ -29,10 +29,16 @@ BB.colorPalettes = {
 	},
   block: {
     light: {
-      background: '#1DA53C'
+      background: '#1DA53C',
+      border: '#000',
+      shadowColor: 'rgba(29, 95, 44, 0.75)',
+      lightColor: 'rgb(70, 204, 101)'
     },
     dark: {
-      background: '#14925C'
+      background: '#14925C',
+      border: '#fff',
+      shadowColor: 'rgba(20, 146, 92, 0.81)',
+      lightColor: '#25c17e'
     }
   }
 };
