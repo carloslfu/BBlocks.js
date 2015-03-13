@@ -1,4 +1,4 @@
-var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1;
+var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2;
 var main = function() {
 	mainWorkspace = new BB.Workspace('main', 'mainWorkspaceDiv');
 	nested1 = mainWorkspace.addWorkspace('nested1', {width : 300, height: 300, x: 10, y: 10});
@@ -11,12 +11,16 @@ var main = function() {
 	nested221 = nested22.addWorkspace('nested221', {width : 30, height: 30, x: 10, y: 10});
 
 	//BB.Workspace.prototype.colorPalette = BB.colorPalettes.workspace.dark;
+	//BB.Block.prototype.colorPalette = BB.colorPalettes.block.dark;
 	// alternate color palette for workspace backgrounds
 	BB.Workspace.prototype.stylingFunction = function() {
 		this.bgColor = this.colorPalette.background[(this.level % 2 == 1) ? 'nested' : 'main'];
 	};
 	mainWorkspace.render();
-	block1 = mainWorkspace.addBlock(test_blocks.test);
+	block1 = mainWorkspace.addBlock(new test_blocks.test('Bloque1'));
 	block1.render();
 	block1.container.move(700, 100);
+    block2 = nested2.addBlock(new test_blocks.test('Bloque2'));
+	block2.render();
+	block2.container.move(50, 50);
 };

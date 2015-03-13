@@ -2,7 +2,8 @@
 
 //A workspace is an SVG document that can contain Blocks or Workspaces
 BB.Workspace = function(name, workspace, options) {
-	this.name = name;
+  BB.Object.call(this, 'Workspace');
+  this.name = name;
   this.children = [];
   this.width = '100%';
   this.height = '100%';
@@ -54,8 +55,7 @@ BB.Workspace = function(name, workspace, options) {
 };
 
 // Workspace inerits from Object
-BB.Workspace.prototype = new BB.Object("Workspace");
-BB.Workspace.prototype.constructor = BB.Workspace;
+BB.Workspace.prototype = Object.create(BB.Object.prototype);
 
 BB.Workspace.prototype.render = function() {
 	if (!this.rendered) {
@@ -66,7 +66,7 @@ BB.Workspace.prototype.render = function() {
       this.container.move(this.x, this.y); //position of nested workspace
     }
     this.root = this.nested ? this.container.nested() : SVG(this.workspace).fixSubPixelOffset();
-    this.root.size(this.width, this.height);
+    this.root.size(this.width, this.height); 
     if (!this.colorPalette) {
       this.colorPalette = BB.colorPalettes.workspace.light; //default palette
     }

@@ -61,3 +61,19 @@ function mouseToSvg(e, node) {
   return convertCoordinates(e.clientX + scrollX,
                                     e.clientY + scrollY, true, node);
 };
+
+// Extend an existing object with a method from another - Mixin pattern
+function mixin(receivingClass, givingClass) {
+  //only provide certain methods
+  if (arguments[2]) {
+    for (var i = 2, len = arguments.length; i < len; i++) {
+      receivingClass.prototype[arguments[i]] = givingClass.prototype[arguments[i]];
+    }
+  } else { //provide all methods
+    for (var methodName in givingClass.prototype) {
+      if (!Object.hasOwnProperty.call(receivingClass.prototype, methodName)) {
+        receivingClass.prototype[methodName] = givingClass.prototype[methodName];
+      }
+    }
+  }
+};
