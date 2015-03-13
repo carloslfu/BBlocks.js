@@ -57,8 +57,8 @@
         }
         
         /* add while and end events to window */
-        window.addEventListener('pointermove', resize);
-        window.addEventListener('pointerup', endResize);
+        PolymerGestures.addEventListener(window, 'track', resize);
+        PolymerGestures.addEventListener(window, 'up', endResize);
         
         /* invoke any callbacks */
         if (element.resizestart)
@@ -146,27 +146,27 @@
         element.startPositionResize = null
 
         /* remove while and end events to window */
-        window.removeEventListener('pointermove', resize);
-        window.removeEventListener('pointerup', endResize);
+        PolymerGestures.removeEventListener(window, 'track', resize);
+        PolymerGestures.removeEventListener(window, 'up', endResize);
 
         /* invoke any callbacks */
         if (element.resizeend)
-          element.resizeend(delta, event)
+          element.resizeend(delta, event);
         event.stopPropagation();
       }
       
       /* bind mousedown event */
       attachToEls.forEach(function(el) {
-        el.node.addEventListener('pointerdown', startResize);
+        PolymerGestures.addEventListener(el.node, 'down', startResize);
       });
       
       /* disable resizable */
       element.fixedResize = function() {
         attachToEls.forEach(function(el) {
-          el.node.removeEventListener('pointerdown', startResize);
+          PolymerGestures.removeEventListener(el.node, 'down', startResize);
         });
-        window.removeEventListener('pointermove', resize);
-        window.removeEventListener('pointerup', endResize);
+        PolymerGestures.removeEventListener(window, 'track', resize);
+        PolymerGestures.removeEventListener(window, 'up', endResize);
         
         startResize = resize = endResize = null
         

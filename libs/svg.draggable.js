@@ -60,8 +60,8 @@
         }
         
         /* add while and end events to window */
-        window.addEventListener('pointermove', drag);
-        window.addEventListener('pointerup', endDrag);
+        PolymerGestures.addEventListener(window, 'track', drag);
+        PolymerGestures.addEventListener(window, 'up', endDrag);
         
         /* invoke any callbacks */
         if (element.dragstart)
@@ -144,8 +144,8 @@
         element.startPositionDrag = null
 
         /* remove while and end events to window */
-        window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', endDrag);
+        PolymerGestures.removeEventListener(window, 'track', drag);
+        PolymerGestures.removeEventListener(window, 'up', endDrag);
 
         /* invoke any callbacks */
         if (element.dragend)
@@ -155,16 +155,16 @@
       
       /* bind mousedown event */
       attachToEls.forEach(function(el) {
-        el.node.addEventListener('pointerdown', startDrag);
+        PolymerGestures.addEventListener(el.node, 'down', startDrag);
       });
       
       /* disable draggable */
       element.fixedDrag = function() {
         attachToEls.forEach(function(el) {
-          el.node.removeEventListener('pointerdown', startDrag);
+          PolymerGestures.removeEventListener(el.node, 'down', startDrag);
         });
-        window.removeEventListener('pointermove', drag);
-        window.removeEventListener('pointerup', endDrag);
+        PolymerGestures.removeEventListener(window, 'track', drag);
+        PolymerGestures.removeEventListener(window, 'up', endDrag);
         
         startDrag = drag = endDrag = null
         
