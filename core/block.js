@@ -80,9 +80,10 @@ BB.Block.prototype.render = function() {
   }
   if (!this.rendered) {
     this.init(); // attributes of Block
-    this.initSvg(); // compute graphics for rendering
+    //needs create container before initSVG, because it render the fields
     this.container = this.workspace.root.group();
     this.container.move(this.x, this.y);
+    this.initSvg(); // compute graphics for rendering
     if (!this.colorPalette) {
       this.colorPalette = BB.colorPalettes.block.light; //default palette
     }
@@ -97,7 +98,7 @@ BB.Block.prototype.render = function() {
     //render block - render fields and all block svg
     this.renderBlock_();
     // render children
-    this.childContainer = this.workspace.root.group();
+    this.childContainer = this.workspace.root.group(); 
     for (var i = 0; i < this.children.length; i++) {
       this.children[i].render();
       this.childContainer.add(this.children[i].container);
@@ -106,10 +107,10 @@ BB.Block.prototype.render = function() {
     this.container.add(this.rootLight);
     this.container.add(this.root);
     this.container.add(this.childContainer);
-    // add fields to container
+    // add fields to top of container
     for (var i = 0; i < this.fields.length; i++) {
       if (typeof(this.fields[i]) == 'object') {
-        this.container.add(this.fields[i]);
+        this.fields[i].toTop();
       }
     }
     this.attachDraggable.push(this.rootDark);
@@ -170,8 +171,9 @@ BB.Block.prototype.initSvg = function() {
           throw 'Unknown width type';
       }
     } else {
-      box = this.fields[i].bbox();
-      this.fields[i].move(metrics.width, metrics.y); // position of field
+      this.fields[i].render();
+      box = this.fields[i].root.bbox();
+      this.fields[i].root.move(metrics.width, metrics.y); // position of field
       metrics.width += box.width + this.metrics.fieldSpace;
       maxHeight = Math.max(maxHeight, box.height);
     }
@@ -208,7 +210,7 @@ BB.Block.prototype.initSvg = function() {
   }
   // compute heights
   var height, lastWidth = this.metrics.rows[0].width;
-  this.metrics.rows[0].lastRadius = 'convex';
+  this.metrics.rows[0].lastRadius = 'plane';
   for (i = 1; i < this.metrics.rows.length; i++) {
     height = this.metrics.rows[i].height;
     if (lastWidth < this.metrics.rows[i].width) {
@@ -245,7 +247,6 @@ BB.Block.prototype.renderBlock_ = function() {
   for (var i = 1; i < this.metrics.rows.length - 1 ; i++) {
     row = this.metrics.rows[i];
     height = row.y;
-    //height = substractRadius(height, row);
     height -= radius;
     if (row.lastRadius == 'convex') {
       this.root.q({x: 0, y: radius}, {x: radius, y: radius})
