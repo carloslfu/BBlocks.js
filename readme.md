@@ -16,10 +16,10 @@ A [live demo][livedemo].
 - SVG based (uses [SVG.js][svgjs-git]).
 - Scalable, resizable and pannabble workspaces.
 - All is nestable.
+- Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
 
 ## Features that will be implemented
 
-- Pointer Gestures (zoom, pan, hold ...).
 - SVG text field.
 - SVG contextmenu.
 - Custom menus.
@@ -28,3 +28,4 @@ A [live demo][livedemo].
 [blocklify-git]: https://github.com/carloslfu/blocklify
 [pep-git]: https://github.com/jquery/PEP
 [svgjs-git]: https://github.com/wout/svg.js
+[polymer-gestures-git]:https://github.com/Polymer/polymer-gestures
