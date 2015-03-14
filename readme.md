@@ -12,11 +12,10 @@ A [live demo][livedemo].
 
 ## Features
 
-- PointerEvents support (uses [PEP][pep-git] polyfills).
+- Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
 - SVG based (uses [SVG.js][svgjs-git]).
 - Scalable, resizable and pannabble workspaces.
 - All is nestable.
-- Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
 
 ## Features that will be implemented
 
