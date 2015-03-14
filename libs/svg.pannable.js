@@ -61,9 +61,6 @@
           , rotation: element.transform('rotation') * Math.PI / 180
           }
         });
-        /* add while and end events to window */
-        PolymerGestures.addEventListener(window, 'track', pan);
-        PolymerGestures.addEventListener(window, 'up', endPan);
         
         /* invoke any callbacks */
         if (element.panstart)
@@ -150,10 +147,6 @@
         element.startEventPan    = null
         element.startPositionsPan = null
 
-        /* remove while and end events to window */
-        PolymerGestures.removeEventListener(window, 'track', pan);
-        PolymerGestures.removeEventListener(window, 'up', endPan);
-
         /* invoke any callbacks */
         if (element.panend)
           element.panend(delta, event)
@@ -162,17 +155,22 @@
       
       /* bind mousedown event */
       attachToEls.forEach(function(el) {
-        PolymerGestures.addEventListener(el.node, 'down', startPan);
+        PolymerGestures.addEventListener(el.node, 'trackstart', startPan);
+        PolymerGestures.addEventListener(el.node, 'track', pan);
+        PolymerGestures.addEventListener(el.node, 'trackend', endPan);
+        //fix pointerdown event (down in PolymerGestures)
+        PolymerGestures.addEventListener(el.node, 'down', function(e){
+          e.preventDefault(); // don't select text with mouse
+        });
       });
       
       /* disable panable */
       element.fixedPan = function() {
         attachToEls.forEach(function(el) {
-          PolymerGestures.removeEventListener(el.node, 'down', startPan);
+          PolymerGestures.removeEventListener(el.node, 'trackstart', startPan);
+          PolymerGestures.removeEventListener(el.node, 'track', pan);
+          PolymerGestures.removeEventListener(el.node, 'trackend', endPan);
         });
-        
-        PolymerGestures.removeEventListener(window, 'track', pan);
-        PolymerGestures.removeEventListener(window, 'up', endPan);
         
         startPan = pan = endPan = null
         

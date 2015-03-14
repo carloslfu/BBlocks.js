@@ -59,10 +59,6 @@
         , rotation: element.transform('rotation') * Math.PI / 180
         }
         
-        /* add while and end events to window */
-        PolymerGestures.addEventListener(window, 'track', drag);
-        PolymerGestures.addEventListener(window, 'up', endDrag);
-        
         /* invoke any callbacks */
         if (element.dragstart)
           element.dragstart({ x: 0, y: 0, zoom: element.startPositionDrag.zoom }, event)
@@ -143,10 +139,6 @@
         element.startEventDrag    = null
         element.startPositionDrag = null
 
-        /* remove while and end events to window */
-        PolymerGestures.removeEventListener(window, 'track', drag);
-        PolymerGestures.removeEventListener(window, 'up', endDrag);
-
         /* invoke any callbacks */
         if (element.dragend)
           element.dragend(delta, event)
@@ -155,16 +147,22 @@
       
       /* bind mousedown event */
       attachToEls.forEach(function(el) {
-        PolymerGestures.addEventListener(el.node, 'down', startDrag);
+        PolymerGestures.addEventListener(el.node, 'trackstart', startDrag);
+        PolymerGestures.addEventListener(el.node, 'track', drag);
+        PolymerGestures.addEventListener(el.node, 'trackend', endDrag);
+        //fix pointerdown event (down in PolymerGestures)
+        PolymerGestures.addEventListener(el.node, 'down', function(e){
+          e.preventDefault(); // don't select text with mouse
+        });
       });
       
       /* disable draggable */
       element.fixedDrag = function() {
         attachToEls.forEach(function(el) {
-          PolymerGestures.removeEventListener(el.node, 'down', startDrag);
+          PolymerGestures.removeEventListener(el.node, 'trackstart', startDrag);
+          PolymerGestures.removeEventListener(el.node, 'track', drag);
+          PolymerGestures.removeEventListener(el.node, 'trackend', endDrag);
         });
-        PolymerGestures.removeEventListener(window, 'track', drag);
-        PolymerGestures.removeEventListener(window, 'up', endDrag);
         
         startDrag = drag = endDrag = null
         

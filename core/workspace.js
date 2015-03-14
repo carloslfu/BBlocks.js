@@ -167,8 +167,8 @@ BB.Workspace.prototype.resize = function(width, height) {
  * @param {!number} Y coordinate of center.
  * @param {!number} type Type of zomming (-1 zooming out and 1 zooming in).
  */
-BB.Workspace.prototype.zoom  = function(x ,y , type) {
-  var speed = this.scaleSpeed;
+BB.Workspace.prototype.zoom  = function(x ,y , type, delta) {
+  var speed = this.scaleSpeed, dScale;
   var center = this.root.node.createSVGPoint();
   center.x = x;
   center.y = y;
@@ -176,7 +176,11 @@ BB.Workspace.prototype.zoom  = function(x ,y , type) {
   var x = center.x;
   var y = center.y;
   // scale factor
-  var dScale = (type == 1)?speed:1/speed;
+  if (delta){
+    dScale = delta;
+  } else {
+    dScale = (type == 1)?speed:1/speed;
+  }
   var matrix = this.childContainer.node.getCTM().translate(-(x*(dScale-1)),-(y*(dScale-1))).scale(dScale);
   // validate if scale is in a valid range
   if (matrix.a >= this.minScale && matrix.a <= this.maxScale) {

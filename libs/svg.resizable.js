@@ -56,10 +56,6 @@
         , rotation: element.transform('rotation') * Math.PI / 180
         }
         
-        /* add while and end events to window */
-        PolymerGestures.addEventListener(window, 'track', resize);
-        PolymerGestures.addEventListener(window, 'up', endResize);
-        
         /* invoke any callbacks */
         if (element.resizestart)
           element.resizestart({ x: 0, y: 0, zoom: element.startPositionResize.zoom }, event)
@@ -145,10 +141,6 @@
         element.startEventResize    = null
         element.startPositionResize = null
 
-        /* remove while and end events to window */
-        PolymerGestures.removeEventListener(window, 'track', resize);
-        PolymerGestures.removeEventListener(window, 'up', endResize);
-
         /* invoke any callbacks */
         if (element.resizeend)
           element.resizeend(delta, event);
@@ -157,16 +149,22 @@
       
       /* bind mousedown event */
       attachToEls.forEach(function(el) {
-        PolymerGestures.addEventListener(el.node, 'down', startResize);
+        PolymerGestures.addEventListener(el.node, 'trackstart', startResize);
+        PolymerGestures.addEventListener(el.node, 'track', resize);
+        PolymerGestures.addEventListener(el.node, 'trackend', endResize);
+        //fix pointerdown event (down in PolymerGestures)
+        PolymerGestures.addEventListener(el.node, 'down', function(e){
+          e.preventDefault(); // don't select text with mouse
+        });
       });
       
       /* disable resizable */
       element.fixedResize = function() {
         attachToEls.forEach(function(el) {
-          PolymerGestures.removeEventListener(el.node, 'down', startResize);
+          PolymerGestures.removeEventListener(el.node, 'trackstart', startResize);
+          PolymerGestures.removeEventListener(el.node, 'track', resize);
+          PolymerGestures.removeEventListener(el.node, 'trackend', endResize);
         });
-        PolymerGestures.removeEventListener(window, 'track', resize);
-        PolymerGestures.removeEventListener(window, 'up', endResize);
         
         startResize = resize = endResize = null
         
