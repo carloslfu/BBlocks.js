@@ -5,8 +5,8 @@
 var test_blocks = {};
 
 // Block inerits from Object
-test_blocks.test = function(id){
-  BB.Block.call(this, "Block");
+test_blocks.test = function(id, options){
+  BB.Block.call(this, "Block", options);
   this.id = id;
 };
 
