@@ -12,10 +12,10 @@ A [live demo][livedemo].
 
 ## Features
 
-- Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
 - SVG based (uses [SVG.js][svgjs-git]).
-- Scalable, resizable and pannabble workspaces.
 - All is nestable.
+- Zoomable, resizable and pannabble workspaces.
+- Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
 
 ## Features that will be implemented
 
