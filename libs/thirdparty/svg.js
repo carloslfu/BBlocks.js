@@ -1265,13 +1265,13 @@
         
         /* ... otherwise continue as a setter */
         var transform = []
+        var bbox = this.bbox(); // keeps bbox after change this.trans beacuse this is use in the compute of bbox
         
         /* parse matrix */
         o = parseMatrix(o)
         
         /* merge values */
         for (v in o)
-          if (o[v] != null)
             this.trans[v] = o[v]
         
         /* compile matrix */
@@ -1291,8 +1291,10 @@
         
         /* add rotation */
         if (o.rotation != 0)
-          transform.push('rotate(' + o.rotation + ' ' + (o.cx == null ? this.bbox().cx : o.cx) + ' ' + (o.cy == null ? this.bbox().cy : o.cy) + ')')
-        
+          transform.push('rotate(' + o.rotation + ' ' + (o.cx == null ? bbox.cx : o.cx) + ' ' + (o.cy == null ? bbox.cy : o.cy) + ')')
+        // update center
+        o.cx = o.cx == null ? bbox.cx : o.cx;
+        o.cy = o.cy == null ? bbox.cy : o.cy;
         /* add scale */
         if (o.scaleX != 1 || o.scaleY != 1)
           transform.push('scale(' + o.scaleX + ' ' + o.scaleY + ')')
