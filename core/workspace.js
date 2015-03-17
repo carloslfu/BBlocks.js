@@ -4,7 +4,6 @@
 BB.Workspace = function(name, workspace, options) {
   BB.Object.call(this, 'Workspace');
   this.name = name;
-  this.children = [];
   this.width = '100%';
   this.height = '100%';
   this.x = 0;
@@ -13,6 +12,8 @@ BB.Workspace = function(name, workspace, options) {
   this.childContainer = null; // svg group that contains all childrens
   this.absoluteScale = 1;
   this.scale = 1;
+  this.absoluteRotation = 0;
+  this.rotation = 0;
   this.border = null;
   this.background = null;
   this.dragBox = null;
@@ -20,6 +21,12 @@ BB.Workspace = function(name, workspace, options) {
   this.scaleSpeed = 1.2;
   this.minScale = 0.3;
   this.maxScale = 10;
+  this.offsetX = 0; // offset with the svg root
+  this.offsetY = 0;
+  this.offsetX2 = 0;
+  this.offsetY2 = 0;
+  this.centerOffsetX = 0;
+  this.centerOffsetY = 0;
 	if (!workspace) {
 		return;
 	}
@@ -58,7 +65,7 @@ BB.Workspace = function(name, workspace, options) {
 BB.Workspace.prototype = Object.create(BB.Object.prototype);
 
 BB.Workspace.prototype.render = function() {
-	if (!this.rendered) {
+  if (!this.rendered) {
     // allows nested workspaces
     this.nested =!(typeof(this.workspace) === 'string');
     if (this.nested) {
@@ -95,17 +102,18 @@ BB.Workspace.prototype.render = function() {
     } else {
       this.root.attr('style', 'border: 1px solid ' + this.borderColor + ';');
     }
-    this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspace
+    this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspaces
     this.childContainer = this.root.group();
     this.text = this.root.text(this.level + '');
+    this.children.push({container: this.text});
     this.childContainer.add(this.text);
     for (var i = 0; i < this.children.length; i++) {
-      if (!this.children[i].rendered) {
+      if (!this.children[i].rendered && this.children[i].render) {
         this.children[i].render();
       }
     }
     if (this.nested) {
-      this.container.draggable(this.workspace, null, [this.dragBox, this.border]);
+      this.container.draggable(this, null, [this.dragBox, this.border]);
       this.container.resizable(this, null, [this.resizeBox]);
       var el = this; //for the next closure
       this.container.dragstart = function() {
@@ -119,7 +127,8 @@ BB.Workspace.prototype.render = function() {
       };
       this.workspace.childContainer.add(this.container);
     }
-    this.childContainer.pannable(this, null, [this.background, this.text], [this.background]);
+    this.attachPannable = [this.background, this.text];
+    this.childContainer.pannable(this, null, this.attachPannable, [this.background]);
     this.attachScalable = [this.background, this.text];
     for (var i = 0; i < this.children.length; i++) {
       if (this.children[i].type == 'Block') {
@@ -127,7 +136,14 @@ BB.Workspace.prototype.render = function() {
       }
     };
     this.childContainer.scalable(this, null, this.attachScalable);
-		this.rendered = true;
+    this.rendered = true;
+    if (this.nested) {
+      var bbox = this.container.bbox();
+      this.offsetX = this.x - bbox.x;
+      this.offsetY = this.y - bbox.y;
+      this.offsetX2 = this.x + this.height + this.offsetX - bbox.x2;
+      this.offsetY2 = this.y + this.width + this.offsetY - bbox.y2;
+    }
   }
 };
 BB.Workspace.prototype.childRendered = function(child) {
@@ -137,18 +153,16 @@ BB.Workspace.prototype.childRendered = function(child) {
   }
 };
 BB.Workspace.prototype.toScale = function(scale) {
-  var dScale = scale/this.scale;
+  var fScale = scale/this.scale;
   this.childContainer.scale(scale);
   this.scale = scale;
-  this.notifyScaling(dScale);
+  this.notifyScaling(fScale);
 };
-BB.Workspace.prototype.notifyScaling = function(dScale) { // this should be only for workspaces - last TODO
-  this.absoluteScale *= dScale;
-  this.absoluteScale = this.absoluteScale; // set absoluteScale to svg.js context for pannable elements
-  var absoluteScale = this.absoluteScale; // keeps absoluteScale for the closure
+BB.Workspace.prototype.notifyScaling = function(fScale) {
+  this.absoluteScale *= fScale; // set absoluteScale to svg.js context for pannable elements
   this.children.forEach(function(el) {
     if (el.type == 'Workspace') { //only notify the workspaces
-      el.notifyScaling(dScale);
+      el.notifyScaling(fScale);
     }
   });
 };
