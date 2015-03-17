@@ -107,7 +107,7 @@
                     child.y(typeof coord.y === 'number' ? coord.y : y)
 
                 } else if (typeof coord === 'boolean' && coord) {
-                  child.container.move(x, y)
+                  child.move(x, y)
                 }
 
               } else if (typeof constraint === 'object') {
@@ -122,7 +122,7 @@
                 else if (constraint.maxY != null && y > constraint.maxY - height)
                   y = constraint.maxY - height
 
-                child.container.move(x, y)          
+                child.move(x, y)
               }
 
               /* invoke any callbacks */
