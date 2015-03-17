@@ -34,15 +34,15 @@
 
         /* get children bounding boxes */
         element.startPositionsPan = [];
-        element.each(function (i, children) {
-          var child = this;
+        for (var i = 0; i < context.children.length; i++) {
+          var child = context.children[i].container;
           var box = child.bbox()
           
-          if (child instanceof SVG.G) {
+          if (child.container instanceof SVG.G) {
             box.x = child.x()
             box.y = child.y()
             
-          } else if (child instanceof SVG.Nested) {
+          } else if (child.container instanceof SVG.Nested) {
             box = {
               x:      child.x()
             , y:      child.y()
@@ -58,10 +58,12 @@
           , width:    box.width
           , height:   box.height
           , zoom:     context.absoluteScale
-          , rotation: element.transform('rotation') * Math.PI / 180
+          , rotation: context.absoluteRotation * Math.PI / 180
           }
-        });
-        
+          if (context.children[i].absoluteRotation) {
+            element.startPositionsPan[i].rotation = context.children[i].absoluteRotation * Math.PI / 180;
+          }
+        }
         /* invoke any callbacks */
         if (element.panstart)
           element.panstart({zoom: element.startPositionsPan}, event)
@@ -77,9 +79,9 @@
         
         if (element.startEventPan) {
           /* calculate move position for all children*/
-          element.each(function (i, children) {
+          for (var i = 0; i < context.children.length; i++) {
             if (exceptions.indexOf(this) == -1) {
-              var child = this;
+              var child = context.children[i];
               var x, y
                 , rotation  = element.startPositionsPan[i].rotation
                 , width     = element.startPositionsPan[i].width
@@ -91,7 +93,7 @@
                   }
               
               /* caculate new position [with rotation correction] */
-              x = element.startPositionsPan[i].x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionsPan[i].zoom;
+              x = element.startPositionsPan[i].x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation)) / element.startPositionsPan[i].zoom;
               y = element.startPositionsPan[i].y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionsPan[i].zoom;
               
               /* move the child to its new position, if possible by constraint */
@@ -105,7 +107,7 @@
                     child.y(typeof coord.y === 'number' ? coord.y : y)
 
                 } else if (typeof coord === 'boolean' && coord) {
-                  child.move(x, y)
+                  child.container.move(x, y)
                 }
 
               } else if (typeof constraint === 'object') {
@@ -120,14 +122,14 @@
                 else if (constraint.maxY != null && y > constraint.maxY - height)
                   y = constraint.maxY - height
 
-                child.move(x, y)          
+                child.container.move(x, y)          
               }
 
               /* invoke any callbacks */
               if (element.panmove)
                 element.panmove(delta, event)
             }
-          });
+          }
         }
         event.stopPropagation();
       }

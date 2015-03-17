@@ -55,8 +55,8 @@
         , y:        box.y
         , width:    box.width
         , height:   box.height
-        , zoom:     context.absoluteScale
-        , rotation: element.transform('rotation') * Math.PI / 180
+        , zoom:     context.workspace.absoluteScale
+        , rotation: context.absoluteRotation * Math.PI / 180
         }
         
         /* invoke any callbacks */
@@ -85,9 +85,8 @@
               }
           
           /* caculate new position [with rotation correction] */
-          x = element.startPositionDrag.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionDrag.zoom;
+          x = element.startPositionDrag.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation)) / element.startPositionDrag.zoom;
           y = element.startPositionDrag.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionDrag.zoom;
-          
           /* move the element to its new position, if possible by constraint */
           if (typeof constraint === 'function') {
             var coord = constraint(x, y)

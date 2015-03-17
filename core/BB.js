@@ -6,8 +6,15 @@ var BB = {};
 // prototype for Workspace and Blocks
 BB.Object = function(type) {
   this.type = type;
+  this.children = [];
   this.nested = false;
   this.level = 0; //level of nesting 0 - main Object
+  this.absoluteRotation = 0;
+  this.rotation = 0;
+  this.offsetX = 0; // offset with the svg root
+  this.offsetY = 0;
+  this.offsetX2 = 0;
+  this.offsetY2 = 0;
 };
 
 BB.Object.prototype.addWorkspace = function(workspace, options) {
@@ -33,7 +40,7 @@ BB.Object.prototype.addWorkspace = function(workspace, options) {
   return this.children[this.children.length-1];
 };
 
-BB.Object.prototype.addBlock = function(block) {
+BB.Object.prototype.addBlock_ = function(block) {
   if (block.type != 'Block') {
     throw 'The type of object must be Block';
     return;
@@ -44,6 +51,31 @@ BB.Object.prototype.addBlock = function(block) {
     this.childAdded(this.children[this.children.length-1]); //callback
   }
   return this.children[this.children.length-1];
+};
+
+BB.Object.prototype.addBlock = function(name, block_prototype) {
+  // generate the block object
+  var block = this.generateBlock(name, block_prototype);
+  return this.addBlock_(new block());
+};
+
+// generates a block object from a protoype
+BB.Object.prototype.generateBlock = function(name, block_prototype) {
+  if (!block_prototype) {
+    throw 'Must have a block protoype as argument';
+    return;
+  }
+  if (!block_prototype.init) {
+    throw 'Block protoype must have a init function';
+    return;
+  }
+  // generate the block object
+  var block = function(options){
+    BB.Block.call(this, name, options);
+  };
+  block.prototype = Object.create(BB.Block.prototype);
+  mixin(block, block_prototype, true); // extend block with block_prototype
+  return block;
 };
 
 //this object to top of this parent Workspace
@@ -63,4 +95,20 @@ BB.Object.prototype.toTopPropagate = function() {
       obj.workspace.childContainer.node.appendChild(obj.container.node);
     }
   }
+};
+BB.Object.prototype.rotate = function(rotation) {
+  var dRotation = rotation - this.rotation;
+  var bbox = this.container.bbox();
+  this.container.rotate(rotation, bbox.x + this.width/2 + this.offsetX,
+                        bbox.y + this.height/2 + this.offsetY);
+  this.rotation = rotation;
+  this.notifyRotation(dRotation);
+};
+BB.Object.prototype.notifyRotation = function(dRotation) { // this should be only for workspaces - last TODO
+  this.absoluteRotation += dRotation; // set absoluteScale to svg.js context for pannable elements
+  this.children.forEach(function(el) {
+    if (el.notifyRotation) {
+      el.notifyRotation(dRotation);
+    }
+  });
 };

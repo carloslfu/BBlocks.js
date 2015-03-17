@@ -52,8 +52,9 @@
         , y:        box.y
         , width:    context.width
         , height:   context.height
+        // scale of parent workspace, because this.absoluteScale is applied only to childs
         , zoom:     context.workspace.absoluteScale
-        , rotation: element.transform('rotation') * Math.PI / 180
+        , rotation: context.absoluteRotation * Math.PI / 180
         }
         
         /* invoke any callbacks */
@@ -84,39 +85,35 @@
           /* caculate new position [with rotation correction] */
           dx = (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionResize.zoom;
           dy = (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionResize.zoom;
-          if (width + dx < 0) {
-            dx = 0;
-          }
-          if (height + dy < 0) {
-            dy = 0;
-          }
-          /* move the element to its new position, if possible by constraint */
-          if (typeof constraint === 'function') {
-            var coord = constraint(x, y)
+          if (width + dx >= 0 && height + dy >= 0) { //TODO: use contraints from workspace
+            /* move the element to its new position, if possible by constraint */
+            if (typeof constraint === 'function') {
+              var coord = constraint(x, y)
 
-            if (typeof coord === 'object') {
-              if (typeof coord.x != 'boolean' || coord.x)
-                element.x(typeof coord.x === 'number' ? coord.x : x)
-              if (typeof coord.y != 'boolean' || coord.y)
-                element.y(typeof coord.y === 'number' ? coord.y : y)
+              if (typeof coord === 'object') {
+                if (typeof coord.x != 'boolean' || coord.x)
+                  element.x(typeof coord.x === 'number' ? coord.x : x)
+                if (typeof coord.y != 'boolean' || coord.y)
+                  element.y(typeof coord.y === 'number' ? coord.y : y)
 
-            } else if (typeof coord === 'boolean' && coord) {
-              context.resize(width + dx, height + dy) 
+              } else if (typeof coord === 'boolean' && coord) {
+                context.resize(width + dx, height + dy) 
+              }
+
+            } else if (typeof constraint === 'object') {
+              /* keep element within constrained box */
+              if (constraint.minX != null && x < constraint.minX)
+                x = constraint.minX
+              else if (constraint.maxX != null && x > constraint.maxX - width)
+                x = constraint.maxX - width
+
+              if (constraint.minY != null && y < constraint.minY)
+                y = constraint.minY
+              else if (constraint.maxY != null && y > constraint.maxY - height)
+                y = constraint.maxY - height
+
+              context.resize(width + dx, height + dy)          
             }
-
-          } else if (typeof constraint === 'object') {
-            /* keep element within constrained box */
-            if (constraint.minX != null && x < constraint.minX)
-              x = constraint.minX
-            else if (constraint.maxX != null && x > constraint.maxX - width)
-              x = constraint.maxX - width
-            
-            if (constraint.minY != null && y < constraint.minY)
-              y = constraint.minY
-            else if (constraint.maxY != null && y > constraint.maxY - height)
-              y = constraint.maxY - height
-
-            context.resize(width + dx, height + dy)          
           }
 
           /* invoke any callbacks */

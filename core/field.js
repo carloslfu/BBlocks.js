@@ -6,9 +6,9 @@ BB.Field = function(type) {
   this.rendered = false;
 };
 
-//this object to top of this parent
+//this field to top of this parent
 BB.Field.prototype.toTop = function() {
   if (this.parent) {
-    this.parent.container.node.appendChild(this.root.node); // this in top of SVG
+    this.parent.container.node.appendChild(this.root.node); // this in top of parent
   }
 };

@@ -5,7 +5,6 @@ BB.Block = function(name, options)  {
   BB.Object.call(this, 'Block');
   this.name = name;
   this.id = null;
-  this.children = [];
   this.x = 0;
   this.y = 0;
   this.width = 20;
@@ -116,7 +115,7 @@ BB.Block.prototype.render = function() {
     this.attachDraggable.push(this.rootDark);
     this.attachDraggable.push(this.rootLight);
     this.attachDraggable.push(this.root);
-    this.container.draggable(this.workspace, null, this.attachDraggable);
+    this.container.draggable(this, null, this.attachDraggable);
     var el = this; //for the next closure
     this.container.dragstart = function() {
       el.toTopPropagate(); //focus workspace
