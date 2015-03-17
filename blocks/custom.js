@@ -39,9 +39,9 @@ test_blocks.test_dev = {
     var this_ = this;
     // TODO: allows animate rotation
     var animation = function(){
-      this_.container.animate(1000).rotate(50).scale(1.4);
+      this_.animate(1000).rotate(50).scale(1.4);
       setTimeout(function(){
-        this_.container.animate(1000).rotate(0).scale(1);
+        this_.animate(1000).rotate(0).scale(1);
       },1000);
     }
     animation();

@@ -7,10 +7,10 @@ var main = function() {
 	mainWorkspace.render();
     block1 = mainWorkspace.addBlock('block1', test_blocks.test_dev);
 	block1.render();
-	block1.container.move(100, 100);
+	block1.move(100, 100);
     block2 = mainWorkspace.addBlock('block2', example_blocks.example);
 	block2.render();
-	block2.container.move(50, 170);
+	block2.move(50, 170);
     block3 = mainWorkspace.addBlock('block3', test_blocks.test);
 	block3.render();
 	//block3.container.move(200, 270); //TODO: implement move of Objects

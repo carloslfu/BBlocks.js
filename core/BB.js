@@ -96,13 +96,16 @@ BB.Object.prototype.toTopPropagate = function() {
     }
   }
 };
+//facades for svg functions
 BB.Object.prototype.rotate = function(rotation) {
-  var dRotation = rotation - this.rotation;
-  var bbox = this.container.bbox();
-  this.container.rotate(rotation, bbox.x + this.width/2 + this.offsetX,
-                        bbox.y + this.height/2 + this.offsetY);
-  this.rotation = rotation;
-  this.notifyRotation(dRotation);
+  if (this.container) { // main Workspaces don't have container
+    var dRotation = rotation - this.rotation;
+    var bbox = this.container.bbox();
+    this.rotation = rotation;
+    this.notifyRotation(dRotation);
+    return this.container.rotate(rotation, bbox.x + this.width/2 + this.offsetX,
+                          bbox.y + this.height/2 + this.offsetY);
+  }
 };
 BB.Object.prototype.notifyRotation = function(dRotation) { // this should be only for workspaces - last TODO
   this.absoluteRotation += dRotation; // set absoluteScale to svg.js context for pannable elements
@@ -111,4 +114,23 @@ BB.Object.prototype.notifyRotation = function(dRotation) { // this should be onl
       el.notifyRotation(dRotation);
     }
   });
+};
+BB.Object.prototype.move = function(x, y) {
+  if (this.container) { // main Workspaces don't have container
+    this.x = x;
+    this.y = y;
+    return this.container.move(x, y);
+  }
+};
+BB.Object.prototype.dmove = function(dx, dy) {
+  if (this.container) { // main Workspaces don't have container
+    this.x += dx;
+    this.y += dy; 
+    return this.container.dmove(dx, dy);
+  }
+};
+BB.Object.prototype.animate = function() {
+  if (this.container) { // main Workspaces don't have container
+    return this.container.animate.apply(this.container, arguments);
+  }
 };

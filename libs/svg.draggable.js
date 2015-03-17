@@ -99,6 +99,9 @@
 
             } else if (typeof coord === 'boolean' && coord) {
               element.move(x, y)
+              // update context
+              context.x = x;
+              context.y = y;
             }
 
           } else if (typeof constraint === 'object') {
@@ -113,7 +116,10 @@
             else if (constraint.maxY != null && y > constraint.maxY - height)
               y = constraint.maxY - height
 
-            element.move(x, y)          
+            element.move(x, y)
+            // update context
+            context.x = x;
+            context.y = y;
           }
 
           /* invoke any callbacks */
