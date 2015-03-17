@@ -117,9 +117,9 @@ BB.Object.prototype.notifyRotation = function(dRotation) { // this should be onl
 };
 BB.Object.prototype.move = function(x, y) {
   if (this.container) { // main Workspaces don't have container
-    this.x = x;
-    this.y = y;
-    return this.container.move(x, y);
+    this.x = x + this.offsetX;
+    this.y = y + this.offsetY;
+    return this.container.move(this.x, this.y);
   }
 };
 BB.Object.prototype.dmove = function(dx, dy) {
