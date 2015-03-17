@@ -55,12 +55,12 @@ BB.Object.prototype.addBlock_ = function(block) {
 
 BB.Object.prototype.addBlock = function(name, block_prototype) {
   // generate the block object
-  var block = this.generateBlock(name, block_prototype);
+  var block = this.createBlock(name, block_prototype);
   return this.addBlock_(new block());
 };
 
-// generates a block object from a protoype
-BB.Object.prototype.generateBlock = function(name, block_prototype) {
+// create a block object from a protoype
+BB.Object.prototype.createBlock = function(name, block_prototype) {
   if (!block_prototype) {
     throw 'Must have a block protoype as argument';
     return;
