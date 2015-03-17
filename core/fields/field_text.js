@@ -10,8 +10,11 @@ BB.FieldText = function(text, parent, options)  {
   this.fontFamily = 'sans-serif';
   this.fontColor = '#fff';
   this.size = 15; // px default metrics in svg.js library
-  if (text) {
+  if (text && typeof(text) == 'string') {
   	this.text = text;
+  } else {
+    throw 'Text must be a valid string';
+    return;
   }
   if (parent) {
     this.parent = parent;
@@ -44,7 +47,8 @@ BB.FieldText.prototype.render = function(){
   if (!this.rendered) {
     this.root = this.parent.container.text(this.text).font({
       family: this.fontFamily
-      , size: this.fontSize}).fill(this.fontColor);
+      , size: this.fontSize}).fill(this.fontColor)
+      .style('text-rendering: geometricPrecision'); // when scales keeps proportions
   }
   if (this.parent.attachDraggable) {
     this.parent.attachDraggable.push(this.root); // This text can drag all parent
