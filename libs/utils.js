@@ -1,23 +1,6 @@
-function disableSelect(el){			
-    if(el.addEventListener){
-        el.addEventListener("pointerdown",disabler,"false");
-    } else {
-        el.attachEvent("onselectstart",disabler);
-    }
-}
- 
-function enableSelect(el){
-    if(el.addEventListener){
-	el.removeEventListener("pointerdown",disabler,"false");
-    } else {
-        el.detachEvent("onselectstart",disabler);
-    }
-}
- 
-function disabler(e){
-    if(e.preventDefault){ e.preventDefault(); }
-    return false;
-}
+'use strict'
+
+// useful functions
 
 //function imported from blockly core : utils.js
 /**
@@ -56,24 +39,78 @@ function convertCoordinates(x, y, toSvg, node) {
  * @return {!Object} Object with .x and .y properties.
  */
 function mouseToSvg(e, node) {
+  
   var scrollX = window.scrollX || window.pageXOffset;
   var scrollY = window.scrollY || window.pageYOffset;
   return convertCoordinates(e.clientX + scrollX,
                                     e.clientY + scrollY, true, node);
 };
 
-// Extend an existing object with a method from another - Mixin pattern
-function mixin(receivingClass, givingClass) {
+// Extend an existing class with a methods from an object - Mixin pattern
+function mixin(receivingClass, givingMixin, override) {
+  if (override == undefined) {
+    override = false; // 'true' overrides elements
+  }
   //only provide certain methods
-  if (arguments[2]) {
-    for (var i = 2, len = arguments.length; i < len; i++) {
-      receivingClass.prototype[arguments[i]] = givingClass.prototype[arguments[i]];
+  if (arguments[3]) {
+    for (var i = 3, len = arguments.length; i < len; i++) {
+      if (!Object.hasOwnProperty.call(receivingClass.prototype, arguments[i])
+          || override) {
+        receivingClass.prototype[arguments[i]] = givingMixin[arguments[i]];
+      }
+    }
+  } else { //provide all methods
+    for (var methodName in givingMixin) {
+      if (!Object.hasOwnProperty.call(receivingClass.prototype, methodName)
+          || override) {
+        receivingClass.prototype[methodName] = givingMixin[methodName];
+      }
+    }
+  }
+};
+
+// reserved for future use
+/*
+// Extend an existing class with a methods from another - Mixin pattern
+function mixinClasses(receivingClass, givingClass, override) {
+  if (override == undefined) {
+    override = false; // 'true' overrides elements
+  }
+  //only provide certain methods
+  if (arguments[3]) {
+    for (var i = 3, len = arguments.length; i < len; i++) {
+      if (!Object.hasOwnProperty.call(receivingClass.prototype, arguments[i])
+          || override) {
+        receivingClass.prototype[arguments[i]] = givingClass.prototype[arguments[i]];
+      }
     }
   } else { //provide all methods
     for (var methodName in givingClass.prototype) {
-      if (!Object.hasOwnProperty.call(receivingClass.prototype, methodName)) {
+      if (!Object.hasOwnProperty.call(receivingClass.prototype, methodName)
+          || override) {
         receivingClass.prototype[methodName] = givingClass.prototype[methodName];
       }
     }
   }
 };
+function disableSelect(el){			
+    if(el.addEventListener){
+        el.addEventListener("pointerdown",disabler,"false");
+    } else {
+        el.attachEvent("onselectstart",disabler);
+    }
+}
+ 
+function enableSelect(el){
+    if(el.addEventListener){
+	el.removeEventListener("pointerdown",disabler,"false");
+    } else {
+        el.detachEvent("onselectstart",disabler);
+    }
+}
+ 
+function disabler(e){
+    if(e.preventDefault){ e.preventDefault(); }
+    return false;
+}
+*/
