@@ -1,14 +1,14 @@
-# BB.js - BlockBuilder (alpha version)
+# BBlocks.js (alpha version)
 
-BB.js is lightweight, flexible and simplist graphical library for build block based GUIs. This project is inspired in [Blockly][blockly-git].
+BBlocks is lightweight, flexible, simplist and hackable graphical library for build block based GUIs.
 
-The main idea is make a graphical library with some advanced features for use in a block editor. This library will replace Blockly in [blocklify][blocklify-git] project.
+The main idea is make a graphical library with some advanced features for use in a block editor. This library will replace [Blockly][blockly-git] in [blocklify][blocklify-git] project.
 
 A [live demo][livedemo].
-[livedemo]: https://carloslfu.github.io/BB.js/demo.html
+[livedemo]: https://carloslfu.github.io/BBlocks.js/demo.html
 
-[![example1](https://github.com/carloslfu/BB.js/blob/master/BB.jpg)](BB.js)
-[![example2](https://github.com/carloslfu/BB.js/blob/master/BB_with_zoom.jpg)](BB.js zoomable)
+[![example1](https://github.com/carloslfu/BBlocks.js/blob/master/BB.jpg)](BBlocks.js)
+[![example2](https://github.com/carloslfu/BBlocks.js/blob/master/BB_with_zoom.jpg)](BBlocks.js zoomable)
 
 ## Features
 
@@ -19,7 +19,7 @@ A [live demo][livedemo].
 
 ## Features that will be implemented
 
-- SVG text field.
+- SVG text input field.
 - SVG contextmenu.
 - Custom menus.
 
