@@ -29,11 +29,11 @@ A [live demo][livedemo].
 
 ## Development
 
-Board on trello [BBlocks][https://trello.com/b/0u71Uj56/bblocks-js].
+Board on trello [BBlocks][BBlocks-trello].
 
 Feel free to suggest anything or do pull requests.
 
-[BBlocks-trello]: https://github.com/google/blockly
+[BBlocks-trello]: https://trello.com/b/0u71Uj56/bblocks-js
 
 [blockly-git]: https://github.com/google/blockly
 [blocklify-git]: https://github.com/carloslfu/blocklify
