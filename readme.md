@@ -19,9 +19,13 @@ A [live demo][livedemo].
 
 ## Features that will be implemented
 
+- Interaction between objects (Workspaces, blocks ...).
 - SVG text input field.
+- Multiple blocks selection.
 - SVG contextmenu.
 - Custom menus.
+- Pugins API.
+- Styling API.
 
 [blockly-git]: https://github.com/google/blockly
 [blocklify-git]: https://github.com/carloslfu/blocklify
