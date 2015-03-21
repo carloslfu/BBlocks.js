@@ -7,8 +7,8 @@ The main idea is make a graphical library with some advanced features for use in
 A [live demo][livedemo].
 [livedemo]: https://carloslfu.github.io/BBlocks.js/demo.html
 
-[![example1](https://github.com/carloslfu/BBlocks.js/blob/master/BB.jpg)]
-[![example2](https://github.com/carloslfu/BBlocks.js/blob/master/BB_with_zoom.jpg)]
+![example1](https://github.com/carloslfu/BBlocks.js/blob/master/BB.jpg)
+![example2](https://github.com/carloslfu/BBlocks.js/blob/master/BB_with_zoom.jpg)
 
 ## Features
 
