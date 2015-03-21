@@ -1,7 +1,8 @@
 'use strict'
 
 //A workspace is an SVG document that can contain Blocks or Workspaces
-BB.Workspace = {
+
+BB.Workspace = BB.Object.prototype.create({
   constructor: function(name, workspace, options) {
     this.parentClass_.constructor.call(this, 'Workspace');
     this.name = name;
@@ -215,6 +216,4 @@ BB.Workspace = {
       this.childContainer.move(matrix.e, matrix.f);
     }
   }
-};
-
-BB.Workspace = BB.Object.prototype.create(BB.Workspace); // workspace inherit from object
+});

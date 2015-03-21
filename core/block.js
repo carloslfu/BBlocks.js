@@ -1,7 +1,8 @@
 'use strict'
 
 // A Block is an svg group that do any behavior, this can contain other Blocks or Workspaces
-BB.Block = {
+
+BB.Block = BB.Object.prototype.create({
   constructor: function(name, options)  {
     BB.Object.call(this, 'Block');
     this.name = name;
@@ -289,6 +290,4 @@ BB.Block = {
     this.rootLight.fill(this.lightColor);
     this.rootLight.dmove(-1,-1);
   }
-};
-
-BB.Block = BB.Object.prototype.create(BB.Block); // Obj.js first level class
+});

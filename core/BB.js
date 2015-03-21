@@ -4,7 +4,8 @@
 var BB = {};
 
 // prototype for Workspace and Blocks
-BB.Object = {
+
+BB.Object = ObjJS.prototype.create({
   constructor: function(type) {
     this.type = type;
     this.children = [];
@@ -129,6 +130,4 @@ BB.Object = {
       return this.container.animate.apply(this.container, arguments);
     }
   }
-};
-
-BB.Object = ObjJS.prototype.create(BB.Object); // Obj.js first level class
+});
