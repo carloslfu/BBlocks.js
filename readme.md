@@ -27,6 +27,14 @@ A [live demo][livedemo].
 - Pugins API.
 - Styling API.
 
+## Development
+
+Board on trello [BBlocks][https://trello.com/b/0u71Uj56/bblocks-js].
+
+Feel free to suggest anything or do pull requests.
+
+[BBlocks-trello]: https://github.com/google/blockly
+
 [blockly-git]: https://github.com/google/blockly
 [blocklify-git]: https://github.com/carloslfu/blocklify
 [pep-git]: https://github.com/jquery/PEP
