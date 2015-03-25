@@ -159,6 +159,7 @@ BB.Workspace = BB.Object.prototype.create({
         this.offsetY2 = this.y + this.width + this.offsetY - bbox.y2;
       }
     }
+    return this;
   },
   childRendered: function(child) {
     if (child.type == 'Block') {

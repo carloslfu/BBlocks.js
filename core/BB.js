@@ -24,7 +24,10 @@ BB.Object = ObjJS.prototype.create({
       return; //blocks can't have Workspaces attached
     }
     if (typeof(workspace) == 'string') {
-      this.children.push(new BB.Workspace(workspace, this, options));
+      var temp = new BB.Workspace(workspace, this, options);
+      this.children.push(temp);
+      // inherits absolute rotation
+      temp = temp.absoluteRotation + this.absoluteRotation;
     } else if (typeof(workspace) == 'object'){
       if (workspace.type != 'Workspace') {
         throw 'The type of object must be Workspace';
@@ -46,7 +49,8 @@ BB.Object = ObjJS.prototype.create({
       return;
     }
     this.children.push(block);
-    this.children[this.children.length-1].workspace = this;
+    block.workspace = this;
+    block.absoluteRotation = block.absoluteRotation + this.absoluteRotation;
     if (this.childAdded) {
       this.childAdded(this.children[this.children.length-1]); //callback
     }
@@ -116,6 +120,8 @@ BB.Object = ObjJS.prototype.create({
       this.x = x + this.offsetX;
       this.y = y + this.offsetY;
       return this.container.move(this.x, this.y);
+    } else {
+      throw "Main Workspaces don't have container";
     }
   },
   dmove: function(dx, dy) {
@@ -123,11 +129,15 @@ BB.Object = ObjJS.prototype.create({
       this.x += dx;
       this.y += dy; 
       return this.container.dmove(dx, dy);
+    } else {
+      throw "Main Workspaces don't have container";
     }
   },
   animate: function() {
     if (this.container) { // main Workspaces don't have container
       return this.container.animate.apply(this.container, arguments);
+    } else {
+      throw "Main Workspaces don't have container";
     }
   }
 });
