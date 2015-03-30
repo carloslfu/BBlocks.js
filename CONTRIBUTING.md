@@ -1,11 +1,11 @@
 # Contributing
 
-This page provides help to any people that wants to contribute. (I will open a Google group for this proyect)
+This page provides help to any people that wants to contribute.
 
 - Do you have any suggestion? open an issue.
 - Do you wants to implement any feature? first open a feature request for get some feedback and then start coding.
 - Do you have an implemented feature? feel free to open a PR.
-- Do you have an extension or someting build on top of this proyect? Publish this in the Group. (I will open this :) )
+- Do you have an extension or someting build on top of this proyect? Publish this in the [Group][BBlocks-group].
 
 This is a Board on trello for this proyect: [BBlocks trello][BBlocks-trello].
 This is the group for this proyect: [BBlocks group][BBlocks-group].
