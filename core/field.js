@@ -11,7 +11,7 @@ BB.Field = BB.Object.prototype.create({
 //this field to top of this parent
   toTop: function() {
     if (this.parent) {
-      this.parent.container.node.appendChild(this.root.node); // this in top of parent
+      this.parent.container.node.appendChild(this.container.node); // this in top of parent
     }
   }
 });

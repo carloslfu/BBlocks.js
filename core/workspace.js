@@ -66,6 +66,7 @@ BB.Workspace = BB.Object.prototype.create({
       this.render();
     }
   },
+
   render: function() {
     if (!this.workspace) {
       throw 'Workspace must have a div identifier or other workspace for be rendered';
@@ -141,7 +142,7 @@ BB.Workspace = BB.Object.prototype.create({
       }
       this.attachPannable = [this.background, this.text];
       if (this.pannable) {
-        this.childContainer.pannable(this, null, this.attachPannable, [this.background]);
+        this.childContainer.pannable(this, null, this.attachPannable, [this.childContainer]);
       }
       this.attachScalable = [this.background, this.text];
       for (var i = 0; i < this.children.length; i++) {
@@ -161,26 +162,31 @@ BB.Workspace = BB.Object.prototype.create({
     }
     return this;
   },
+
   childRendered: function(child) {
     if (child.type == 'Block') {
       this.attachScalable.push(child.container);
       this.childContainer.scalable(this, null, this.attachScalable);
     }
   },
+
   toScale: function(scale) {
     var fScale = scale/this.scale;
     this.childContainer.scale(scale);
     this.scale = scale;
     this.notifyScaling(fScale);
   },
+  
   notifyScaling: function(fScale) {
-    this.absoluteScale *= fScale; // set absoluteScale to svg.js context for pannable elements
+    // set absoluteScale to svg.js context for pannable elements
     this.children.forEach(function(el) {
       if (el.type == 'Workspace') { //only notify the workspaces
+        el.absoluteScale *= fScale;
         el.notifyScaling(fScale);
       }
     });
   },
+
   resize: function(width, height) {
     this.width = width;
     this.height = height;
@@ -189,7 +195,20 @@ BB.Workspace = BB.Object.prototype.create({
     this.background.size(width, height);
     this.resizeBox.move(this.width-5, this.height-5);
   },
-
+  setWidth: function(width) {
+    this.width = width;
+    this.border.width(width);
+    this.root.width(width);
+    this.background.width(width);
+    this.resizeBox.x(this.width-5);
+  },
+  setHeight: function(height) {
+    this.height = height;
+    this.border.height(height);
+    this.root.height(height);
+    this.background.height(height);
+    this.resizeBox.y(this.height-5);
+  },
   /**
    * Zooming the workspace centered in (x,y) coordinate with zooming in or out.
    * @param {!number} x X coordinate of center.
