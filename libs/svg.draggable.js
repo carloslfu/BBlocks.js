@@ -25,43 +25,15 @@
       /* start dragging */
       startDrag = function(event) {
         event = event || window.event
+        element.startEventDrag = event;
 
         /* invoke any callbacks */
         if (element.beforedrag)
           element.beforedrag(event)
-        
-        /* get element bounding box */
-        var box = element.bbox()
-        
-        if (element instanceof SVG.G) {
-          box.x = element.x()
-          box.y = element.y()
-          
-        } else if (element instanceof SVG.Nested) {
-          box = {
-            x:      element.x()
-          , y:      element.y()
-          , width:  element.width()
-          , height: element.height()
-          }
-        }
-        
-        /* store event */
-        element.startEventDrag = event
-        
-        /* store start position */
-        element.startPositionDrag = {
-          x:        box.x
-        , y:        box.y
-        , width:    box.width
-        , height:   box.height
-        , zoom:     context.workspace.absoluteScale
-        , rotation: context.absoluteRotation * Math.PI / 180
-        }
-        
+
         /* invoke any callbacks */
         if (element.dragstart)
-          element.dragstart({ x: 0, y: 0, zoom: element.startPositionDrag.zoom }, event)
+          element.dragstart(event)
         
         /* prevent selection dragging */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
@@ -74,20 +46,17 @@
         
         if (element.startEventDrag) {
           /* calculate move position */
-          var x, y
-            , rotation  = element.startPositionDrag.rotation
-            , width     = element.startPositionDrag.width
-            , height    = element.startPositionDrag.height
-            , delta     = {
-                x:    event.pageX - element.startEventDrag.pageX,
-                y:    event.pageY - element.startEventDrag.pageY,
-                zoom: element.startPositionDrag.zoom
-              }
-          
+          var rotation  = context.absoluteRotation * Math.PI / 180;
+          var bbox = {
+            x: element.x(),
+            y: element.y()
+          };
+          var zoom = context.workspace.absoluteScale * context.workspace.scale;
+          var ddx = (event.ddx * Math.cos(rotation) + event.ddy * Math.sin(rotation)) / zoom;
+          var ddy = (event.ddy * Math.cos(rotation) + event.ddx * Math.sin(-rotation)) / zoom;
           /* caculate new position [with rotation correction] */
-          x = element.startPositionDrag.x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation)) / element.startPositionDrag.zoom;
-          y = element.startPositionDrag.y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionDrag.zoom;
-          /* move the element to its new position, if possible by constraint */
+          x = bbox.x + ddx;
+          y = bbox.y + ddy;
           if (typeof constraint === 'function') {
             var coord = constraint(x, y)
 
@@ -124,7 +93,7 @@
 
           /* invoke any callbacks */
           if (element.dragmove)
-            element.dragmove(delta, event)
+            element.dragmove(event)
         }
         event.stopPropagation();
       }
@@ -132,21 +101,14 @@
       /* when dragging ends */
       endDrag = function(event) {
         event = event || window.event
-        
-        /* calculate move position */
-        var delta = {
-          x:    event.pageX - element.startEventDrag.pageX
-        , y:    event.pageY - element.startEventDrag.pageY
-        , zoom: element.startPositionDrag.zoom
-        }
-        
+
         /* reset store */
         element.startEventDrag    = null
         element.startPositionDrag = null
 
         /* invoke any callbacks */
         if (element.dragend)
-          element.dragend(delta, event)
+          element.dragend(event)
         event.stopPropagation();
       }
       

@@ -7,7 +7,7 @@
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
     resizable: function(context, constraint, attachToEls) {
-      var startResize, resize, endResize
+      var startResize, resize, endResize, initialWidth, initialHeight
         , element = this
         , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
 
@@ -28,38 +28,15 @@
         /* invoke any callbacks */
         if (element.beforeresize)
           element.beforeresize(event)
-        
-        /* get element bounding box */
-        var box = element.bbox()
-        
-        if (element instanceof SVG.G) {
-          box.x = element.x()
-          box.y = element.y()
-          
-        } else if (element instanceof SVG.Nested) {
-          box = {
-            x:      element.x()
-          , y:      element.y()
-          }
-        }
+        initialWidth = context.width;
+        initialHeight = context.height;
         
         /* store event */
         element.startEventResize = event
-        
-        /* store start position */
-        element.startPositionResize = {
-          x:        box.x
-        , y:        box.y
-        , width:    context.width
-        , height:   context.height
-        // scale of parent workspace, because this.absoluteScale is applied only to childs
-        , zoom:     context.workspace.absoluteScale
-        , rotation: context.absoluteRotation * Math.PI / 180
-        }
-        
+
         /* invoke any callbacks */
         if (element.resizestart)
-          element.resizestart({ x: 0, y: 0, zoom: element.startPositionResize.zoom }, event)
+          element.resizestart(event)
         
         /* prevent selection resizing */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
@@ -72,53 +49,24 @@
         
         if (element.startEventResize) {
           /* calculate move position */
-          var dx, dy
-            , rotation  = element.startPositionResize.rotation
-            , width     = element.startPositionResize.width
-            , height    = element.startPositionResize.height
-            , delta     = {
-                x:    event.pageX - element.startEventResize.pageX,
-                y:    event.pageY - element.startEventResize.pageY,
-                zoom: element.startPositionResize.zoom
-              }
+          var rotation  = context.absoluteRotation * Math.PI / 180;
+          var zoom = context.workspace.absoluteScale * context.workspace.scale;
+          var ddx = (event.ddx * Math.cos(rotation) + event.ddy * Math.sin(rotation)) / zoom;
+          var ddy = (event.ddy * Math.cos(rotation) + event.ddx * Math.sin(-rotation)) / zoom;
+          var dx = (event.dx * Math.cos(rotation) + event.dy * Math.sin(rotation)) / zoom;
+          var dy = (event.dy * Math.cos(rotation) + event.dx * Math.sin(-rotation)) / zoom;
           
-          /* caculate new position [with rotation correction] */
-          dx = (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation))  / element.startPositionResize.zoom;
-          dy = (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionResize.zoom;
-          if (width + dx >= 0 && height + dy >= 0) { //TODO: use contraints from workspace
-            /* move the element to its new position, if possible by constraint */
-            if (typeof constraint === 'function') {
-              var coord = constraint(x, y)
-
-              if (typeof coord === 'object') {
-                if (typeof coord.x != 'boolean' || coord.x)
-                  element.x(typeof coord.x === 'number' ? coord.x : x)
-                if (typeof coord.y != 'boolean' || coord.y)
-                  element.y(typeof coord.y === 'number' ? coord.y : y)
-
-              } else if (typeof coord === 'boolean' && coord) {
-                context.resize(width + dx, height + dy) 
-              }
-
-            } else if (typeof constraint === 'object') {
-              /* keep element within constrained box */
-              if (constraint.minX != null && x < constraint.minX)
-                x = constraint.minX
-              else if (constraint.maxX != null && x > constraint.maxX - width)
-                x = constraint.maxX - width
-
-              if (constraint.minY != null && y < constraint.minY)
-                y = constraint.minY
-              else if (constraint.maxY != null && y > constraint.maxY - height)
-                y = constraint.maxY - height
-
-              context.resize(width + dx, height + dy)          
-            }
+          //TODO: constraints
+          if (initialWidth + dx >= 0) {
+            context.setWidth(initialWidth + dx);
+          }
+          if (initialHeight + dy >= 0) {
+            context.setHeight(initialHeight + dy);
           }
 
           /* invoke any callbacks */
           if (element.resizemove)
-            element.resizemove(delta, event)
+            element.resizemove(event)
         }
         event.stopPropagation();
       }
@@ -126,21 +74,13 @@
       /* when resizing ends */
       endResize = function(event) {
         event = event || window.event
-        
-        /* calculate move position */
-        var delta = {
-          x:    event.pageX - element.startEventResize.pageX
-        , y:    event.pageY - element.startEventResize.pageY
-        , zoom: element.startPositionResize.zoom
-        }
-        
+
         /* reset store */
         element.startEventResize    = null
-        element.startPositionResize = null
 
         /* invoke any callbacks */
         if (element.resizeend)
-          element.resizeend(delta, event);
+          element.resizeend(event);
         event.stopPropagation();
       }
       

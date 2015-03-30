@@ -52,7 +52,7 @@
         element.pinchScale = e.scale;
         context.zoom(element.pinchCenter.x, element.pinchCenter.y , null, element.pinchdScale);
         e.preventDefault();
-        console.log('pinch event in ' + context.name + ', scale: ' + e.scale);
+        //console.log('pinch event in ' + context.name + ', scale: ' + e.scale);
       };
       
       pinchEnd = function(e){

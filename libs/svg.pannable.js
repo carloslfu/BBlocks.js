@@ -6,7 +6,7 @@
     // Make element a pannable area
     // Constraint might be a object (as described in readme.md) or a function in the form "function (x, y)" that gets called before every move.
     // The function can return a boolean or a object of the form {x, y}, to which the element will be moved. "False" skips moving, true moves to raw x, y.
-    pannable: function(context, constraint, attachToEls, exceptions) { // exceptions are no pannable elements
+    pannable: function(context, constraint, attachToEls, pannableEls) { // exceptions are no pannable elements
       var startPan, pan, endPan
         , element = this
         , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
@@ -32,38 +32,6 @@
         /* store event */
         element.startEventPan = event;
 
-        /* get children bounding boxes */
-        element.startPositionsPan = [];
-        for (var i = 0; i < context.children.length; i++) {
-          var child = context.children[i].container;
-          var box = child.bbox()
-          
-          if (child.container instanceof SVG.G) {
-            box.x = child.x()
-            box.y = child.y()
-            
-          } else if (child.container instanceof SVG.Nested) {
-            box = {
-              x:      child.x()
-            , y:      child.y()
-            , width:  child.width()
-            , height: child.height()
-            }
-          }
-          
-          /* store start position */
-          element.startPositionsPan[i] = {
-            x:        box.x
-          , y:        box.y
-          , width:    box.width
-          , height:   box.height
-          , zoom:     context.absoluteScale
-          , rotation: context.absoluteRotation * Math.PI / 180
-          }
-          if (context.children[i].absoluteRotation) {
-            element.startPositionsPan[i].rotation = context.children[i].absoluteRotation * Math.PI / 180;
-          }
-        }
         /* invoke any callbacks */
         if (element.panstart)
           element.panstart({zoom: element.startPositionsPan}, event)
@@ -79,56 +47,51 @@
         
         if (element.startEventPan) {
           /* calculate move position for all children*/
-          for (var i = 0; i < context.children.length; i++) {
-            if (exceptions.indexOf(this) == -1) {
-              var child = context.children[i];
-              var x, y
-                , rotation  = element.startPositionsPan[i].rotation
-                , width     = element.startPositionsPan[i].width
-                , height    = element.startPositionsPan[i].height
-                , delta     = {
-                    x:    event.pageX - element.startEventPan.pageX,
-                    y:    event.pageY - element.startEventPan.pageY,
-                    zoom: element.startPositionsPan[i].zoom
-                  }
-              
-              /* caculate new position [with rotation correction] */
-              x = element.startPositionsPan[i].x + (delta.x * Math.cos(rotation) + delta.y * Math.sin(rotation)) / element.startPositionsPan[i].zoom;
-              y = element.startPositionsPan[i].y + (delta.y * Math.cos(rotation) + delta.x * Math.sin(-rotation)) / element.startPositionsPan[i].zoom;
-              
-              /* move the child to its new position, if possible by constraint */
-              if (typeof constraint === 'function') {
-                var coord = constraint(x, y)
+          for (var i = 0; i < pannableEls.length; i++) {
+            var child = pannableEls[i];
+            var rotation  = context.absoluteRotation * Math.PI / 180;
+            var bbox = {
+              x: child.x(),
+              y: child.y()
+            };
+            var ddx = (event.ddx * Math.cos(rotation) + event.ddy * Math.sin(rotation)) / context.absoluteScale;
+            var ddy = (event.ddy * Math.cos(rotation) + event.ddx * Math.sin(-rotation)) / context.absoluteScale;
+            /* caculate new position [with rotation correction] */
+            x = bbox.x + ddx;
+            y = bbox.y + ddy;
 
-                if (typeof coord === 'object') {
-                  if (typeof coord.x != 'boolean' || coord.x)
-                    child.x(typeof coord.x === 'number' ? coord.x : x)
-                  if (typeof coord.y != 'boolean' || coord.y)
-                    child.y(typeof coord.y === 'number' ? coord.y : y)
+            /* move the child to its new position, if possible by constraint */
+            if (typeof constraint === 'function') {
+              var coord = constraint(x, y)
 
-                } else if (typeof coord === 'boolean' && coord) {
-                  child.move(x, y)
-                }
+              if (typeof coord === 'object') {
+                if (typeof coord.x != 'boolean' || coord.x)
+                  child.x(typeof coord.x === 'number' ? coord.x : x)
+                if (typeof coord.y != 'boolean' || coord.y)
+                  child.y(typeof coord.y === 'number' ? coord.y : y)
 
-              } else if (typeof constraint === 'object') {
-                /* keep child within constrained box */
-                if (constraint.minX != null && x < constraint.minX)
-                  x = constraint.minX
-                else if (constraint.maxX != null && x > constraint.maxX - width)
-                  x = constraint.maxX - width
-                
-                if (constraint.minY != null && y < constraint.minY)
-                  y = constraint.minY
-                else if (constraint.maxY != null && y > constraint.maxY - height)
-                  y = constraint.maxY - height
-
+              } else if (typeof coord === 'boolean' && coord) {
                 child.move(x, y)
               }
 
-              /* invoke any callbacks */
-              if (element.panmove)
-                element.panmove(delta, event)
+            } else if (typeof constraint === 'object') {
+              /* keep child within constrained box */
+              if (constraint.minX != null && x < constraint.minX)
+                x = constraint.minX
+              else if (constraint.maxX != null && x > constraint.maxX - width)
+                x = constraint.maxX - width
+
+              if (constraint.minY != null && y < constraint.minY)
+                y = constraint.minY
+              else if (constraint.maxY != null && y > constraint.maxY - height)
+                y = constraint.maxY - height
+
+              child.move(x, y)
             }
+
+            /* invoke any callbacks */
+            if (element.panmove)
+              element.panmove(delta, event)
           }
         }
         event.stopPropagation();
