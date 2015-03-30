@@ -3,7 +3,7 @@
 // A Block is an svg group that do any behavior, this can contain other Blocks or Workspaces
 
 BB.Block = BB.Object.prototype.create({
-  constructor: function(name, options)  {
+  constructor: function(name, options, customOptions)  {
     BB.Object.call(this, 'Block');
     this.name = name;
     this.id = null;
@@ -20,7 +20,7 @@ BB.Block = BB.Object.prototype.create({
     this.fields = [];
     this.attachDraggable = [];
     this.metrics = {
-      borderRadius: 5,
+      borderRadius: 2,
       borderWidth: 1,
       initialSpace: {x: 4, y: 0},
       finalSpace: {x: 4, y: 4},
@@ -28,6 +28,9 @@ BB.Block = BB.Object.prototype.create({
       rowSpace: 5, // same as borderRadius is recommended
       widthType: 'globalWidth',
     };
+    if (customOptions) { //options of a custom blocks
+      this.customOptions = customOptions;
+    }
     if (!options) {
       return;
     }
@@ -53,6 +56,7 @@ BB.Block = BB.Object.prototype.create({
 
   appendField: function(field) {
       this.fields.push(field);
+      return field;
   },
 
   newRow: function() {
@@ -77,7 +81,7 @@ BB.Block = BB.Object.prototype.create({
       return;
     }
     if (!this.rendered) {
-      this.init(); // attributes of Block
+      this.init(this.customOptions); // attributes of custom Block
       //needs create container before initSVG, because it render the fields
       this.container = this.workspace.root.group();
       this.container.move(this.x, this.y);
@@ -141,17 +145,20 @@ BB.Block = BB.Object.prototype.create({
       y: this.metrics.initialSpace.y
     };
     this.metrics.rows = [];
+    this.metrics.numRows = 0;
     for (var i = 0; i < this.fields.length; i++) {
       if (typeof(this.fields[i]) == 'string') { //field control commands
         switch (this.fields[i]) {
             case 'newRow':
               metrics.y += maxHeight + this.metrics.rowSpace + this.metrics.initialSpace.y;
               metrics.width  += this.metrics.finalSpace.x - this.metrics.fieldSpace;
-              this.metrics.rows.push({width: metrics.width,
-                                      y: metrics.y,
-                                      height: maxHeight,
-                                      widthType: this.metrics.widthType
-                                     });
+              this.metrics.rows[this.metrics.numRows] = {
+                width: metrics.width,
+                y: metrics.y,
+                height: maxHeight,
+                widthType: this.metrics.widthType
+              };
+              this.metrics.numRows++;
               globalWidth = Math.max(metrics.width, globalWidth);
               metrics.width = this.metrics.initialSpace.x;
               maxHeight = 0;
@@ -169,9 +176,17 @@ BB.Block = BB.Object.prototype.create({
             throw 'Unknown width type';
         }
       } else {
+        // updates incrementally metrics for dinamic fields rendering
+        this.metrics.rows[this.metrics.numRows] = {
+          width: metrics.width,
+          y: metrics.y,
+          height: maxHeight,
+          widthType: this.metrics.widthType
+        };
+        this.fields[i].row = this.metrics.numRows;
         this.fields[i].render();
-        box = this.fields[i].root.bbox();
-        this.fields[i].root.move(metrics.width, metrics.y); // position of field
+        box = this.fields[i].container.bbox();
+        this.fields[i].container.move(metrics.width, metrics.y); // position of field
         metrics.width += box.width + this.metrics.fieldSpace;
         maxHeight = Math.max(maxHeight, box.height);
       }
@@ -226,7 +241,9 @@ BB.Block = BB.Object.prototype.create({
     this.metrics.rows[this.metrics.rows.length-1].nextRadius = 'convex';
   },
 
+  //renders the block root
   renderBlock_: function() {
+    //TODO: block root must be a group
     var radius = this.metrics.borderRadius; // for typing
     var rowSpace = this.metrics.rowSpace; // for typing
     this.root = this.workspace.root.path().M({x: radius, y: this.height})
@@ -278,10 +295,13 @@ BB.Block = BB.Object.prototype.create({
     this.root.q({x: 0, y: radius}, {x: -radius, y: radius})
              .h(-finalWidth + 2*radius)
              // TODO: report border bug in svg, when drag a block with black border, this proyest dont use that, use svg rect
+    // this bug is resolved in chromium 43, TODO: test in chrome 41
              /*.stroke({ color: this.borderColor,
                        opacity: 1,
                        width: this.metrics.borderWidth
               }).fill(this.bgColor);*/
+    //TODO: make a lightpath and a boxshadow filter for 3d effect
+    // instead of cloning the main path of block(root)
     this.root.fill(this.bgColor);
     this.rootDark = this.root.clone();
     this.rootDark.fill(this.shadowColor);

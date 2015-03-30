@@ -1,6 +1,9 @@
 'use strict'
 
-//namespace for BB
+//GLOBAL TODOS:
+// - Replace BB.Object for BB.Component, this is more semantic name.
+
+//namespace for BBlocks (BB)
 var BB = {};
 
 // prototype for Workspace and Blocks
@@ -107,7 +110,7 @@ BB.Object = ObjJS.prototype.create({
                             bbox.y + this.height/2 + this.offsetY);
     }
   },
-  notifyRotation: function(dRotation) { // this should be only for workspaces - last TODO
+  notifyRotation: function(dRotation) {
     this.absoluteRotation += dRotation; // set absoluteScale to svg.js context for pannable elements
     this.children.forEach(function(el) {
       if (el.notifyRotation) {
