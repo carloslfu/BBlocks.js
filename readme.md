@@ -19,7 +19,7 @@ A [live demo][livedemo].
 
 ## Getting started
 
-See the demos folder. All documentation is in construction... (github wiki coming soon).
+See the demos folder. All documentation is in construction... (github wiki coming soon). Visit the [BBlocks group][BBlocks-group] for get some feedback.
 
 ## Features that will be implemented
 
@@ -37,8 +37,9 @@ Feel free to suggest anything or do pull requests. Visit the [contributing page]
 
 Board on trello [BBlocks][BBlocks-trello].
 
-[Contributing-guide]: https://github.com/carloslfu/BBlocks.js/CONTRIBUTING.md
-[docs-page]: https://github.com/carloslfu/BBlocks.js/DOCS.md
+[BBlocks-group]: https://groups.google.com/forum/?hl=es#!forum/bblocks
+[Contributing-guide]: https://github.com/carloslfu/BBlocks.js/blob/master/CONTRIBUTING.md
+[docs-page]: https://github.com/carloslfu/BBlocks.js/blob/master/DOCS.md
 [BBlocks-trello]: https://trello.com/b/0u71Uj56/bblocks-js
 
 [blockly-git]: https://github.com/google/blockly

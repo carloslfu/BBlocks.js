@@ -8,7 +8,7 @@ This page contains the documentation of the proyect. All of this content should 
 
 This proyect follow the [Google JavaScript style][google-js-style] (FIX this link). The all the code must meet these rules, if not feel free to patch this.
 
-[google-js-style]:http//google.com
+[google-js-style]:https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
 ### Architecture
 

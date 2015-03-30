@@ -8,9 +8,9 @@ This page provides help to any people that wants to contribute. (I will open a G
 - Do you have an extension or someting build on top of this proyect? Publish this in the Group. (I will open this :) )
 
 This is a Board on trello for this proyect: [BBlocks trello][BBlocks-trello].
-This is the group for this proyect: [BBlocks group][BBlocks-trello].
+This is the group for this proyect: [BBlocks group][BBlocks-group].
 
-[BBlocks-group]: https://trello.com/b/0u71Uj56/bblocks-js
+[BBlocks-group]: https://groups.google.com/forum/?hl=es#!forum/bblocks
 [BBlocks-trello]: https://trello.com/b/0u71Uj56/bblocks-js
 
 ##TODOs
