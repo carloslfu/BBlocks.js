@@ -1,4 +1,4 @@
-# BBlocks.js
+# BBlocks.js documentation
 
 This page contains the documentation of the proyect. All of this content should be merged in the proyect wiki. This docs are in construction ...
 
