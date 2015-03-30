@@ -61,7 +61,7 @@ Workspace:
 - *demos*: All demos of this proyect.
 - *libs*: Libraries used in this proyect.
   - *utils.js*: Useful functions and ObjJS class for dinamically creating classes.
-  - *draggable.js: Svg.js extension for make a component dragabble.
+  - *draggable.js*: Svg.js extension for make a component dragabble.
   - *pannable.js*: Svg.js extension for make a component pannable.
   - *resizable.js*: Svg.js extension for make a component resizable.
   - *scalable.js*: Svg.js extension for make a component scalable (zooming).
