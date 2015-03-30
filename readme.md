@@ -2,10 +2,10 @@
 
 BBlocks is lightweight, flexible, simplist and hackable graphical library for build block based GUIs. This proyect is mainly inspired in [Blockly][blockly-git].
 
-The main idea is make a graphical library with some advanced features for use in a block editor. This library will replace [Blockly][blockly-git] in [blocklify][blocklify-git] project.
+The main idea is make a graphical library with some advanced features for use in a block editor, but can be used in anything . This library will replace [Blockly][blockly-git] in [blocklify][blocklify-git] project.
 
 A [live demo][livedemo].
-[livedemo]: https://carloslfu.github.io/BBlocks.js/demo.html
+[livedemo]: https://carloslfu.github.io/BBlocks.js/demos/basic/demo.html
 
 ![example1](https://github.com/carloslfu/BBlocks.js/blob/master/BB.jpg)
 ![example2](https://github.com/carloslfu/BBlocks.js/blob/master/BB_with_zoom.jpg)
@@ -16,6 +16,10 @@ A [live demo][livedemo].
 - All is nestable.
 - Zoomable, resizable and pannabble workspaces.
 - Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
+
+## Getting started
+
+See the demos folder. All documentation is in construction... (github wiki coming soon).
 
 ## Features that will be implemented
 
@@ -29,10 +33,12 @@ A [live demo][livedemo].
 
 ## Development
 
+Feel free to suggest anything or do pull requests. Visit the [contributing page][Contributing-guide] and the [documentation page][docs-page].
+
 Board on trello [BBlocks][BBlocks-trello].
 
-Feel free to suggest anything or do pull requests.
-
+[Contributing-guide]: https://github.com/carloslfu/BBlocks.js/CONTRIBUTING.md
+[docs-page]: https://github.com/carloslfu/BBlocks.js/DOCS.md
 [BBlocks-trello]: https://trello.com/b/0u71Uj56/bblocks-js
 
 [blockly-git]: https://github.com/google/blockly
