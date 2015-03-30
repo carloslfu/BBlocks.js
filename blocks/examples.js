@@ -6,13 +6,18 @@ var example_blocks = {};
 
 // Block inerits from Object
 example_blocks.example = {
-  init: function(){
+  //DOCS: init options are the customOptions passed in a block constructor
+  init: function(options){
+    if (!options) {
+      options = {};
+    }
     // this example shows the row system
     this.widthType('grouped');
     this.appendField(new BB.FieldText('hello! \n this is a text field', this));
     this.newRow();
     this.appendField(new BB.FieldText('text', this));
     this.appendField(new BB.FieldText('text', this));
+    this.appendField(new BB.FieldButton('Button', this, options.ondown));
     this.newRow();
     this.appendField(new BB.FieldText('text', this));
     this.newRow();

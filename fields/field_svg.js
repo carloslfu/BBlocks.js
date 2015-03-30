@@ -31,10 +31,10 @@ BB.FieldSvg = BB.Field.prototype.create({
       return;
     }
     if (!this.rendered) {
-      this.root = this.svg;
+      this.container = this.svg;
     }
     if (this.parent.attachDraggable) {
-      this.parent.attachDraggable.push(this.root); // This text can drag all parent
+      this.parent.attachDraggable.push(this.container); // This text can drag all parent
     }
   }
 });

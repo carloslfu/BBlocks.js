@@ -43,13 +43,13 @@ BB.FieldText = BB.Field.prototype.create({
       return;
     }
     if (!this.rendered) {
-      this.root = this.parent.container.text(this.text).font({
+      this.container = this.parent.container.text(this.text).font({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor)
         .style('text-rendering: geometricPrecision'); // when scales keeps proportions
     }
     if (this.parent.attachDraggable) {
-      this.parent.attachDraggable.push(this.root); // This text can drag all parent
+      this.parent.attachDraggable.push(this.container); // This text can drag all parent
     }
   }
 });

@@ -1,0 +1,19 @@
+/* Styles for FieldButton*/
+.BBFieldButton rect{
+  fill: #1d58d4;
+}
+.BBFieldButton:hover rect{
+  stroke: #1a4cb7;
+  stroke-width: 1px;
+  stroke-opacity: 1;
+  fill: #1a4cb7;
+}
+.BBFieldButton.BBFieldButtonPressed rect{
+  fill: #2461e0;
+  stroke: #1545af;
+  stroke-width: 2px;
+  stroke-opacity: 1;
+}
+.BBFieldButton.BBFieldButtonPressed text{
+  fill: #d3dfe2;
+}

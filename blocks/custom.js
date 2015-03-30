@@ -34,20 +34,32 @@ test_blocks.test_dev = {
     this.appendField(new BB.FieldText('Click or touch\nthe blue rect', this));
     this.appendField(new BB.FieldSvg(group2, this));
   },
-  attach: function(){
+  attach: function() {
     //this.rotate(45);
     var this_ = this;
     // TODO: allows animate rotation
-    var animation = function(){
-      PolymerGestures.removeEventListener(this_.fields[1].root.node, 'down', animation);
+    this.methods.animation = function() {
+      // start animation
+      if (this_.methods.animationStart)
+        this_.methods.animationStart();
+      PolymerGestures.removeEventListener(this_.fields[1].container.node, 'down', this_.methods.animation);
       this_.animate(1000).rotate(15).scale(1.2);
-      setTimeout(function(){
+      setTimeout(function() {
         this_.animate(1000).rotate(0).scale(1);
-        setTimeout(function(){
-          PolymerGestures.addEventListener(this_.fields[1].root.node, 'down', animation);
+        setTimeout(function() {
+          //finalize animation
+          PolymerGestures.addEventListener(this_.fields[1].container.node, 'down', this_.methods.animation);
+          if (this_.methods.animationEnd)
+            this_.methods.animationEnd();
         }, 1000);
       },1000);
     }
-    PolymerGestures.addEventListener(this.fields[1].root.node, 'down', animation);
+    PolymerGestures.addEventListener(this.fields[1].container.node, 'down', this_.methods.animation);
+  },
+  //DOCS: Best practice is put custom block methods in methods namespace
+  methods: {
+    animation: null,
+    animationStart: null,
+    animationEnd: null
   }
 };
