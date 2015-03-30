@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>test page</title>
+  <title>integration test page</title>
+
+  <!-- styles -->
+  <link type="text/css" href="../themes/default/BB.css" rel="stylesheet">
 
   <!-- touch emulator for debugging (by hammer.js)
   <script src="libs/touch-emulator.js"></script>
@@ -19,12 +22,14 @@
   <script src="../libs/utils.js"></script>
   <!-- Core -->
   <script src="../core/BB.js"></script>
-  <script src="../core/color_palettes.js"></script>
+  <script src="../themes/default/color_palettes.js"></script> <!-- now this isn't in the core TODO: fix code for separate this -->
   <script src="../core/block.js"></script>
   <script src="../core/workspace.js"></script>
   <script src="../core/field.js"></script>
-  <script src="../core/fields/field_svg.js"></script>
-  <script src="../core/fields/field_text.js"></script>
+  <!-- Fields -->
+  <script src="../fields/field_svg.js"></script>
+  <script src="../fields/field_text.js"></script>
+  <script src="../fields/field_button.js"></script>
   <!-- Blocks -->
   <script src="../blocks/custom.js"></script>
   <script src="../blocks/examples.js"></script>

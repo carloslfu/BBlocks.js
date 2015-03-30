@@ -33,10 +33,18 @@ var main = function() {
   nested2.rotate(0);
   nested2.rotate(45);
   block4.move(50, 170);
+  //field button fires animation
+  block2.fields[5].ondown = block1.methods.animation;
+  block1.methods.animationStart = function () {
+    block2.fields[5].ondown = null;
+  }
+  block1.methods.animationEnd = function () {
+    block2.fields[5].ondown = block1.methods.animation;
+  }
   
   // nesting blocks performance test
-  for (var i = 1; i < 10; i++) {
-    nested2211.addBlock('block' + i, example_blocks.example).render();
+  for (var i = 1; i < 0; i++) {
+  //  nested2211.addBlock('block' + i, example_blocks.example).render();
   }
 };
 

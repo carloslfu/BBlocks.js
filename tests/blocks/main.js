@@ -3,7 +3,6 @@ var main = function() {
 	mainWorkspace = new BB.Workspace('main', 'mainWorkspaceDiv');
 	//BB.Workspace.prototype.colorPalette = BB.colorPalettes.workspace.dark;
 	//BB.Block.prototype.colorPalette = BB.colorPalettes.block.dark;
-	// alternate color palette for workspace backgrounds
 	mainWorkspace.render();
     block1 = mainWorkspace.addBlock('block1', test_blocks.test_dev);
 	block1.render();
@@ -13,5 +12,5 @@ var main = function() {
 	block2.move(50, 170);
     block3 = mainWorkspace.addBlock('block3', test_blocks.test);
 	block3.render();
-	//block3.container.move(200, 270); //TODO: implement move of Objects
+	block3.container.move(200, 270);
 };
