@@ -8,6 +8,7 @@ This page provides help to any people that wants to contribute.
 - Do you have an extension or someting build on top of this proyect? Publish this in the [Group][BBlocks-group].
 
 This is a Board on trello for this proyect: [BBlocks trello][BBlocks-trello].
+
 This is the group for this proyect: [BBlocks group][BBlocks-group].
 
 [BBlocks-group]: https://groups.google.com/forum/?hl=es#!forum/bblocks
