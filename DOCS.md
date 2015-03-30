@@ -6,7 +6,7 @@ This page contains the documentation of the proyect. All of this content should 
 
 ### Coding
 
-This proyect follow the [Google JavaScript style][google-js-style] (FIX this link). The all the code must meet these rules, if not feel free to patch this.
+This proyect follow the [Google JavaScript style][google-js-style]. The all the code must meet these rules, if not feel free to patch this.
 
 [google-js-style]:https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
