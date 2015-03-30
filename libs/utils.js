@@ -52,16 +52,16 @@ ObjJS.mixin = function(receivingClass, givingMixin, override) {
   }
 };
 
+
+// reserved for future use
+/*
 ObjJS.countElements = function(obj) {
   var i=0;
-  for(el in mainWorkspace){
+  for(el in obj){
     i++;
   }
   return i;
 };
-
-// reserved for future use
-/*
 // Extend an existing class with a methods from another - Mixin pattern
 ObjJS.mixinClasses = function(receivingClass, givingClass, override) {
   if (override == undefined) {
