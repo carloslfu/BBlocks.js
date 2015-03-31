@@ -4,7 +4,7 @@
 
 BB.Block = BB.Component.prototype.create({
   constructor: function(name, options, customOptions)  {
-    BB.Object.call(this, 'Block');
+    this.parentClass_.constructor.call(this, 'Block');
     this.name = name;
     this.id = null;
     this.x = 0;
