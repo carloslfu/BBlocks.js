@@ -2,7 +2,7 @@
 
 // Fields are elements of blocks
 
-BB.Field = BB.Object.prototype.create({
+BB.Field = BB.Component.prototype.create({
   contructor: function(type){
     this.type = type;
     this.rendered = false;

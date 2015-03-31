@@ -1,8 +1,8 @@
 'use strict'
 
-// A Block is an svg group that do any behavior, this can contain other Blocks or Workspaces
+// A Block is an svg group that do any behavior, this can contain Fields or other Blocks
 
-BB.Block = BB.Object.prototype.create({
+BB.Block = BB.Component.prototype.create({
   constructor: function(name, options, customOptions)  {
     BB.Object.call(this, 'Block');
     this.name = name;

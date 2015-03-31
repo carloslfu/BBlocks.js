@@ -1,8 +1,8 @@
 'use strict'
 
-//A workspace is an SVG document that can contain Blocks or Workspaces
+//A Workspace is an SVG document that can contain Blocks, Workspaces and Fields (TODO: find the best way for attach Fields - An idea is a separated GUI class)
 
-BB.Workspace = BB.Object.prototype.create({
+BB.Workspace = BB.Component.prototype.create({
   constructor: function(name, workspace, options) {
     this.parentClass_.constructor.call(this, 'Workspace');
     this.name = name;

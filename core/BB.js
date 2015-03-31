@@ -1,14 +1,14 @@
 'use strict'
 
-//GLOBAL TODOS:
-// - Replace BB.Object for BB.Component, this is more semantic name.
+//GLOBAL TODOs:
+// none
 
 //namespace for BBlocks (BB)
 var BB = {};
 
-// prototype for Workspace and Blocks
+// Component class, all derivates of this
 
-BB.Object = ObjJS.prototype.create({
+BB.Component = ObjJS.prototype.create({
   constructor: function(type) {
     this.type = type;
     this.children = [];
