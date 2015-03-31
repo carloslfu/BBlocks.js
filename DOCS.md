@@ -49,7 +49,7 @@ Workspace:
 - *themes*: Styles for all objects.
   - *default*: Default theme files.
 - *core*: Main BBlocks classes
-  - *BB.js*: This contains the namespace for all BBlocks clases this use the utils.js ObjJS library. All BBlock classes inherits from BB.Component(now BB.Object but will be renamed)
+  - *BB.js*: This contains the namespace for all BBlocks clases this use the utils.js ObjJS library. All BBlock classes inherits from BB.Component.
   - *block.js*: BB.Block class: all blocks inherits from this. This implements the Block API.
   - *workspace.js*: BB.Workspace class: all workspaces inherits from this. This implements the Workspace API.
   - *field.js*: BB.Field class: all fields inherits from this. This implements the Field API.
