@@ -108,7 +108,8 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // Pointerdown handler
       PolymerGestures.addEventListener(this.container.node, 'down', function (e) {
         if (!this_.cursorInterval) {
-          this_.foreignTextInput.getChild(0).focus();
+          // TODO: the caret should be in the down event position
+          setCaretPosition(this_.foreignTextInput.getChild(0), this_.foreignTextInput.getChild(0).value.length);
           this_.showCursor();
           var blur = function (ev) {
             if (e.target.viewportElement != ev.target.viewportElement) { // An element in the same viewport can't deactivate the caret

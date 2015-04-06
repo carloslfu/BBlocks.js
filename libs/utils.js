@@ -169,6 +169,11 @@ function getCaretPosition (oField) {
   return (iCaretPos);
 }
 
+function setCaretPosition(el, position) {
+  el.selectionStart = position;
+  el.focus();
+}
+
 
 // reserved for future use
 /*
