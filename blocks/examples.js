@@ -31,7 +31,7 @@ example_blocks.example = {
     this.appendField(new BB.FieldText('text', this, {fontColor: '#ff9417'}));
     this.newRow();
     this.widthType('global');
-    this.appendField(new BB.FieldText('text', this));
+    this.appendField(new BB.FieldTextInput('TextInput', this));
     this.appendField(new BB.FieldText('text', this));
     this.appendField(new BB.FieldText('text', this));
     this.newRow();

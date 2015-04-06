@@ -70,4 +70,4 @@ Workspace:
     - *svg.min.js*: A lightweight library for manipulating and animating SVG.
     - *svg.path.min.js*: Svg.js extension for manipulating SVG paths.
     - *touch-emulator.js*: Library for emulate two finger gestures.
-    - *svg.foreignobject.js*: Svg.js extension for manipulating SVG foreign objects (isn't used yet).
+    - *svg.foreignobject.js*: Svg.js extension for manipulating SVG foreign objects.
