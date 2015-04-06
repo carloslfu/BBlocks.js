@@ -25,7 +25,8 @@ BB.Block = BB.Component.prototype.create({
       initialSpace: {x: 4, y: 0},
       finalSpace: {x: 4, y: 4},
       fieldSpace: 5,
-      rowSpace: 5, // same as borderRadius is recommended
+      topRowSpace: 2.5,
+      bottomRowSpace: 2.5,
       widthType: 'globalWidth',
     };
     if (customOptions) { //options of a custom blocks
@@ -150,12 +151,12 @@ BB.Block = BB.Component.prototype.create({
       if (typeof(this.fields[i]) == 'string') { //field control commands
         switch (this.fields[i]) {
             case 'newRow':
-              metrics.y += maxHeight + this.metrics.rowSpace + this.metrics.initialSpace.y;
+              metrics.y += maxHeight + this.metrics.bottomRowSpace + this.metrics.initialSpace.y + this.metrics.topRowSpace;
               metrics.width  += this.metrics.finalSpace.x - this.metrics.fieldSpace;
               this.metrics.rows[this.metrics.numRows] = {
                 width: metrics.width,
                 y: metrics.y,
-                height: maxHeight,
+                height: maxHeight + this.metrics.topRowSpace,
                 widthType: this.metrics.widthType
               };
               this.metrics.numRows++;
@@ -180,13 +181,13 @@ BB.Block = BB.Component.prototype.create({
         this.metrics.rows[this.metrics.numRows] = {
           width: metrics.width,
           y: metrics.y,
-          height: maxHeight,
+          height: maxHeight + this.metrics.topRowSpace,
           widthType: this.metrics.widthType
         };
         this.fields[i].row = this.metrics.numRows;
         this.fields[i].render();
-        box = this.fields[i].container.bbox();
-        this.fields[i].container.move(metrics.width, metrics.y); // position of field
+        box = (this.fields[i].container.type == 'svg')?this.fields[i].container.viewbox():this.fields[i].container.bbox();
+        this.fields[i].container.move(metrics.width, metrics.y + this.metrics.topRowSpace); // position of field
         metrics.width += box.width + this.metrics.fieldSpace;
         maxHeight = Math.max(maxHeight, box.height);
       }
