@@ -19,6 +19,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.cursorInterval = null;
     if (text && typeof(text) == 'string') {
       this.text = text;
+      this.mirrorText = text;
     } else {
       throw 'Text must be a valid string';
       return;
@@ -59,25 +60,49 @@ BB.FieldTextInput = BB.Field.prototype.create({
       this.container = this.parent.container.nested()
         .attr('style', 'overflow: hidden;');
       this.container.size(this.height, this.width);
+      //Mirror root for cursor position, this contains 0 to cursorPosition text (metrics)
+      this.mirrorRoot = this.container.text(this.text).font({
+        family: this.fontFamily
+        , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
+        .style('text-rendering: geometricPrecision');
+      // Background hides mirrorRoot
       this.background = this.container.rect(this.height, this.width).move(0, 0).fill('#fff');
       this.root = this.container.text(this.text).font({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
         .style('text-rendering: geometricPrecision'); // when scales keeps proportions
-      // Creates a text input for listening keyboard events, this isn't necesary when implemented editable svg text element from SVG 1.2 tiny specification
+      // Creates a foreign text input for listening keyboard events, this isn't necesary when implemented editable svg text element from SVG 1.2 tiny specification
       // avoid some webkit and blink bugs with textinputs when are rotated and scaled.
       this.foreignTextInput = this.container.foreignObject(0,0).attr({id: 'fobj'})
         .appendChild("textarea", {value: this.text});
       // Keyboard handler
       var this_ = this;
-      var KeyboardHandler = function (e) {
-        console.log(e.which);
-        if (this_.text != e.target.value) {
-          this_.text = e.target.value;
-          this_.root.text(this_.text);
+      var KeyboardHandler = function (e) { // Note that this handles keyup and keydown events
+        var caretPos = getCaretPosition(e.target), mirrorText;
+        if (e.type == 'input' || this_.text == e.target.value) {
+          mirrorText = this_.text.substr(0, caretPos);
+          if (this_.mirrorText != mirrorText) { // The text before the caret
+            console.log(caretPos);
+            this_.mirrorText = mirrorText;
+            this_.mirrorRoot.text(mirrorText);
+            var bbox = this_.mirrorRoot.bbox();
+            if (this_.mirrorText == '') {
+              bbox.width = 0;
+            }
+            this_.cursor.move(bbox.width, 1);
+          }
+          if (this_.text != e.target.value) {
+            this_.text = e.target.value;
+            this_.root.text(this_.text);
+            /*this_.root.text(function(add) {
+              var text =  this_.text.split('\n');
+              for (var i = 0, il = text.length; i < il; i++)
+                this.tspan(text[i]).newLine();
+            });*/
+          }
         }
-        
       }
+      this.foreignTextInput.getChild(0).addEventListener('input', KeyboardHandler);
       this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandler);
       this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandler);
       // Pointerdown handler
@@ -86,7 +111,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
           this_.foreignTextInput.getChild(0).focus();
           this_.showCursor();
           var blur = function (ev) {
-            if (e.target != ev.target) { // The element can't deactivate itself
+            if (e.target.viewportElement != ev.target.viewportElement) { // An element in the same viewport can't deactivate the caret
               PolymerGestures.removeEventListener(window, 'down', blur);
               this_.foreignTextInput.getChild(0).blur();
               this_.hideCursor();
@@ -106,12 +131,16 @@ BB.FieldTextInput = BB.Field.prototype.create({
     if (pos) {
       this.cursorXY = pos;
     } else {
-      this.cursorXY.x = 0;
-      this.cursorXY.y = 0;
+      var bbox = this.mirrorRoot.bbox();
+      if (this.mirrorText == '') {
+        bbox.width = 0;
+      }
+      this.cursorXY.x = bbox.width;
+      this.cursorXY.y = 1;
     }
     var x = this.cursorXY.x, y = this.cursorXY.y;
     if (!this.cursor) {
-      this.cursor = this.container.line(10, 1, 10, 17).stroke({ width: 1 });
+      this.cursor = this.container.line(x, y, x, y + 16).stroke({ width: 1 });
     }
     if (!this.cursorInterval) {
       this.cursor.stroke({opacity: 1});

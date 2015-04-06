@@ -17,6 +17,13 @@ A [live demo][livedemo].
 - Zoomable, resizable and pannabble workspaces.
 - Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
 
+Fields:
+
+- Svg.
+- Button.
+- Text.
+- Text input (Partially implemented).
+
 ## Getting started
 
 See the demos folder. All documentation is in construction... (github wiki coming soon). Visit the [BBlocks group][BBlocks-group] for get some feedback.
@@ -24,7 +31,7 @@ See the demos folder. All documentation is in construction... (github wiki comin
 ## Features that will be implemented
 
 - Interaction between objects (Workspaces, blocks ...).
-- SVG text input field.
+- SVG textarea input field.
 - Multiple blocks selection.
 - SVG contextmenu.
 - Custom menus.

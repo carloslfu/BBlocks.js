@@ -87,7 +87,8 @@ ObjJS.mixinClasses = function(receivingClass, givingClass, override) {
 */
 // ------------- end of Obj.js library
 /*
-// useful functions --- for svg coordenates
+// useful functions 
+// --- for svg coordenates
 
 //function imported from blockly core : utils.js
 /**
@@ -132,6 +133,42 @@ function mouseToSvg(e, node) {
   return convertCoordinates(e.clientX + scrollX,
                                     e.clientY + scrollY, true, node);
 };
+
+// --- for textInput
+
+/*
+** Returns the caret (cursor) position of the specified text field.
+** Return value range is 0-oField.value.length.
+*/
+function getCaretPosition (oField) {
+
+  // Initialize
+  var iCaretPos = 0;
+
+  // IE Support
+  if (document.selection) {
+
+    // Set focus on the element
+    oField.focus ();
+
+    // To get cursor position, get empty selection range
+    var oSel = document.selection.createRange ();
+
+    // Move selection start to 0 position
+    oSel.moveStart ('character', -oField.value.length);
+
+    // The caret position is selection length
+    iCaretPos = oSel.text.length;
+  }
+
+  // Firefox support
+  else if (oField.selectionStart || oField.selectionStart == '0')
+    iCaretPos = oField.selectionStart;
+
+  // Return results
+  return (iCaretPos);
+}
+
 
 // reserved for future use
 /*
