@@ -82,17 +82,19 @@ BB.FieldTextInput = BB.Field.prototype.create({
       this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandler);
       // Pointerdown handler
       PolymerGestures.addEventListener(this.container.node, 'down', function (e) {
-        this_.foreignTextInput.getChild(0).focus();
-        this_.showCursor();
-        var blur = function () {
-          PolymerGestures.removeEventListener(window, 'down', blur);
-          this_.foreignTextInput.getChild(0).blur();
-          this_.hideCursor();
-        };
-        // Next down event blurs textinput
-        PolymerGestures.addEventListener(window, 'down', blur);
-        e.preventDefault();
-        e.stopPropagation();
+        if (!this_.cursorInterval) {
+          this_.foreignTextInput.getChild(0).focus();
+          this_.showCursor();
+          var blur = function (ev) {
+            if (e.target != ev.target) { // The element can't deactivate itself
+              PolymerGestures.removeEventListener(window, 'down', blur);
+              this_.foreignTextInput.getChild(0).blur();
+              this_.hideCursor();
+            }
+          };
+          // Next down event blurs textinput
+          PolymerGestures.addEventListener(window, 'down', blur);
+        }
       });
     }
     if (this.parent.attachDraggable) {
