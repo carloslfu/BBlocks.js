@@ -13,6 +13,10 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.size = 15; // px default metrics in svg.js library
     this.width = 18;
     this.height = 100;
+    this.cursor = null;
+    this.cursorXY = {x: 0, y: 0};
+    this.cursorState = 0; //0: off, 1: on
+    this.cursorInterval = null;
     if (text && typeof(text) == 'string') {
       this.text = text;
     } else {
@@ -66,17 +70,24 @@ BB.FieldTextInput = BB.Field.prototype.create({
         .appendChild("textarea", {value: this.text});
       // Keyboard handler
       var this_ = this;
-      this.foreignTextInput.getChild(0).addEventListener('keyup', function (e) {
-        //console.log(e.which);
-        this_.text = e.target.value;
-        this_.root.text(this_.text);
-      });
+      var KeyboardHandler = function (e) {
+        console.log(e.which);
+        if (this_.text != e.target.value) {
+          this_.text = e.target.value;
+          this_.root.text(this_.text);
+        }
+        
+      }
+      this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandler);
+      this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandler);
       // Pointerdown handler
       PolymerGestures.addEventListener(this.container.node, 'down', function (e) {
         this_.foreignTextInput.getChild(0).focus();
+        this_.showCursor();
         var blur = function () {
           PolymerGestures.removeEventListener(window, 'down', blur);
           this_.foreignTextInput.getChild(0).blur();
+          this_.hideCursor();
         };
         // Next down event blurs textinput
         PolymerGestures.addEventListener(window, 'down', blur);
@@ -87,5 +98,41 @@ BB.FieldTextInput = BB.Field.prototype.create({
     if (this.parent.attachDraggable) {
       this.parent.attachDraggable.push(this.container); // This text can drag all parent
     }
+  },
+
+  showCursor: function (pos) {
+    if (pos) {
+      this.cursorXY = pos;
+    } else {
+      this.cursorXY.x = 0;
+      this.cursorXY.y = 0;
+    }
+    var x = this.cursorXY.x, y = this.cursorXY.y;
+    if (!this.cursor) {
+      this.cursor = this.container.line(10, 1, 10, 17).stroke({ width: 1 });
+    }
+    if (!this.cursorInterval) {
+      this.cursor.stroke({opacity: 1});
+      this.cursorState = 1;
+      var this_ = this;
+      this.cursorInterval = setInterval(function () {
+        if(this_.cursorState == 0) {
+          this_.cursor.stroke({opacity: 1});
+          this_.cursorState = 1;
+        } else {
+          this_.cursor.stroke({opacity: 0});
+          this_.cursorState = 0;
+        }
+      }, 530 );
+    }
+  },
+
+  hideCursor: function () {
+    if (this.cursor) {
+      this.cursor.stroke({opacity: 0});
+      clearInterval(this.cursorInterval);
+      this.cursorInterval = null;
+    }
   }
+
 });
