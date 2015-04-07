@@ -75,14 +75,28 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // avoid some webkit and blink bugs with textinputs when are rotated and scaled.
       this.foreignTextInput = this.container.foreignObject(0,0).attr({id: 'fobj'})
         .appendChild("textarea", {value: this.text});
-      // Keyboard handler
+      // Keyboard input handler
       var this_ = this;
-      var KeyboardHandler = function (e) { // Note that this handles keyup and keydown events
-        var caretPos = getCaretPosition(e.target), mirrorText;
-        if (e.type == 'input' || this_.text == e.target.value) {
+      var KeyboardHandlerInput = function (e) { // Note that this handles keyup and keydown events
+        var caretPos = getCaretPosition(e.target) + 1, mirrorText;
+        this_.text += e.data;
+        this_.root.text(this_.text);
+        mirrorText = this_.text.substr(0, caretPos);
+        this_.mirrorText = mirrorText;
+        this_.mirrorRoot.text(mirrorText);
+        var bbox = this_.mirrorRoot.bbox();
+        if (this_.mirrorText == '') {
+          bbox.width = 0;
+        }
+        this_.cursor.move(bbox.width, 1);
+      }
+      // Special keys handler
+      var KeyboardHandlerSpecial = function (e) { // Note that this handles keyup and keydown events
+        if (e.which == 8 || e.keyIdentifier == 'Left' || e.keyIdentifier == 'Right'
+            || e.keyIdentifier == 'Up' || e.keyIdentifier == 'Down') {
+          var caretPos = getCaretPosition(e.target), mirrorText;
           mirrorText = this_.text.substr(0, caretPos);
           if (this_.mirrorText != mirrorText) { // The text before the caret
-            console.log(caretPos);
             this_.mirrorText = mirrorText;
             this_.mirrorRoot.text(mirrorText);
             var bbox = this_.mirrorRoot.bbox();
@@ -91,20 +105,17 @@ BB.FieldTextInput = BB.Field.prototype.create({
             }
             this_.cursor.move(bbox.width, 1);
           }
+        }
+        if (e.which == 8) {
           if (this_.text != e.target.value) {
             this_.text = e.target.value;
             this_.root.text(this_.text);
-            /*this_.root.text(function(add) {
-              var text =  this_.text.split('\n');
-              for (var i = 0, il = text.length; i < il; i++)
-                this.tspan(text[i]).newLine();
-            });*/
           }
         }
       }
-      this.foreignTextInput.getChild(0).addEventListener('input', KeyboardHandler);
-      this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandler);
-      this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandler);
+      this.foreignTextInput.getChild(0).addEventListener('textInput', KeyboardHandlerInput);
+      this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandlerSpecial);
+      this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandlerSpecial);
       // Pointerdown handler
       PolymerGestures.addEventListener(this.container.node, 'down', function (e) {
         if (!this_.cursorInterval) {
