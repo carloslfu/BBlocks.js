@@ -67,7 +67,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
         .style('text-rendering: geometricPrecision');
       // Background hides mirrorRoot
       this.background = this.container.rect(this.height, this.width).move(0, 0).fill('#fff');
-      this.root = this.container.text(this.text).font({
+      this.root = this.container.text(this.text.replace(/ /g, '\u00a0')).font({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
         .style('text-rendering: geometricPrecision'); // when scales keeps proportions
@@ -78,27 +78,28 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // Keyboard input handler
       var this_ = this;
       var KeyboardHandlerInput = function (e) { // Note that this handles keyup and keydown events
-        var caretPos = getCaretPosition(e.target) + 1, mirrorText;
-        this_.text += e.data;
-        this_.root.text(this_.text);
+        var caretPos = getCaretPosition(e.target), mirrorText;
+        this_.text = this_.text.substr(0, caretPos) + e.data + this_.text.substr(caretPos, this_.text.length - 1);
+        this_.root.text(this_.text.replace(/ /g, '\u00a0'));
+        caretPos++;
         mirrorText = this_.text.substr(0, caretPos);
         this_.mirrorText = mirrorText;
-        this_.mirrorRoot.text(mirrorText);
+        this_.mirrorRoot.text(mirrorText.replace(/ /g, '\u00a0'));
         var bbox = this_.mirrorRoot.bbox();
         if (this_.mirrorText == '') {
           bbox.width = 0;
         }
         this_.cursor.move(bbox.width, 1);
       }
-      // Special keys handler
+      // Specialkeys keyboard handler
       var KeyboardHandlerSpecial = function (e) { // Note that this handles keyup and keydown events
-        if (e.which == 8 || e.keyIdentifier == 'Left' || e.keyIdentifier == 'Right'
-            || e.keyIdentifier == 'Up' || e.keyIdentifier == 'Down') {
+        if (e.which == 8 || e.which == 46 || e.keyIdentifier == 'Left' || e.keyIdentifier == 'Right'
+            || e.keyIdentifier == 'Up' || e.keyIdentifier == 'Down' || e.keyIdentifier == 'Home' || e.keyIdentifier == 'End') {
           var caretPos = getCaretPosition(e.target), mirrorText;
           mirrorText = this_.text.substr(0, caretPos);
           if (this_.mirrorText != mirrorText) { // The text before the caret
             this_.mirrorText = mirrorText;
-            this_.mirrorRoot.text(mirrorText);
+            this_.mirrorRoot.text(mirrorText.replace(/ /g, '\u00a0'));
             var bbox = this_.mirrorRoot.bbox();
             if (this_.mirrorText == '') {
               bbox.width = 0;
@@ -106,10 +107,11 @@ BB.FieldTextInput = BB.Field.prototype.create({
             this_.cursor.move(bbox.width, 1);
           }
         }
-        if (e.which == 8) {
+        // Special keys that changes the text: backspace, delete
+        if (e.which == 8 || e.which == 46) {
           if (this_.text != e.target.value) {
             this_.text = e.target.value;
-            this_.root.text(this_.text);
+            this_.root.text(this_.text.replace(/ /g, '\u00a0'));
           }
         }
       }
