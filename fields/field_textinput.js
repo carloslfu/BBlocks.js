@@ -71,53 +71,52 @@ BB.FieldTextInput = BB.Field.prototype.create({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
         .style('text-rendering: geometricPrecision'); // when scales keeps proportions
-      // Creates a foreign text input for listening keyboard events, this isn't necesary when implemented editable svg text element from SVG 1.2 tiny specification
+      // Creates a foreign text input for listening keyboard events,
+      // this isn't necesary when implemented editable svg text element from SVG 1.2 tiny specification
       // avoid some webkit and blink bugs with textinputs when are rotated and scaled.
       this.foreignTextInput = this.container.foreignObject(0,0).attr({id: 'fobj'})
         .appendChild("textarea", {value: this.text});
-      // Keyboard input handler
       var this_ = this;
-      var KeyboardHandlerInput = function (e) { // Note that this handles keyup and keydown events
-        var caretPos = getCaretPosition(e.target), mirrorText;
-        this_.text = this_.text.substr(0, caretPos) + e.data + this_.text.substr(caretPos, this_.text.length - 1);
-        this_.root.text(this_.text.replace(/ /g, '\u00a0'));
-        caretPos++;
-        mirrorText = this_.text.substr(0, caretPos);
-        this_.mirrorText = mirrorText;
-        this_.mirrorRoot.text(mirrorText.replace(/ /g, '\u00a0'));
-        var bbox = this_.mirrorRoot.bbox();
-        if (this_.mirrorText == '') {
-          bbox.width = 0;
+      // Keyboard handler
+      var KeyboardHandler = function (e) { // Note that this handles keyup and keydown events
+        // compatibility with Chrome and firefox
+        var keyId;
+        if (e.key) { // Firefox
+          keyId = e.key;
+        } else if (e.keyIdentifier) { // Chrome
+          keyId = e.keyIdentifier;
         }
-        this_.cursor.move(bbox.width, 1);
-      }
-      // Specialkeys keyboard handler
-      var KeyboardHandlerSpecial = function (e) { // Note that this handles keyup and keydown events
-        if (e.which == 8 || e.which == 46 || e.keyIdentifier == 'Left' || e.keyIdentifier == 'Right'
-            || e.keyIdentifier == 'Up' || e.keyIdentifier == 'Down' || e.keyIdentifier == 'Home' || e.keyIdentifier == 'End') {
-          var caretPos = getCaretPosition(e.target), mirrorText;
-          mirrorText = this_.text.substr(0, caretPos);
-          if (this_.mirrorText != mirrorText) { // The text before the caret
-            this_.mirrorText = mirrorText;
-            this_.mirrorRoot.text(mirrorText.replace(/ /g, '\u00a0'));
-            var bbox = this_.mirrorRoot.bbox();
-            if (this_.mirrorText == '') {
-              bbox.width = 0;
+        if (e.which == 8 || e.which == 46 || keyId == 'Left' || keyId == 'Right'
+            || keyId == 'Up' || keyId == 'Down' || keyId == 'Home' || keyId == 'End'
+            // New keyboard API for firfox see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key
+            || keyId == 'ArrowLeft' || keyId == 'ArrowRight' || keyId == 'ArrowUp' || keyId == 'ArrowDown'
+           ) {
+          // Special keys that changes the text: backspace, delete
+          if (e.which == 8 || e.which == 46) {
+            if (this_.text != e.target.value) {
+              this_.text = e.target.value;
+              this_.root.text(this_.text.replace(/ /g, '\u00a0'));
             }
-            this_.cursor.move(bbox.width, 1);
           }
+        } else { // normal keys
+          caretPos++;
+          this_.text = e.target.value;
+          this_.root.text(this_.text.replace(/ /g, '\u00a0'));
         }
-        // Special keys that changes the text: backspace, delete
-        if (e.which == 8 || e.which == 46) {
-          if (this_.text != e.target.value) {
-            this_.text = e.target.value;
-            this_.root.text(this_.text.replace(/ /g, '\u00a0'));
+        var caretPos = getCaretPosition(e.target), mirrorText;
+        mirrorText = this_.text.substr(0, caretPos);
+        if (this_.mirrorText != mirrorText) { // The text before the caret
+          this_.mirrorText = mirrorText;
+          this_.mirrorRoot.text(mirrorText.replace(/ /g, '\u00a0'));
+          var bbox = this_.mirrorRoot.bbox();
+          if (this_.mirrorText == '') {
+            bbox.width = 0;
           }
+          this_.cursor.move(bbox.width, 1);
         }
       }
-      this.foreignTextInput.getChild(0).addEventListener('textInput', KeyboardHandlerInput);
-      this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandlerSpecial);
-      this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandlerSpecial);
+      this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandler);
+      this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandler);
       // Pointerdown handler
       PolymerGestures.addEventListener(this.container.node, 'down', function (e) {
         if (!this_.cursorInterval) {
