@@ -75,7 +75,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // this isn't necesary when implemented editable svg text element from SVG 1.2 tiny specification
       // avoid some webkit and blink bugs with textinputs when are rotated and scaled.
       this.foreignTextInput = this.container.foreignObject(0,0).attr({id: 'fobj'})
-        .appendChild("textarea", {value: this.text});
+        .appendChild("input", {type: 'text', value: this.text});
       var this_ = this;
       // Keyboard handler
       var KeyboardHandler = function (e) { // Note that this handles keyup and keydown events
