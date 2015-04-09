@@ -171,6 +171,7 @@ function getCaretPosition (oField) {
 
 function setCaretPosition(el, position) {
   el.selectionStart = position;
+  el.selectionEnd = position;
   el.focus();
 }
 

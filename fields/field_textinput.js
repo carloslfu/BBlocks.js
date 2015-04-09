@@ -138,7 +138,6 @@ BB.FieldTextInput = BB.Field.prototype.create({
             break;
           }
         }
-        //if ()
         this_.mirrorText = this_.text.substr(0, i);
         this_.mirrorRoot.text(this_.mirrorText.replace(/ /g, '\u00a0'));
         setCaretPosition(this_.foreignTextInput.getChild(0), i);
