@@ -116,6 +116,7 @@ BB.Workspace = BB.Component.prototype.create({
       this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspaces
       this.childContainer = this.root.group();
       this.text = this.root.text(this.level + '');
+      //this.text = this.root.text(this.name + ' ( level: ' + this.level + ')'); // for debugging
       this.children.push({container: this.text,
                           move: function(x,y){this.container.move(x,y)}
                          });
