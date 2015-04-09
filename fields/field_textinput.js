@@ -11,11 +11,20 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.fontFamily = 'sans-serif';
     this.fontColor = '#000';
     this.size = 15; // px default metrics in svg.js library
-    this.width = 18;
-    this.height = 100;
+    this.width = 100;
+    this.height = this.size + 3;
     // Intenals
+    // TODO: a container must be a group for decoration, the root will be the root
     this.textMetrics = null;
-    this.cursorOffsetY = 1; // Y cursor offset relative to the text
+    this.textWidth = 0;
+    this.lastTextWidth = 0;
+    this.initialSpaceX = 0;
+    this.initialSpaceY = 0;
+    this.finalSpaceX = 0;
+    this.finalSpaceY = 0;
+    this.offsetX = 0; // X scroll offset relative to the text (one line textInput doesn't need offsetY)
+    this.initialCursorY = 1; // Vertical cursor initial separation relative to SVG element
+    this.initialCursorX = 0; // Horizontal cursor initial separation relative to SVG element
     this.cursor = null;
     this.cursorXY = {x: 0, y: 0};
     this.cursorState = 0; //0: off, 1: on
@@ -62,7 +71,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // Nested svg as a container allows use overflow css property
       this.container = this.parent.container.nested()
         .attr('style', 'overflow: hidden;');
-      this.container.size(this.height, this.width);
+      this.container.size(this.width, this.height);
       //Mirror root for cursor position, this contains 0 to cursorPosition text (metrics)
       this.mirrorRoot = this.container.text(this.text).font({
         family: this.fontFamily
@@ -71,10 +80,10 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // Text metrics
       this.textMetrics = this.getTextMetrics();
       // Background hides mirrorRoot
-      this.background = this.container.rect(this.height, this.width).move(0, 0).fill('#fff');
+      this.background = this.container.rect(this.width, this.height).move(0, 0).fill('#fff');
       this.root = this.container.text(this.text.replace(/ /g, '\u00a0')).font({
         family: this.fontFamily
-        , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
+        , size: this.fontSize}).fill(this.fontColor).move(this.initialSpaceX, this.initialSpaceY) //BUG: svg.js bug when add text to a group
         .style('text-rendering: geometricPrecision'); // when scales keeps proportions
       // Creates a foreign text input for listening keyboard events,
       // this isn't necesary when implemented editable svg text element from SVG 1.2 tiny specification
@@ -87,15 +96,18 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // Keyboard handler
       var KeyboardHandler = function (e) { // Note that this handles keyup and keydown events
         // compatibility with Chrome and firefox
-        var keyId;
+        var keyId, refreshCursor = false;
         if (e.key) { // Firefox
           keyId = e.key;
         } else if (e.keyIdentifier) { // Chrome
           keyId = e.keyIdentifier;
         }
+        if (keyId == 'Enter') {
+          return; // Ignore some keys
+        }
         if (e.which == 8 || e.which == 46 || keyId == 'Left' || keyId == 'Right'
             || keyId == 'Up' || keyId == 'Down' || keyId == 'Home' || keyId == 'End'
-            // New keyboard API for firfox see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key
+            // New keyboard API for firefox see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key
             || keyId == 'ArrowLeft' || keyId == 'ArrowRight' || keyId == 'ArrowUp' || keyId == 'ArrowDown'
            ) {
           // Special keys that changes the text: backspace, delete
@@ -103,6 +115,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
             if (this_.text != e.target.value) {
               this_.text = e.target.value;
               this_.root.text(this_.text.replace(/ /g, '\u00a0'));
+              this_.textMetrics = this_.getTextMetrics(); // Update text metrics
             }
           }
         } else { // normal keys
@@ -112,23 +125,44 @@ BB.FieldTextInput = BB.Field.prototype.create({
           this_.textMetrics = this_.getTextMetrics(); // Update text metrics
         }
         var caretPos = getCaretPosition(e.target), mirrorText;
+        // The text before the caret
         mirrorText = this_.text.substr(0, caretPos);
-        if (this_.mirrorText != mirrorText) { // The text before the caret
-          this_.mirrorText = mirrorText;
-          this_.mirrorRoot.text(mirrorText.replace(/ /g, '\u00a0'));
-          var bbox = this_.mirrorRoot.bbox();
-          if (this_.mirrorText == '') { // Avoids chromium bug see: https://code.google.com/p/chromium/issues/detail?id=474275
-            bbox.width = 0;
-          }
-          this_.cursor.move(bbox.width, this_.cursorOffsetY);
+        this_.mirrorText = mirrorText;
+        this_.mirrorRoot.text(mirrorText.replace(/ /g, '\u00a0'));
+        var bbox = this_.mirrorRoot.bbox();
+        if (this_.mirrorText == '') { // Avoids chromium bug see: https://code.google.com/p/chromium/issues/detail?id=474275
+          bbox.width = 0;
         }
+        // Scrolling logic
+        if (keyId == 'Left' || keyId == 'Right'
+            || keyId == 'Up' || keyId == 'Down' || keyId == 'Home' || keyId == 'End'
+            // New keyboard API for firefox see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key
+            || keyId == 'ArrowLeft' || keyId == 'ArrowRight' || keyId == 'ArrowUp' || keyId == 'ArrowDown'
+           ) { // Modify text have a diferent behavior that only moves in it
+          if (-this_.offsetX > bbox.width) {
+            this_.offsetX = -bbox.width;
+          }
+        } else { // Logic for scrolling when modify text
+          if (-this_.offsetX + this_.width >= this_.lastTextWidth && this_.width < this_.lastTextWidth) {
+            this_.offsetX = (this_.width - this_.textWidth > 0) ? 0 : this_.width - this_.textWidth;
+          }
+        }
+        if (this_.width - this_.offsetX <= bbox.width) {
+          this_.offsetX = this_.width - bbox.width;
+        }
+        this_.cursor.move(this_.initialCursorX + this_.offsetX + bbox.width, this_.initialCursorY); // Position of cursor
+        this_.root.x(this_.initialCursorX + this_.offsetX); // Scrolls the text
       }
       this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandler);
       this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandler);
 
       // Pointerdown handler
       PolymerGestures.addEventListener(this.container.node, 'down', function (e) {
+        // Keeps reference to viewport
+        var lastviewportElement = e.target.viewportElement;
         var mousePos = mouseToSvg(e, this_.container.node), i, len, pos1 = 0, pos2 = 0;
+        // Mouse position relative to scroll
+        mousePos.x -= this_.initialCursorX + this_.initialSpaceX + this_.offsetX;
         // Find the caret position for this pointerdown event
         for (i = 0, len = this_.textMetrics.length; i <= len; i++) {
           pos1 = pos2;
@@ -143,11 +177,13 @@ BB.FieldTextInput = BB.Field.prototype.create({
         setCaretPosition(this_.foreignTextInput.getChild(0), i);
         if (!this_.cursorInterval) {
           var blur = function (ev) {
-            if (e.target.viewportElement != ev.target.viewportElement) { // An element in the same viewport can't deactivate the caret
+            if (lastviewportElement != ev.target.viewportElement) { // An element in the same viewport can't deactivate the caret
               PolymerGestures.removeEventListener(window, 'down', blur);
               this_.foreignTextInput.getChild(0).blur();
               this_.hideCursor();
             }
+            ev.preventDefault();
+            ev.stopPropagation();
           };
           // Next down event blurs textinput
           PolymerGestures.addEventListener(window, 'down', blur);
@@ -155,10 +191,11 @@ BB.FieldTextInput = BB.Field.prototype.create({
         this_.showCursor();
       });
 
+      if (this.parent.attachDraggable) {
+        this.parent.attachDraggable.push(this.container); // This text can drag all parent
+      }
     }
-    if (this.parent.attachDraggable) {
-      this.parent.attachDraggable.push(this.container); // This text can drag all parent
-    }
+  
   },
 
   showCursor: function (pos) {
@@ -169,12 +206,12 @@ BB.FieldTextInput = BB.Field.prototype.create({
       if (this.mirrorText == '') {
         bbox.width = 0;
       }
-      this.cursorXY.x = bbox.width;
-      this.cursorXY.y = this.cursorOffsetY;
+      this.cursorXY.x = this.initialCursorX + this.offsetX + bbox.width;
+      this.cursorXY.y = this.initialCursorY;
     }
     var x = this.cursorXY.x, y = this.cursorXY.y;
     if (!this.cursor) {
-      this.cursor = this.container.line(x, y, x, y + 16).stroke({ width: 1 });
+      this.cursor = this.container.line(x, y, x, y + this.size + 1).stroke({ width: 1 });
     } else { // If cursor exists moves it
       this.cursor.move(x, y);
     }
@@ -190,7 +227,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
           this_.cursor.stroke({opacity: 0});
           this_.cursorState = 0;
         }
-      }, 530 );
+      }, 530 ); // Interval in ms for the caret
     }
   },
 
@@ -204,6 +241,8 @@ BB.FieldTextInput = BB.Field.prototype.create({
 
   getTextMetrics: function () {
     var tempMirrorText = this.text, lastWidth = 0;
+    // Keeps last value
+    this.lastTextWidth = this.textWidth;
     // Calc text metrics
     var textMetrics = [], bbox;
     for (var i = 1, len = this.text.length; i <= len; i++) {
@@ -213,6 +252,8 @@ BB.FieldTextInput = BB.Field.prototype.create({
       textMetrics.push(bbox.width - lastWidth);
       lastWidth = bbox.width;
     }
+    // Keeps lastWidth
+    this.textWidth = lastWidth;
     // Restores mirrorRoot text
     this.mirrorRoot.text(this.text.replace(/ /g, '\u00a0'));
     return textMetrics;
