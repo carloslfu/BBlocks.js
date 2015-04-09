@@ -45,7 +45,7 @@ Workspace:
 
 - *blocks*: Definitions of custom blocks using the Block API, in this folder there are some example and testing blocks.
 - *fields*:  Definitions of custom fields using the Field API.
-  - *FieldSVG, FieldText and FieldButton are implemented here*.
+  - *FieldSVG, FieldText, FieldTextInput and FieldButton are implemented here*.
 - *themes*: Styles for all objects.
   - *default*: Default theme files.
 - *core*: Main BBlocks classes
