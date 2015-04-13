@@ -2,6 +2,7 @@
 
 // Field text input
 BB.FieldTextInput = BB.Field.prototype.create({
+  // TODO: invert text color when are selected, note that is not trivial.
   constructor: function(text, parent, options)  {
     this.parentClass_.constructor.call(this, 'Text');
     this.children = [];
@@ -9,12 +10,14 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.childContainer = null; // svg group that contains all children
     this.root = null;
     this.fontFamily = 'sans-serif';
-    this.fontColor = '#000';
+    this.fontColor = '#000'; // Must be in hex format to get the negative or modify utils.js/color2negative function to allows other color formats
+    // (Not yet implemented negative color for selection)
+    this.selectionColor = '#3399FF';
     this.size = 15; // px default metrics in svg.js library
     this.width = 100;
     this.height = this.size + 3;
     // Intenals
-    // TODO: a container must be a group for decoration, the root will be the root
+    // TODO: a container must be a group for decoration, the root will be the text
     this.textMetrics = null;
     this.textWidth = 0;
     this.lastTextWidth = 0;
@@ -81,6 +84,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       this.textMetrics = this.getTextMetrics();
       // Background hides mirrorRoot
       this.background = this.container.rect(this.width, this.height).move(0, 0).fill('#fff');
+      this.selectionRoot =  this.container.rect(0, this.initialCursorY + this.size + 1).move(0, 0).fill(this.selectionColor);
       this.root = this.container.text(this.text.replace(/ /g, '\u00a0')).font({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor).move(this.initialSpaceX, this.initialSpaceY) //BUG: svg.js bug when add text to a group
@@ -124,7 +128,19 @@ BB.FieldTextInput = BB.Field.prototype.create({
           this_.root.text(this_.text.replace(/ /g, '\u00a0'));
           this_.textMetrics = this_.getTextMetrics(); // Update text metrics
         }
-        var caretPos = getCaretPosition(e.target), mirrorText;
+        // getCaretPosition function not used now
+        var selectionStart = this_.foreignTextInput.getChild(0).selectionStart, mirrorText,
+            selectionEnd = this_.foreignTextInput.getChild(0).selectionEnd, selectionWidth = 0, i,
+            caretPos = selectionStart;
+        // Computes the width of selectionRoot (the rect for selected text)
+        for (i = selectionStart; i < selectionEnd; i++) {
+          selectionWidth += this_.textMetrics[i];
+        }
+        if (selectionWidth == 0) {
+          this_.showCursor();
+        } else {
+          this_.hideCursor();
+        }
         // The text before the caret
         mirrorText = this_.text.substr(0, caretPos);
         this_.mirrorText = mirrorText;
@@ -152,6 +168,8 @@ BB.FieldTextInput = BB.Field.prototype.create({
         }
         this_.cursor.move(this_.initialCursorX + this_.offsetX + bbox.width, this_.initialCursorY); // Position of cursor
         this_.root.x(this_.initialCursorX + this_.offsetX); // Scrolls the text
+        this_.selectionRoot.move(this_.initialCursorX + this_.offsetX + bbox.width, this_.initialCursorY);
+        this_.selectionRoot.width(selectionWidth);
       }
       this.foreignTextInput.getChild(0).addEventListener('keyup', KeyboardHandler);
       this.foreignTextInput.getChild(0).addEventListener('keydown', KeyboardHandler);
@@ -167,11 +185,12 @@ BB.FieldTextInput = BB.Field.prototype.create({
         for (i = 0, len = this_.textMetrics.length; i <= len; i++) {
           pos1 = pos2;
           pos2 += ((i == 0) ? 0 : this_.textMetrics[i - 1]/2) + ((i == len) ? 0 : this_.textMetrics[i]/2);
-          console.log(pos1 + '<=' + mousePos.x + '<' + pos2)
+          //console.log(pos1 + '<=' + mousePos.x + '<' + pos2) // DEBUGGING LINE
           if (pos1 <= mousePos.x && mousePos.x < pos2) {
             break;
           }
         }
+        this_.selectionRoot.width(0);
         this_.mirrorText = this_.text.substr(0, i);
         this_.mirrorRoot.text(this_.mirrorText.replace(/ /g, '\u00a0'));
         setCaretPosition(this_.foreignTextInput.getChild(0), i);

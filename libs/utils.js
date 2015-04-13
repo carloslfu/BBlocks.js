@@ -136,10 +136,18 @@ function mouseToSvg(e, node) {
 
 // --- for textInput
 
+function setCaretPosition(el, position) {
+  el.selectionStart = position;
+  el.selectionEnd = position;
+  el.focus();
+};
+
+// getCaretPosition function not used now
 /*
 ** Returns the caret (cursor) position of the specified text field.
 ** Return value range is 0-oField.value.length.
 */
+/*
 function getCaretPosition (oField) {
 
   // Initialize
@@ -167,13 +175,25 @@ function getCaretPosition (oField) {
 
   // Return results
   return (iCaretPos);
-}
+};
+*/
 
-function setCaretPosition(el, position) {
-  el.selectionStart = position;
-  el.selectionEnd = position;
-  el.focus();
-}
+function color2negative(hex) {
+    // Validate hex string
+    hex = String(hex).replace(/[^0-9a-f]/gi, "");
+    if (hex.length < 6) {
+        hex = hex.replace(/(.)/g, '$1$1');
+    }
+    // Convert to decimal and converts to negative
+    var rgb = "#",
+        c;
+    for (var i = 0; i < 3; ++i) {
+        c = parseInt(hex.substr(i * 2, 2), 16);
+        c = (255 - c).toString(16);
+        rgb += ("00" + c).substr(c.length);
+    }
+    return rgb;
+};
 
 
 // reserved for future use
