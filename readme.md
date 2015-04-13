@@ -40,7 +40,7 @@ See the demos folder. All documentation is in construction... (github wiki comin
 
 ## Development
 
-Feel free to suggest anything or subbmit a pull request. Visit the [contributing page][Contributing-guide] and the [documentation page][docs-page].
+Feel free to suggest anything or submit a pull request. Visit the [contributing page][Contributing-guide] and the [documentation page][docs-page].
 
 Board on trello [BBlocks][BBlocks-trello].
 
