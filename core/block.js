@@ -295,7 +295,7 @@ BB.Block = BB.Component.prototype.create({
     // bottom line
     this.root.q({x: 0, y: radius}, {x: -radius, y: radius})
              .h(-finalWidth + 2*radius)
-             // TODO: report border bug in svg, when drag a block with black border, this proyest dont use that, use svg rect
+             // TODO: report border bug in svg, when drag a block with black border, this project dont use that, use svg rect
     // this bug is resolved in chromium 43, TODO: test in chrome 41
              /*.stroke({ color: this.borderColor,
                        opacity: 1,

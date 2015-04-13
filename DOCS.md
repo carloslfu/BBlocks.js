@@ -1,12 +1,12 @@
 # BBlocks.js documentation
 
-This page contains the documentation of the proyect. All of this content should be merged in the proyect wiki. This docs are in construction ...
+This page contains the documentation of the project. All of this content should be merged in the project wiki. This docs are in construction ...
 
 ## Develop
 
 ### Coding
 
-This proyect follow the [Google JavaScript style][google-js-style]. All the code must meet these rules, if not, feel free to patch this.
+This project follows the [Google JavaScript style][google-js-style]. All the code must meet these rules, if not, feel free to patch this.
 
 [google-js-style]:https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
@@ -54,18 +54,18 @@ Workspace:
   - *workspace.js*: BB.Workspace class: all workspaces inherits from this. This implements the Workspace API.
   - *field.js*: BB.Field class: all fields inherits from this. This implements the Field API.
   - *workspace_blocks.js*: not yet implemented, (this will contains all GUI attached to workspaces).
-- *tests*: Tests for this proyect.
+- *tests*: Tests for this project.
   - *blocks*: Tests for integration of Blocks and Fields.
   - *workspaces*: Tests for workspaces.
   - *playground.html*: Tests of integration of all components.
-- *demos*: All demos of this proyect.
-- *libs*: Libraries used in this proyect.
+- *demos*: All demos of this project.
+- *libs*: Libraries used in this project.
   - *utils.js*: Useful functions and ObjJS class for dinamically creating classes.
   - *draggable.js*: Svg.js extension for make a component dragabble.
   - *pannable.js*: Svg.js extension for make a component pannable.
   - *resizable.js*: Svg.js extension for make a component resizable.
   - *scalable.js*: Svg.js extension for make a component scalable (zooming).
-  - *thirdparty*: Thirdparty libraies used in this proyect.
+  - *thirdparty*: Thirdparty libraies used in thisjyect.
     - *polymergestures.min.js*: Library for pointer gestures support (mouse, touch, pen ...).
     - *svg.min.js*: A lightweight library for manipulating and animating SVG.
     - *svg.path.min.js*: Svg.js extension for manipulating SVG paths.

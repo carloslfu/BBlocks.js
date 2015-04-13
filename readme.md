@@ -1,6 +1,6 @@
 # BBlocks.js (alpha version)
 
-BBlocks is lightweight, flexible, simplist and hackable graphical library for build block based GUIs. This proyect is mainly inspired in [Blockly][blockly-git].
+BBlocks is lightweight, flexible, simplist and hackable graphical library for build block based GUIs. This project is mainly inspired in [Blockly][blockly-git].
 
 The main idea is make a graphical library with some advanced features for use in a block editor, but can be used in anything . This library will replace [Blockly][blockly-git] in [blocklify][blocklify-git] project.
 
