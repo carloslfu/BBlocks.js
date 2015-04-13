@@ -84,7 +84,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       this.textMetrics = this.getTextMetrics();
       // Background hides mirrorRoot
       this.background = this.container.rect(this.width, this.height).move(0, 0).fill('#fff');
-      this.selectionRoot =  this.container.rect(0, this.initialCursorY + this.size + 1).move(0, 0).fill(this.selectionColor);
+      this.selectionRoot =  this.container.rect(0, this.initialCursorY + this.size).move(0, 0).fill(this.selectionColor);
       this.root = this.container.text(this.text.replace(/ /g, '\u00a0')).font({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor).move(this.initialSpaceX, this.initialSpaceY) //BUG: svg.js bug when add text to a group
@@ -118,7 +118,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
           if (e.which == 8 || e.which == 46) {
             if (this_.text != e.target.value) {
               this_.text = e.target.value;
-              this_.root.text(this_.text.replace(/ /g, '\u00a0'));
+              this_.root.text(this_.text.replace(/ /g, '\u00a0')); // Shows spaces with the &nbsp html character
               this_.textMetrics = this_.getTextMetrics(); // Update text metrics
             }
           }
@@ -199,6 +199,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
             if (lastviewportElement != ev.target.viewportElement) { // An element in the same viewport can't deactivate the caret
               PolymerGestures.removeEventListener(window, 'down', blur);
               this_.foreignTextInput.getChild(0).blur();
+              this_.selectionRoot.width(0); // Hides selectionRoot
               this_.hideCursor();
             }
             ev.preventDefault();
