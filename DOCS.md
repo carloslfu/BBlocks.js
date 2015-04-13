@@ -65,7 +65,7 @@ Workspace:
   - *pannable.js*: Svg.js extension for make a component pannable.
   - *resizable.js*: Svg.js extension for make a component resizable.
   - *scalable.js*: Svg.js extension for make a component scalable (zooming).
-  - *thirdparty*: Thirdparty libraies used in thisjyect.
+  - *thirdparty*: Thirdparty libraies used in this project.
     - *polymergestures.min.js*: Library for pointer gestures support (mouse, touch, pen ...).
     - *svg.min.js*: A lightweight library for manipulating and animating SVG.
     - *svg.path.min.js*: Svg.js extension for manipulating SVG paths.
