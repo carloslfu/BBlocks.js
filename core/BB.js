@@ -1,7 +1,7 @@
 'use strict'
 
 //GLOBAL TODOs:
-// none
+// - Make all unrender methods (Allows rerender a component)
 
 //namespace for BBlocks (BB)
 var BB = {};
