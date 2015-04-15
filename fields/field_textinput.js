@@ -168,6 +168,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
         }
         this_.cursor.move(this_.initialCursorX + this_.offsetX + bbox.width, this_.initialCursorY); // Position of cursor
         this_.root.x(this_.initialCursorX + this_.offsetX); // Scrolls the text
+        // Moves and resize selectionRoot
         this_.selectionRoot.move(this_.initialCursorX + this_.offsetX + bbox.width, this_.initialCursorY);
         this_.selectionRoot.width(selectionWidth);
       }
@@ -176,6 +177,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
 
       // Pointerdown handler
       PolymerGestures.addEventListener(this.container.node, 'down', function (e) {
+        console.log('down');
         // Keeps reference to viewport
         var lastviewportElement = e.target.viewportElement;
         var mousePos = mouseToSvg(e, this_.container.node), i, len, pos1 = 0, pos2 = 0;
@@ -210,9 +212,64 @@ BB.FieldTextInput = BB.Field.prototype.create({
         }
         this_.showCursor();
       });
-
+      
+      //Pointertrackstart handler
+      PolymerGestures.addEventListener(this.container.node, 'trackstart', function (e) {
+        this_.referenceCursorSelection = this_.foreignTextInput.getChild(0).selectionStart;
+      });
+      // Pointertrack handler (movement of cursor)
+      PolymerGestures.addEventListener(this.container.node, 'track', function (e) {
+        console.log(e.dx)
+        // Keeps reference to viewport
+        var mousePos = mouseToSvg(e, this_.container.node), i, len, pos1 = 0, pos2 = 0;
+        // Mouse position relative to scroll
+        mousePos.x -= this_.initialCursorX + this_.initialSpaceX + this_.offsetX;
+        // Find the caret position for this pointerdown event
+        if (mousePos.x < 0) {
+          i = 0;
+        } else { 
+          for (i = 0, len = this_.textMetrics.length; i <= len; i++) {
+            pos1 = pos2;
+            pos2 += ((i == 0) ? 0 : this_.textMetrics[i - 1]/2) + ((i == len) ? 0 : this_.textMetrics[i]/2);
+            //console.log(pos1 + '<=' + mousePos.x + '<' + pos2) // DEBUGGING LINE
+            if (pos1 <= mousePos.x && mousePos.x < pos2) {
+              break;
+            }
+          }
+        }
+        var reverseSelection = false;
+        if (e.dx >= 0) {
+          this_.foreignTextInput.getChild(0).selectionStart = this_.referenceCursorSelection;
+          this_.foreignTextInput.getChild(0).selectionEnd = i;
+        } else {
+          this_.foreignTextInput.getChild(0).selectionStart = i;
+          this_.foreignTextInput.getChild(0).selectionEnd = this_.referenceCursorSelection;
+          reverseSelection = true;
+        }
+        //console.log('d:'+this_.foreignTextInput.getChild(0).selectionEnd);
+        //console.log('d:'+this_.foreignTextInput.getChild(0).selectionStart);
+        var selectionStart = this_.foreignTextInput.getChild(0).selectionStart,
+            mirrorText, selectionEnd = this_.foreignTextInput.getChild(0).selectionEnd, selectionWidth = 0;
+        // Computes the width of selectionRoot (the rect for selected text)
+        for (i = selectionStart; i < selectionEnd; i++) {
+          selectionWidth += this_.textMetrics[i];
+        }
+        if (selectionWidth == 0) {
+          this_.showCursor();
+        } else {
+          this_.hideCursor();
+        }
+        //console.log('up:' + selectionWidth);
+        var bbox = this_.mirrorRoot.bbox();
+        if (this_.mirrorText == '') { // Avoids chromium bug see: https://code.google.com/p/chromium/issues/detail?id=474275
+          bbox.width = 0;
+        }
+        // Moves and resize selectionRoot
+        this_.selectionRoot.move(this_.initialCursorX + this_.offsetX + bbox.width - (reverseSelection?selectionWidth:0), this_.initialCursorY);
+        this_.selectionRoot.width(selectionWidth);
+      });
       if (this.parent.attachDraggable) {
-        this.parent.attachDraggable.push(this.container); // This text can drag all parent
+        //this.parent.attachDraggable.push(this.container); // This text can drag all parent
       }
     }
   

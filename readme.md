@@ -22,7 +22,7 @@ Fields:
 - Svg.
 - Button.
 - Text.
-- Text input (Partially implemented).
+- Text input.
 
 ## Getting started
 
