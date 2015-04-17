@@ -17,3 +17,7 @@
 .BBFieldButton.BBFieldButtonPressed text{
   fill: #d3dfe2;
 }
+.BBFieldTextInput:hover>rect {
+  stroke-width: 2;
+  stroke: #fff;
+}

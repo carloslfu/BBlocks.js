@@ -51,5 +51,6 @@ BB.FieldText = BB.Field.prototype.create({
     if (this.parent.attachDraggable) {
       this.parent.attachDraggable.push(this.container); // This text can drag all parent
     }
+    this.rendered = true;
   }
 });

@@ -119,7 +119,7 @@ BB.Block = BB.Component.prototype.create({
       this.attachDraggable.push(this.rootDark);
       this.attachDraggable.push(this.rootLight);
       this.attachDraggable.push(this.root);
-      this.container.draggable(this, null, this.attachDraggable);
+      this.updateDraggable();
       var el = this; //for the next closure
       this.container.dragstart = function() {
         el.toTopPropagate(); //focus workspace
@@ -136,6 +136,10 @@ BB.Block = BB.Component.prototype.create({
   attachEvents: function(child) {
     this.attachDraggable.push(child);
     this.container.draggable(this.workspace, null, this.attachDraggable);
+  },
+
+  updateDraggable: function(child) {
+    this.container.draggable(this, null, this.attachDraggable);
   },
 
   // calculate metrics
@@ -186,7 +190,7 @@ BB.Block = BB.Component.prototype.create({
         };
         this.fields[i].row = this.metrics.numRows;
         this.fields[i].render();
-        box = (this.fields[i].container.type == 'svg')?this.fields[i].container.viewbox():this.fields[i].container.bbox();
+        box = this.fields[i].bbox();
         this.fields[i].container.move(metrics.width, metrics.y + this.metrics.topRowSpace); // position of field
         metrics.width += box.width + this.metrics.fieldSpace;
         maxHeight = Math.max(maxHeight, box.height);

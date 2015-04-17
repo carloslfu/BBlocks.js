@@ -81,5 +81,6 @@ BB.FieldButton = BB.Field.prototype.create({
     PolymerGestures.addEventListener(this.container.node, 'up', function() {
       this_.container.removeClass(this_.style.classPressedName);
     });
+    this.rendered = true;
   }
 });

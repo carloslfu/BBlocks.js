@@ -34,11 +34,11 @@ BB.Workspace = BB.Component.prototype.create({
       return;
     }
     this.workspace = workspace;
-    //woorkspace not rendered
+    // Workspace not rendered
     this.rendered = false;
     // options
     if (!options) {
-    //default options
+    // default options
       return;
     }
     if (options.width) {
