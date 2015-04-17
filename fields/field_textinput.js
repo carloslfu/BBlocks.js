@@ -1,5 +1,5 @@
 'use strict'
-
+// Future inspiration and ideas for implementation http://making.fiftythree.com/fluid-text-inputs/
 // Field text input
 BB.FieldTextInput = BB.Field.prototype.create({
   // TODO: invert text color when are selected, note that is not trivial.
@@ -106,7 +106,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // avoid some webkit and blink bugs with textinputs when are rotated and scaled.
       this.foreignTextInput = this.container.foreignObject(0,0).attr({id: 'fobj'})
         .appendChild("input", {type: 'text', value: this.text});
-
+      this.setMaxChars(24); // Android bug when have 25 characters - REPORT this (OMG report all svg foreign object implementation! o.O)
       var this_ = this;
 
       // Keyboard handler
@@ -447,6 +447,16 @@ BB.FieldTextInput = BB.Field.prototype.create({
         this.parent.updateDraggable();
       }
       this.focused = bool;
+    }
+  },
+
+  // set the max number of chars in the field
+  setMaxChars: function(num){
+    if (num != undefined) {
+      this.maxChars_ = num;
+      this.foreignTextInput.getChild(0).maxLength = num;
+    } else {
+      throw 'Num is not optional';
     }
   },
 
