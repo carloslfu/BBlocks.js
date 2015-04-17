@@ -95,12 +95,12 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // Background hides mirrorRoot
       this.background = this.root.rect(this.width, this.height).move(0, 0).fill(this.backgroundColorBlured);
       this.selectionRoot =  this.root.rect(0, this.initialCursorY + this.size).move(0, 0).fill(this.selectionColor);
-      // Text metrics
-      this.getTextMetrics();
       this.textRoot = this.root.text(this.text.replace(/ /g, '\u00a0')).font({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
         .style('text-rendering: geometricPrecision'); // when scales keeps proportions
+      // Text metrics
+      this.getTextMetrics();
       // Creates a foreign text input for listening keyboard events,
       // this isn't necesary when implemented editable svg text element from SVG 1.2 tiny specification
       // avoid some webkit and blink bugs with textinputs when are rotated and scaled.
@@ -135,9 +135,11 @@ BB.FieldTextInput = BB.Field.prototype.create({
             }
           }
         } else { // normal keys
-          this_.text = e.target.value;
-          this_.textRoot.text(this_.text.replace(/ /g, '\u00a0'));
-          this_.getTextMetrics(-1, this_.foreignTextInput.getChild(0).selectionStart); // Update text metrics
+          if (this_.text != e.target.value) {
+            this_.text = e.target.value;
+            this_.textRoot.text(this_.text.replace(/ /g, '\u00a0'));
+            this_.getTextMetrics(-1, this_.foreignTextInput.getChild(0).selectionStart); // Update text metrics
+          }
         }
         // getCaretPosition function not used now
         var selectionStart = this_.foreignTextInput.getChild(0).selectionStart, mirrorText,
@@ -319,7 +321,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
     if (pos) {
       this.cursorXY = pos;
     } else {
-      var bbox = this.mirrorRoot.bbox();
+      var bbox = this.mirrorRoot.node.getBBox();
       if (this.mirrorText == '') {
         bbox.width = 0;
       }
@@ -368,7 +370,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.lastTextWidth = this.textWidth;
     // Calc text metrics
     var textMetrics, bbox, bbox2, bbox3, dx1, dx2;
-    if (true || keydiff == undefined || this.textMetrics == null) { // Calcs metrics of a whole text
+    if (keydiff == undefined || this.textMetrics == null) { // Calcs metrics of a whole text
       textMetrics = [];
       for (var i = 1, len = this.text.length; i <= len; i++) {
         tempMirrorText = this.text.substr(0, i);
@@ -385,38 +387,27 @@ BB.FieldTextInput = BB.Field.prototype.create({
         textMetrics = this.textMetrics;
         tempMirrorText = this.text.substr(0, position - 1);
         this.mirrorRoot.text(tempMirrorText.replace(/ /g, '\u00a0')); // TODO: make a setText method that functionality
-        bbox = this.mirrorRoot.bbox();
+        bbox = this.mirrorRoot.node.getBBox();
         if (tempMirrorText.length == 0) { // BUG: chrome, reported before in this code
           bbox.width = 0;
         }
         tempMirrorText = this.text.substr(0, position);
         this.mirrorRoot.text(tempMirrorText.replace(/ /g, '\u00a0')); // TODO: make a setText method that functionality
-        bbox2 = this.mirrorRoot.bbox();
-        if (tempMirrorText.length == 0) { // BUG: chrome, reported before in this code
-          bbox2.width = 0;
-        }
+        bbox2 = this.mirrorRoot.node.getBBox();
         dx1 = bbox2.width - bbox.width;
         tempMirrorText = this.text.substr(0, position + 1);
         this.mirrorRoot.text(tempMirrorText.replace(/ /g, '\u00a0')); // TODO: make a setText method that functionality
-        bbox3 = this.mirrorRoot.bbox();
-        if (tempMirrorText.length == 0) { // BUG: chrome, reported before in this code
-          bbox3.width = 0;
-        }
+        bbox3 = this.mirrorRoot.node.getBBox();
         dx2 = bbox3.width - bbox2.width;
-        this.mirrorRoot.text(this.text.replace(/ /g, '\u00a0')); // TODO: make a setText method that functionality Telue
-        bbox = this.mirrorRoot.bbox();
-        lastWidth = bbox.width;
-        if (dx1 != 0) {
-          textMetrics =  textMetrics.slice(0, position - 1).concat([dx1].concat(textMetrics.slice(position - 1)));
-        }
+        textMetrics =  textMetrics.slice(0, position - 1).concat([dx1].concat(textMetrics.slice(position)));
         if (dx2 != 0) {
           textMetrics =  textMetrics.slice(0, position).concat([dx2].concat(textMetrics.slice(position)));
         }
-        console.log(dx1 + ' : ' +dx2)
+        //console.log(textMetrics.length + ' : ' + this.text.length)
       }
     }
     // Keeps lastWidth
-    this.textWidth = lastWidth;
+    this.textWidth =  this.textRoot.node.getBBox().width;
     // Keeps lastText
     this.lastText = this.text;
     // Restores mirrorRoot text

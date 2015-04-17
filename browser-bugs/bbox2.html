@@ -13,19 +13,20 @@
   <!-- thirdparty libs -->
   <script src="../libs/thirdparty/svg.js"></script>
   <script type="text/javascript">
+    // TODO: report this bug in chromium
     function main() {
       var canvas = SVG('mainWorkspaceDiv').fixSubPixelOffset();
       var text = canvas.text('TT');
       var bbox = text.bbox();
       console.log(bbox.width);
       text.text('TTT');
-      var bbox1 = text.bbox();
+      var bbox1 = text.node.getBBox();
       console.log(bbox1.width - bbox.width);
       text.text('TTTT');
-      var bbox2 = text.bbox();
+      var bbox2 = text.node.getBBox();
       console.log(bbox2.width - bbox1.width);
       text.text('TTTTT');
-      var bbox3 = text.bbox();
+      var bbox3 = text.node.getBBox();
       console.log(bbox3.width - bbox2.width);
     }
   </script>
