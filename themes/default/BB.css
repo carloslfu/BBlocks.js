@@ -21,3 +21,13 @@
   stroke-width: 2;
   stroke: #fff;
 }
+.BBComponentBlock {
+  stroke: #000;
+  stroke-width: 1px;
+  stroke-opacity: 0.4;
+}
+.BBComponentWorkspace {
+  stroke: #000;
+  stroke-width: 6px;
+  stroke-opacity: 0.4;
+}

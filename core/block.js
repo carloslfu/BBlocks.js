@@ -19,6 +19,9 @@ BB.Block = BB.Component.prototype.create({
     this.nested = true; // Blocks are nested by default, allows toTopPropagate
     this.fields = [];
     this.attachDraggable = [];
+    this.style = {
+      className: 'BBComponentBlock'
+    };
     this.metrics = {
       borderRadius: 2,
       borderWidth: 1,
@@ -106,8 +109,8 @@ BB.Block = BB.Component.prototype.create({
         this.children[i].render();
         this.childContainer.add(this.children[i].container);
       }
-      this.container.add(this.rootDark);
-      this.container.add(this.rootLight);
+      //this.container.add(this.rootDark);
+      //this.container.add(this.rootLight);
       this.container.add(this.root);
       this.container.add(this.childContainer);
       // add fields to top of container
@@ -116,8 +119,8 @@ BB.Block = BB.Component.prototype.create({
           this.fields[i].toTop();
         }
       }
-      this.attachDraggable.push(this.rootDark);
-      this.attachDraggable.push(this.rootLight);
+      //this.attachDraggable.push(this.rootDark);
+      //this.attachDraggable.push(this.rootLight);
       this.attachDraggable.push(this.root);
       this.updateDraggable();
       var el = this; //for the next closure
@@ -261,8 +264,7 @@ BB.Block = BB.Component.prototype.create({
     height -= radius;
     //first row
     this.root.H(row.width - radius)
-              .q({x: radius, y: 0}, {x: radius, y: radius})
-              .V(height);
+              .q({x: radius, y: 0}, {x: radius, y: radius});
     //render by row rigth line - middle
     for (var i = 1; i < this.metrics.rows.length - 1 ; i++) {
       row = this.metrics.rows[i];
@@ -305,14 +307,7 @@ BB.Block = BB.Component.prototype.create({
                        opacity: 1,
                        width: this.metrics.borderWidth
               }).fill(this.bgColor);*/
-    //TODO: make a lightpath and a boxshadow filter for 3d effect
-    // instead of cloning the main path of block(root)
     this.root.fill(this.bgColor);
-    this.rootDark = this.root.clone();
-    this.rootDark.fill(this.shadowColor);
-    this.rootDark.dmove(1,1);
-    this.rootLight = this.root.clone();
-    this.rootLight.fill(this.lightColor);
-    this.rootLight.dmove(-1,-1);
+    this.root.addClass(this.style.className);
   }
 });

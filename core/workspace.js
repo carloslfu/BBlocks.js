@@ -30,6 +30,9 @@ BB.Workspace = BB.Component.prototype.create({
     this.centerOffsetX = 0;
     this.centerOffsetY = 0;
     this.pannable = true;
+    this.style = {
+      className: 'BBComponentWorkspace'
+    };
     if (!workspace) {
       return;
     }
@@ -105,11 +108,15 @@ BB.Workspace = BB.Component.prototype.create({
         this.resizeBox = this.workspace.root.rect(10, 10)
                            .stroke({ color: this.borderColor, opacity: 1, width: 1 })
                            .fill(this.resizeBoxColor).radius(1).move(this.width-5, this.height-5);
+        //this.borderShadow = this.workspace.root.rect(this.width + 4, this.height + 4).fill('none').radius(7).dmove(-2,-2);
+        this.borderShadow = this.workspace.root.rect(this.width, this.height).fill('none').radius(5);
         this.border = this.workspace.root.rect(this.width, this.height)
                           .stroke({ color: this.borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
+        this.container.add(this.borderShadow);
         this.container.add(this.border);
         this.container.add(this.dragBox);
         this.container.add(this.resizeBox);
+        this.borderShadow.addClass(this.style.className);
       } else {
         this.root.attr('style', 'border: 1px solid ' + this.borderColor + ';');
       }
