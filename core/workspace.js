@@ -193,6 +193,7 @@ BB.Workspace = BB.Component.prototype.create({
     this.width = width;
     this.height = height;
     this.border.size(width, height);
+    this.borderShadow.size(width, height);
     this.root.size(width, height);
     this.background.size(width, height);
     this.resizeBox.move(this.width-5, this.height-5);
@@ -200,6 +201,7 @@ BB.Workspace = BB.Component.prototype.create({
   setWidth: function(width) {
     this.width = width;
     this.border.width(width);
+    this.borderShadow.width(width);
     this.root.width(width);
     this.background.width(width);
     this.resizeBox.x(this.width-5);
@@ -207,6 +209,7 @@ BB.Workspace = BB.Component.prototype.create({
   setHeight: function(height) {
     this.height = height;
     this.border.height(height);
+    this.borderShadow.height(height);
     this.root.height(height);
     this.background.height(height);
     this.resizeBox.y(this.height-5);
