@@ -31,3 +31,8 @@
   stroke-width: 6px;
   stroke-opacity: 0.4;
 }
+.BBComponentBlockSelected {
+  stroke: #fc3;
+  stroke-width: 3px;
+  stroke-opacity: 1;
+}

@@ -22,6 +22,10 @@ BB.Block = BB.Component.prototype.create({
     this.style = {
       className: 'BBComponentBlock'
     };
+    // Capabilities of block
+    this.selectable = true;
+    this.movable = true;
+    
     this.metrics = {
       borderRadius: 2,
       borderWidth: 1,
@@ -32,26 +36,26 @@ BB.Block = BB.Component.prototype.create({
       bottomRowSpace: 2.5,
       widthType: 'globalWidth',
     };
+    // Intenal attributes
+    this.selected_ = false;
+    // Options
     if (customOptions) { //options of a custom blocks
       this.customOptions = customOptions;
     }
     if (!options) {
       return;
     }
-    if (options.x) {
-      this.x = options.x;
-    }
-    if (options.y) {
-      this.y = options.y;
-    }
-    if (options.stylingFunction) {
-      this.stylingFunction = options.stylingFunction;
-    }
-    if (options.colorPalette) {
-      this.colorPalette = options.colorPalette;
-    }
-    if (options.metrics) {
-      this.metrics = options.metrics;
+    // TODO: Implement validation for options
+    this.optionList = ['x',
+                       'y',
+                       'stylingFunction',
+                       'colorPalette',
+                       'metrics',
+                       'selectable'];
+    for (var i = 0,el; el = this.optionList[i]; i++) {
+      if (options[el]) {
+        this[el] = options[el];
+      }
     }
     if (options.render) {
       this.render();
@@ -84,7 +88,7 @@ BB.Block = BB.Component.prototype.create({
       throw 'Blocks must have a workspace to be rendered';
       return;
     }
-    if (!this.rendered) {
+    if (!this.rendered_) {
       this.init(this.customOptions); // attributes of custom Block
       //needs create container before initSVG, because it render the fields
       this.container = this.workspace.root.group();
@@ -132,7 +136,7 @@ BB.Block = BB.Component.prototype.create({
       if (this.attach) {
         this.attach(); // attach additional svg elements to block
       }
-      this.rendered = true;
+      this.rendered_ = true;
     }
   },
 

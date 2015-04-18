@@ -42,7 +42,7 @@ BB.FieldText = BB.Field.prototype.create({
       throw 'FieldText must have a parent to be rendered';
       return;
     }
-    if (!this.rendered) {
+    if (!this.rendered_) {
       this.container = this.parent.container.text(this.text).font({
         family: this.fontFamily
         , size: this.fontSize}).fill(this.fontColor)
@@ -51,6 +51,6 @@ BB.FieldText = BB.Field.prototype.create({
     if (this.parent.attachDraggable) {
       this.parent.attachDraggable.push(this.container); // This text can drag all parent
     }
-    this.rendered = true;
+    this.rendered_ = true;
   }
 });

@@ -1,6 +1,6 @@
 'use strict';
 // Future inspiration and ideas for implementation http://making.fiftythree.com/fluid-text-inputs/
-// TODOs: 
+// TODOs:
 //    - Implement granular character handling (user pair evaluation) , this allows have more than 24 characters
 //    - Implement option for expandable fluid text
 // Field text input
@@ -81,7 +81,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       throw 'FieldTextInput must have a parent to be rendered';
       return;
     }
-    if (!this.rendered) {
+    if (!this.rendered_) {
       this.container = this.parent.container.group().addClass(this.style.className);
       this.mainBackground = this.container
         .rect(this.width + this.initialSpaceX + this.finalSpaceX, this.height + this.initialSpaceY + this.finalSpaceY)
@@ -315,7 +315,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
         this.parent.attachDraggable.push(this.container); // This text can drag all parent
         this.draggableIndex = this.parent.attachDraggable.length - 1;
       }
-      this.rendered = true;
+      this.rendered_ = true;
     }
   
   },
@@ -465,7 +465,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
 
   // get viewbox, override parent class method
   bbox: function(type){
-    if (this.rendered) {
+    if (this.rendered_) {
       var bbox = this.root.viewbox();
       bbox.width += this.initialSpaceX + this.finalSpaceX;
       bbox.height += this.initialSpaceY + this.finalSpaceY;

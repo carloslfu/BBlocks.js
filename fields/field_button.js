@@ -47,7 +47,7 @@ BB.FieldButton = BB.Field.prototype.create({
       throw 'FieldButton must have a parent to be rendered';
       return;
     }
-    if (!this.rendered) {
+    if (!this.rendered_) {
       this.container = this.parent.container.group()
         .addClass(this.style.className);
       this.textSvg = this.container.text(this.text)
@@ -81,6 +81,6 @@ BB.FieldButton = BB.Field.prototype.create({
     PolymerGestures.addEventListener(this.container.node, 'up', function() {
       this_.container.removeClass(this_.style.classPressedName);
     });
-    this.rendered = true;
+    this.rendered_ = true;
   }
 });

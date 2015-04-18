@@ -37,30 +37,24 @@ BB.Workspace = BB.Component.prototype.create({
       return;
     }
     this.workspace = workspace;
-    // Workspace not rendered
-    this.rendered = false;
     // options
     if (!options) {
     // default options
       return;
     }
-    if (options.width) {
-      this.width = options.width;
-    }
-    if (options.height) {
-      this.height = options.height;
-    }
-    if (options.x) {
-      this.x = options.x;
-    }
-    if (options.y) {
-      this.y = options.y;
-    }
-    if (options.stylingFunction) {
-      this.stylingFunction = options.stylingFunction;
-    }
-    if (options.colorPalette) {
-      this.colorPalette = options.colorPalette;
+    // TODO: Implement validation for options
+    this.optionList = ['x',
+                       'y',
+                       'width',
+                       'height',
+                       'stylingFunction',
+                       'colorPalette',
+                       'metrics',
+                       'selectable'];
+    for (var i = 0,el; el = this.optionList[i]; i++) {
+      if (options[el]) {
+        this[el] = options[el];
+      }
     }
     if (options.pannable != undefined) {
       this.pannable = pannable;
@@ -74,7 +68,7 @@ BB.Workspace = BB.Component.prototype.create({
     if (!this.workspace) {
       throw 'Workspace must have a div identifier or other workspace for be rendered';
     }
-    if (!this.rendered) {
+    if (!this.rendered_) {
       // allows nested workspaces
       this.nested =!(typeof(this.workspace) === 'string');
       if (this.nested) {
@@ -159,7 +153,7 @@ BB.Workspace = BB.Component.prototype.create({
         }
       };
       this.childContainer.scalable(this, null, this.attachScalable);
-      this.rendered = true;
+      this.rendered_ = true;
       if (this.nested) {
         var bbox = this.container.bbox();
         this.offsetX = this.x - bbox.x;

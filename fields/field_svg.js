@@ -30,12 +30,12 @@ BB.FieldSvg = BB.Field.prototype.create({
       throw 'FieldSvg must have a parent to be rendered';
       return;
     }
-    if (!this.rendered) {
+    if (!this.rendered_) {
       this.container = this.svg;
     }
     if (this.parent.attachDraggable) {
       this.parent.attachDraggable.push(this.container); // This text can drag all parent
     }
-    this.rendered = true;
+    this.rendered_ = true;
   }
 });

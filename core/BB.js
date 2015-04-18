@@ -20,6 +20,7 @@ BB.Component = ObjJS.prototype.create({
     this.offsetY = 0;
     this.offsetX2 = 0;
     this.offsetY2 = 0;
+    this.rendered_ = false;
   },
   addWorkspace: function(workspace, options) {
     if (this.type == 'Block') {

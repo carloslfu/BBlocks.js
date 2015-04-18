@@ -5,12 +5,12 @@
 BB.Field = BB.Component.prototype.create({
   constructor: function(type){
     this.type = type;
-    this.rendered = false;
+    this.rendered_ = false;
   },
 
 // get viewbox of element, override this if is necesary
   bbox: function(type){
-    if (this.rendered) {
+    if (this.rendered_) {
       return this.container.bbox();
     } else {
       throw 'Only rendered fields have a container';
