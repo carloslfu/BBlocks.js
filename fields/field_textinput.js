@@ -1,7 +1,7 @@
-'use strict'
+'use strict';
 // Future inspiration and ideas for implementation http://making.fiftythree.com/fluid-text-inputs/
 // TODOs: 
-//    - Implement granular character handlig (user pair evaluation) , this allows have more than 24 characters
+//    - Implement granular character handling (user pair evaluation) , this allows have more than 24 characters
 //    - Implement option for expandable fluid text
 // Field text input
 BB.FieldTextInput = BB.Field.prototype.create({
