@@ -18,10 +18,6 @@ This is the group for this project: [BBlocks group][BBlocks-group].
 
 For coding TODOs search 'TODO' in the project or visit the [trello board][BBlocks-trello].
 
-- Make the build system (with Grunt).
-- Make a github wiki with DOCS.md
-- Make getting started guide.
-
 ##Features that will be implemented.
 
 - Interaction between objects (Workspaces, blocks ...).
