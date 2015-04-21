@@ -1,7 +1,7 @@
 'use strict'
 
 //A Workspace is an SVG document that can contain Blocks, Workspaces and Fields (TODO: find the best way for attach Fields - An idea is a separated GUI class)
-
+// TODO: implement activeWorkspace for selection and event handling
 BB.Workspace = BB.Component.prototype.create({
   constructor: function(name, workspace, options) {
     this.parentClass_.constructor.call(this, 'Workspace');
@@ -146,6 +146,11 @@ BB.Workspace = BB.Component.prototype.create({
       if (this.pannable) {
         this.childContainer.pannable(this, null, this.attachPannable, [this.childContainer]);
       }
+      // unselect all childrens when pointerdown
+      var this_ = this;
+      BB.attachToEls(this.attachPannable, 'down', function() {
+        this_.unselectChilds();
+      });
       this.attachScalable = [this.background, this.text];
       for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].type == 'Block') {
@@ -169,6 +174,25 @@ BB.Workspace = BB.Component.prototype.create({
     if (child.type == 'Block') {
       this.attachScalable.push(child.container);
       this.childContainer.scalable(this, null, this.attachScalable);
+    }
+  },
+
+  childSelected: function(child) {
+    var i, len = this.children.length;
+    for (i = 0; i < len; i++) {
+      // unselect all childrens except 'child'
+      if (this.children[i] != child && this.children[i].setSelected) {
+        this.children[i].setSelected(false);
+      }
+    }
+  },
+
+  unselectChilds: function() {
+    var i, len = this.children.length;
+    for (i = 0; i < len; i++) {
+      if (this.children[i].setSelected) {
+        this.children[i].setSelected(false);
+      }
     }
   },
 

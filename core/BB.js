@@ -3,8 +3,18 @@
 //GLOBAL TODOs:
 // - Make all unrender methods (Allows rerender a component)
 
-//namespace for BBlocks (BB)
+// namespace for BBlocks (BB)
 var BB = {};
+
+// attach a event handler to an array of svg.js elements
+BB.attachToEls = function(els ,eventName, func) {
+  var i;
+  var len = els.length;
+  for (i = 0; i < len; i++) {
+    PolymerGestures.removeEventListener(els[i].node, eventName, func);
+    PolymerGestures.addEventListener(els[i].node, eventName, func);
+  }
+};
 
 // Component class, all derivates of this
 
@@ -54,16 +64,17 @@ BB.Component = ObjJS.prototype.create({
     }
     this.children.push(block);
     block.workspace = this;
+    block.parent = this;
     block.absoluteRotation = block.absoluteRotation + this.absoluteRotation;
     if (this.childAdded) {
       this.childAdded(this.children[this.children.length-1]); //callback
     }
     return this.children[this.children.length-1];
   },
-  addBlock: function(name, blockPrototype) {
+  addBlock: function(name, blockPrototype, options) {
     // generate the block object
     var block = this.createBlock(name, blockPrototype);
-    return this.addBlock_(new block());
+    return this.addBlock_(new block(options));
   },
   // create a block object from a protoype
   createBlock: function(name, blockPrototype) {

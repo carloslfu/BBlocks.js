@@ -24,7 +24,7 @@ BB.Block = BB.Component.prototype.create({
     };
     // Capabilities of block
     this.selectable = true;
-    this.movable = true;
+    this.draggable_ = true;
     
     this.metrics = {
       borderRadius: 2,
@@ -50,12 +50,17 @@ BB.Block = BB.Component.prototype.create({
                        'y',
                        'stylingFunction',
                        'colorPalette',
-                       'metrics',
-                       'selectable'];
+                       'metrics'];
     for (var i = 0,el; el = this.optionList[i]; i++) {
-      if (options[el]) {
+      if (options.hasOwnProperty(el)) {
         this[el] = options[el];
       }
+    }
+    if (options.hasOwnProperty('selectable')) {
+      this.selectable = options.selectable;
+    }
+    if (options.hasOwnProperty('draggable')) {
+      this.draggable_ = options.draggable;
     }
     if (options.render) {
       this.render();
@@ -127,10 +132,6 @@ BB.Block = BB.Component.prototype.create({
       //this.attachDraggable.push(this.rootLight);
       this.attachDraggable.push(this.root);
       this.updateDraggable();
-      var el = this; //for the next closure
-      this.container.dragstart = function() {
-        el.toTopPropagate(); //focus workspace
-      };
       this.workspace.childContainer.add(this.container);
       this.workspace.childRendered(this);
       if (this.attach) {
@@ -146,7 +147,57 @@ BB.Block = BB.Component.prototype.create({
   },
 
   updateDraggable: function(child) {
-    this.container.draggable(this, null, this.attachDraggable);
+    // Prevents text selection and default behavior
+    var this_ = this;
+    var pereventDefaultClosure = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    BB.attachToEls(this.attachDraggable, 'down', pereventDefaultClosure);
+    if (this.draggable_) {
+      this.container.draggable(this, null, this.attachDraggable);
+    } else if (this.rendered_) {
+      this.container.fixedDrag(); // Remove dragging from container
+    }
+    var toTopClosure = function() {
+      this_.toTopPropagate();
+      this_.setSelected(true);
+    };
+    BB.attachToEls(this.attachDraggable, 'down', toTopClosure);
+  },
+
+  //TODO: implement onSelect and onBlur callbacks
+  setSelected: function(bool) {
+    if (this.selectable && this.selected_ != bool) { // performance optimization
+      this.selected_ = bool;
+      if (this.selected_) {
+        this.root.addClass('BBComponentBlockSelected');
+      } else {
+        this.root.removeClass('BBComponentBlockSelected');
+      }
+      // Notify parent about this change
+      if (this.selected_ && this.parent.childSelected) {
+        this.parent.childSelected(this);
+      }
+      if (!this.selected_ && this.parent.childUnselected) {
+        this.parent.childUnselected(this);
+      }
+    }
+  },
+
+  dragstart: function() {
+    this.root.addClass('BBComponentBlockDragging');
+  },
+
+  dragend: function() {
+    this.root.removeClass('BBComponentBlockDragging');
+  },
+
+  setDraggable: function(bool) {
+    this.draggable_ = bool;
+    if (this.rendered_) {
+      this.updateDraggable();
+    }
   },
 
   // calculate metrics
@@ -225,10 +276,10 @@ BB.Block = BB.Component.prototype.create({
           }
           groupFound = true;
         }
-        this.metrics.rows[i].width = maxWidth; //uniforms width
+        this.metrics.rows[i].width = maxWidth; // uniforms width
       } else {
          if (this.metrics.rows[i].widthType == 'globalWidth') {
-           this.metrics.rows[i].width = this.width; //global width
+           this.metrics.rows[i].width = this.width; // global width
          }
          groupFound = false;
       }

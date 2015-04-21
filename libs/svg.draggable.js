@@ -28,12 +28,8 @@
         element.startEventDrag = event;
 
         /* invoke any callbacks */
-        if (element.beforedrag)
-          element.beforedrag(event)
-
-        /* invoke any callbacks */
-        if (element.dragstart)
-          element.dragstart(event)
+        if (context.dragstart)
+          context.dragstart(event)
         
         /* prevent selection dragging */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
@@ -92,8 +88,8 @@
           }
 
           /* invoke any callbacks */
-          if (element.dragmove)
-            element.dragmove(event)
+          if (context.dragmove)
+            context.dragmove(event)
         }
         event.stopPropagation();
       }
@@ -107,8 +103,8 @@
         element.startPositionDrag = null
 
         /* invoke any callbacks */
-        if (element.dragend)
-          element.dragend(event)
+        if (context.dragend)
+          context.dragend(event)
         event.stopPropagation();
       }
       

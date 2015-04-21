@@ -24,17 +24,13 @@
       /* start panning */
       startPan = function(event) {
         event = event || window.event
-
-        /* invoke any callbacks */
-        if (element.beforepan)
-          element.beforepan(event);
         
         /* store event */
         element.startEventPan = event;
 
         /* invoke any callbacks */
-        if (element.panstart)
-          element.panstart({zoom: element.startPositionsPan}, event)
+        if (context.panstart)
+          context.panstart({zoom: element.startPositionsPan}, event)
         
         /* prevent selection panning */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
@@ -90,8 +86,8 @@
             }
 
             /* invoke any callbacks */
-            if (element.panmove)
-              element.panmove(delta, event)
+            if (context.panmove)
+              context.panmove(delta, event)
           }
         }
         event.stopPropagation();
@@ -113,8 +109,8 @@
         element.startPositionsPan = null
 
         /* invoke any callbacks */
-        if (element.panend)
-          element.panend(delta, event)
+        if (context.panend)
+          context.panend(delta, event)
         event.stopPropagation();
       }
       
