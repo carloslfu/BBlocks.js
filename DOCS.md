@@ -25,7 +25,7 @@ Avoid use rotations when the object have text because Firefox renders it bad (se
 
 ### Chrome
 
-Avoid use a fluid text scaling beacause it is rendered bad.
+Avoid use a fluid text scaling beacause it is rendered bad (TODO: report this bug).
 
 ## Develop
 
