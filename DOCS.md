@@ -14,13 +14,18 @@ Some recomendations for GUI performance:
 
 ## Cross browser
 
-I test this proyect for Chrome and Firefox browsers but the goal is supports all modern browsers if possible. Now the best svg renderer is Chrome.
+I test this proyect for Chrome and Firefox browsers but the goal is supports all modern browsers if possible.
 
 Avoid use foreign objects that contains text for selection and text inputs (this is largely bugged in all rendering engines).
 
 ### Firefox
 
-Avoid use rotations when the object have text because Firefox renders it bad (TODO: report this bug).
+Avoid use rotations when the object have text because Firefox renders it bad (see [rotated text bug][rotated-text-firefox-bug]).
+[rotated-text-firefox-bug]: https://bugzilla.mozilla.org/show_bug.cgi?id=1156827
+
+### Chrome
+
+Avoid use a fluid text scaling beacause it is rendered bad.
 
 ## Develop
 
@@ -28,7 +33,7 @@ Avoid use rotations when the object have text because Firefox renders it bad (TO
 
 This project follows the [Google JavaScript style][google-js-style]. All the code must meet these rules, if not, feel free to patch this.
 
-[google-js-style]:https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+[google-js-style]: https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
 ### Architecture
 
