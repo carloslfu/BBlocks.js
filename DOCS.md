@@ -6,7 +6,7 @@ This page contains the documentation of the project. All of this content should 
 
 Some recomendations for GUI performance:
 
-- Avoid use workspaces largely, the ´ovewflow: hidden´ property used for workspace directly impacts in performance.
+- Avoid use workspaces largely, the `ovewflow: hidden` property used for workspaces has a direct impact on performance.
 - Avoid excesive nesting.
 - Make your interface as simple as possible.
 - Avoid keep excesive nodes in the GUI at same time.
