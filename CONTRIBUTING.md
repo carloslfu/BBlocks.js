@@ -21,7 +21,7 @@ For coding TODOs search 'TODO' in the project or visit the [trello board][BBlock
 ##Features that will be implemented.
 
 - Interaction between objects (Workspaces, blocks ...).
-- SVG text input field.
+- SVG textarea input field.
 - Multiple blocks selection.
 - SVG contextmenu.
 - Custom menus.
