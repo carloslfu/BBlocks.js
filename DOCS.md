@@ -2,6 +2,26 @@
 
 This page contains the documentation of the project. All of this content should be merged in the project wiki. This docs are in construction ...
 
+## Performance
+
+Some recomendations for GUI performance:
+
+- Avoid use workspaces largely, the ´ovewflow: hidden´ property used for workspace directly impacts in performance.
+- Avoid excesive nesting.
+- Make your interface as simple as possible.
+- Avoid keep excesive nodes in the GUI at same time.
+- Test your GUI in mobile devices, the performace is critic for those.
+
+## Cross browser
+
+I test this proyect for Chrome and Firefox browsers but the goal is supports all modern browsers if possible. Now the best svg renderer is Chrome.
+
+Avoid use foreign objects that contains text for selection and text inputs (this is largely bugged in all rendering engines).
+
+### Firefox
+
+Avoid use rotations when the object have text because Firefox renders it bad (TODO: report this bug).
+
 ## Develop
 
 ### Coding
