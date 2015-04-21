@@ -2,13 +2,8 @@ var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, ne
 var main = function() {
 	mainWorkspace = new BB.Workspace('main', 'mainWorkspaceDiv');
 	nested1 = mainWorkspace.addWorkspace('nested1', {width : 300, height: 300, x: 10, y: 10});
-	nested11 = nested1.addWorkspace('nested11', {width : 100, height: 100, x: 10, y: 10});
-	nested12 = nested1.addWorkspace('nested12', {width : 100, height: 100, x: 20, y: 20});
-	nested121 = nested12.addWorkspace('nested121', {width : 30, height: 30, x: 10, y: 10});
 	nested2 = mainWorkspace.addWorkspace('nested2', {width : 300, height: 300});
 	nested21 = nested2.addWorkspace('nested21', {width : 100, height: 100, x: 10, y: 10});
-	nested22 = nested2.addWorkspace('nested22', {width : 100, height: 100, x: 20, y: 20});
-	nested221 = nested22.addWorkspace('nested221', {width : 30, height: 30, x: 10, y: 10});
 
 	//BB.Workspace.prototype.colorPalette = BB.colorPalettes.workspace.dark;
 	//BB.Block.prototype.colorPalette = BB.colorPalettes.block.dark;
@@ -29,8 +24,6 @@ var main = function() {
     nested2.move(350,50);
     block4 = nested2.addBlock('block4', example_blocks.example);
 	block4.render();
-    nested2.rotate(0);
-    nested2.rotate(45);
 	block4.move(50, 170);
     //field button fires animation
     block2.fields[5].ondown = block1.methods.animation;

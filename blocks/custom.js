@@ -43,9 +43,9 @@ test_blocks.test_dev = {
       if (this_.methods.animationStart)
         this_.methods.animationStart();
       PolymerGestures.removeEventListener(this_.fields[1].container.node, 'down', this_.methods.animation);
-      this_.animate(1000).rotate(15).scale(1.2);
+      this_.animate(1000).scale(1.2); //.rotate(15) // rotation disabled until firefox rotated svg rendered is fixed
       setTimeout(function() {
-        this_.animate(1000).rotate(0).scale(1);
+        this_.animate(1000).scale(1); //.rotate(0)
         setTimeout(function() {
           //finalize animation
           PolymerGestures.addEventListener(this_.fields[1].container.node, 'down', this_.methods.animation);
