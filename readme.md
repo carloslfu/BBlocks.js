@@ -1,8 +1,8 @@
 # BBlocks.js (alpha version)
 
-BBlocks is lightweight, flexible, simplist and hackable graphical library for build block based GUIs. This project is mainly inspired in [Blockly][blockly-git].
+BBlocks is lightweight, flexible, simplist and hackable graphical library for building GUIs based on SVG components. This project is mainly inspired in [Blockly][blockly-git] and [Snap-BYOB][snap-git] awesome proyects.
 
-The main idea is make a graphical library with some advanced features for use in a block editor, but can be used in anything . This library will replace [Blockly][blockly-git] in [blocklify][blocklify-git] project.
+The main idea is make a graphical library with some advanced features for use in a block editor, but can be used in anything. The goal is construct an advanced visual programming editor in top of this proyect. The editor should be able to be used in production, either individually or as embedded editor, see [Blocklify][blocklify-git] proyect.
 
 A [live demo][livedemo].
 [livedemo]: https://carloslfu.github.io/BBlocks.js/demos/basic/demo.html
@@ -50,6 +50,7 @@ Board on trello [BBlocks][BBlocks-trello].
 [BBlocks-trello]: https://trello.com/b/0u71Uj56/bblocks-js
 
 [blockly-git]: https://github.com/google/blockly
+[snap-git]: https://github.com/jmoenig/Snap--Build-Your-Own-Blocks
 [blocklify-git]: https://github.com/carloslfu/blocklify
 [pep-git]: https://github.com/jquery/PEP
 [svgjs-git]: https://github.com/wout/svg.js
