@@ -32,6 +32,7 @@ BB.Component = ObjJS.prototype.create({
       this.selected_ = bool;
       if (this.selected_) {
         this.root.addClass(this.selectedClass);
+        this.toTop();
         if (this.onSelect) {
           this.onSelect();
         }
@@ -159,7 +160,7 @@ BB.Component = ObjJS.prototype.create({
       }
     }
   },
-  //facades for svg functions
+  // Facades for svg functions
   rotate: function(rotation) {
     if (this.container) { // main Workspaces don't have container
       var dRotation = rotation - this.rotation;
@@ -170,6 +171,7 @@ BB.Component = ObjJS.prototype.create({
                             bbox.y + this.height/2 + this.offsetY);
     }
   },
+  // Notify all childrens
   notifyRotation: function(dRotation) {
     this.absoluteRotation += dRotation; // set absoluteScale to svg.js context for pannable elements
     this.children.forEach(function(el) {

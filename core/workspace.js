@@ -131,16 +131,6 @@ BB.Workspace = BB.Component.prototype.create({
       if (this.nested) {
         this.container.draggable(this, null, [this.dragBox, this.border]);
         this.container.resizable(this, null, [this.resizeBox]);
-        var el = this; //for the next closure
-        this.container.dragstart = function() {
-          el.toTopPropagate(); //focus workspace
-        };
-        this.container.resizestart = function() {
-          el.toTopPropagate(); //focus workspace
-        };
-        this.childContainer.panstart = function() {
-          el.toTopPropagate(); //focus workspace
-        };
         this.workspace.childContainer.add(this.container);
       }
       this.attachPannable = [this.background, this.text];
@@ -149,7 +139,8 @@ BB.Workspace = BB.Component.prototype.create({
       }
       // unselect all childrens when pointerdown
       var this_ = this;
-      BB.attachToEls(this.attachPannable, 'down', function() {
+      var els = (this.nested) ? this.attachPannable.concat([this.dragBox, this.border, this.resizeBox]) : this.attachPannable;
+      BB.attachToEls(els, 'down', function() {
         this_.setSelected(true);
         this_.unselectChilds();
       });
@@ -185,7 +176,7 @@ BB.Workspace = BB.Component.prototype.create({
     this.scale = scale;
     this.notifyScaling(fScale);
   },
-  
+  // Notify all childrens
   notifyScaling: function(fScale) {
     // set absoluteScale to svg.js context for pannable elements
     this.children.forEach(function(el) {
@@ -247,25 +238,5 @@ BB.Workspace = BB.Component.prototype.create({
       this.toScale(matrix.a);
       this.childContainer.move(matrix.e, matrix.f);
     }
-  },
-
-  dragstart: function() {
-    this.setSelected(true);
-  },
-
-  resizestart: function() {
-    this.setSelected(true);
-  },
-
-  scalestart: function() {
-    this.setSelected(true);
-  },
-
-  panstart: function() {
-    this.setSelected(true);
-  },
-
-  onSelect: function() {
-    this.toTopPropagate();
   }
 });

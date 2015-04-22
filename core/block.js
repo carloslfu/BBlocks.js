@@ -346,10 +346,6 @@ BB.Block = BB.Component.prototype.create({
     this.root.addClass(this.style.className);
   },
 
-  onSelect: function() {
-    this.toTopPropagate();
-  },
-
   onBlur: function() { // Unselect all fields
     var i, len = this.fields.length;
     for (i = 0; i < len; i++) {
