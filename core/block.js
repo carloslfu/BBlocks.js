@@ -1,10 +1,14 @@
 'use strict'
 
-// A Block is an svg group that do any behavior, this can contain Fields or other Blocks
+// A Block is an svg group that do any behavior, this can contain Fields or other Blocks.
+//  This is an abstract Block class, don't instance this.
+//  All block prototypes live in blocks folder or create your own using the Block API
+//  Block can be instantiable from workspaces with addBlock method, see the basic-demo
+// TODO: documentation for Block API
 
 BB.Block = BB.Component.prototype.create({
   constructor: function(name, options, customOptions)  {
-    this.parentClass_.constructor.call(this, 'Block');
+    BB.Component.prototype.constructor.call(this, 'Block');
     this.name = name;
     this.id = null;
     this.x = 0;

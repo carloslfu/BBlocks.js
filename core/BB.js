@@ -1,12 +1,24 @@
 'use strict'
 
 //GLOBAL TODOs:
+// - Fix all tests (last commit changes some APIs, see basic-demo)
 // - Make all unrender methods (Allows rerender a component)
 
 // namespace for BBlocks (BB)
 var BB = {};
 
-// Component class, all derivates of this
+// Component class, all core classes derivates of this.
+//  This is an abstract Component class, don't instance this.
+//  Create your own components using the Component API
+//    Recomendation: only create components from scratch (created of this class)
+//    if you want to do a very different thing that you can not to do with existing components
+//    (workspaces, blocks and fields)
+// Components that will be implemented (in order of priority)(TODO):
+//  - Menu (for context menus and static menus)
+//  - Dialog box
+//  - Tab (for tabs handling)
+//  - Anything awesome component :)
+// TODO: documentation for Component API
 
 BB.Component = ObjJS.prototype.create({
   constructor: function(type) {
@@ -80,21 +92,22 @@ BB.Component = ObjJS.prototype.create({
     }
   },
 
-  addWorkspace: function(workspace, options) {
+  /*addWorkspace: function(workspace, options) {
     if (this.type == 'Block') {
       throw 'Blocks can\'t have Workspaces attached';
       return; //blocks can't have Workspaces attached
     }
     if (typeof(workspace) == 'string') {
       var temp = new BB.Workspace(workspace, this, options);
-      this.children.push(temp);
       // inherits absolute rotation
-      temp = temp.absoluteRotation + this.absoluteRotation;
+      temp.absoluteRotation = temp.absoluteRotation + this.absoluteRotation;
+      this.children.push(temp);
     } else if (typeof(workspace) == 'object'){
       if (workspace.type != 'Workspace') {
         throw 'The type of object must be Workspace';
         return;
       }
+      workspace.absoluteRotation = workspace.absoluteRotation + this.absoluteRotation;
       this.children.push(workspace);
     } else {
       throw 'This function only receives workspace name or Workspace object';
@@ -106,6 +119,31 @@ BB.Component = ObjJS.prototype.create({
       this.childAdded(this.children[this.children.length-1]); //callback
     }
     return this.children[this.children.length-1];
+  },*/
+
+  addWorkspace: function(name, workspacePrototype, options) {
+    // generate the block object
+    //var workspace = this.createWorkspace(name, workspacePrototype);
+    return this.addWorkspace_(new BB.Workspace(name, workspacePrototype, this, options));
+  },
+  addWorkspace_: function(workspace) {
+    if (this.type == 'Block') {
+      throw 'Blocks can\'t have Workspaces attached';
+      return; //blocks can't have Workspaces attached
+    }
+    this.children.push(workspace);
+    this.children[this.children.length-1].level = this.level + 1;
+    this.children[this.children.length-1].parent = this;
+    if (this.childAdded) {
+      this.childAdded(this.children[this.children.length-1]); //callback
+    }
+    return this.children[this.children.length-1];
+  }, 
+
+  addBlock: function(name, blockPrototype, options) {
+    // generate the block object
+    var block = this.createBlock(name, blockPrototype);
+    return this.addBlock_(new block(options));
   },
   addBlock_: function(block) {
     if (block.type != 'Block') {
@@ -120,11 +158,6 @@ BB.Component = ObjJS.prototype.create({
       this.childAdded(this.children[this.children.length-1]); //callback
     }
     return this.children[this.children.length-1];
-  },
-  addBlock: function(name, blockPrototype, options) {
-    // generate the block object
-    var block = this.createBlock(name, blockPrototype);
-    return this.addBlock_(new block(options));
   },
   // create a block object from a protoype
   createBlock: function(name, blockPrototype) {
@@ -184,7 +217,8 @@ BB.Component = ObjJS.prototype.create({
     if (this.container) { // main Workspaces don't have container
       this.x = x;
       this.y = y;
-      return this.container.move(this.x, this.y);
+      this.container.move(this.x, this.y);
+      return this;
     } else {
       throw "Main Workspaces don't have container";
     }
@@ -193,7 +227,8 @@ BB.Component = ObjJS.prototype.create({
     if (this.container) { // main Workspaces don't have container
       this.x += dx;
       this.y += dy; 
-      return this.container.dmove(dx, dy);
+      this.container.dmove(dx, dy);
+      return this;
     } else {
       throw "Main Workspaces don't have container";
     }

@@ -1,6 +1,9 @@
 'use strict'
 
 // Fields are elements of blocks
+//  This is an abstract Field class, don't instance this.
+//  All instantiable fields live in fields folder or create your own using the Field API
+// TODO: documentation for Field API
 
 BB.Field = BB.Component.prototype.create({
   constructor: function(type){

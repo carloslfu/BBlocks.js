@@ -8,7 +8,7 @@
 BB.FieldTextInput = BB.Field.prototype.create({
   // TODO: invert text color when are selected, note that is not trivial.
   constructor: function(text, parent, options)  {
-    this.parentClass_.constructor.call(this, 'TextInput');
+    BB.Field.prototype.constructor.call(this, 'TextInput');
     this.children = [];
     this.container = null; // contains attached elements(border)
     this.childContainer = null; // svg group that contains all children

@@ -3,7 +3,7 @@
 // Field text
 BB.FieldText = BB.Field.prototype.create({
   constructor: function(text, parent, options)  {
-    this.parentClass_.constructor.call(this, 'Text');
+    BB.Field.prototype.constructor.call(this, 'Text');
     this.children = [];
     this.container = null; // contains attached elements(border) and SVG document
     this.childContainer = null; // svg group that contains all children

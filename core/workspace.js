@@ -1,9 +1,13 @@
 'use strict'
 
-//A Workspace is an SVG document that can contain Blocks, Workspaces and Fields.
+// A Workspace is an SVG document that can contain Blocks, Workspaces and Fields.
+//  This is an abstract Workspace class, don't instance this.
+//  All instantiable workspaces live in workspaces folder or create your own using the Workspace API
+// TODO: documentation for Workspace API
+
 BB.Workspace = BB.Component.prototype.create({
-  constructor: function(name, workspace, options) {
-    this.parentClass_.constructor.call(this, 'Workspace');
+  constructor: function(name, workspacePrototype, workspace, options) {
+    BB.Component.prototype.constructor.call(this, 'Workspace');
     this.name = name;
     this.width = 200;
     this.height = 200;
@@ -30,6 +34,7 @@ BB.Workspace = BB.Component.prototype.create({
     this.centerOffsetY = 0;
     this.pannable = true;
     this.selectable = true;
+    this.attachedElements = [];
     this.style = {
       className: 'BBComponentWorkspace'
     };
@@ -60,6 +65,9 @@ BB.Workspace = BB.Component.prototype.create({
     if (options.pannable != undefined) {
       this.pannable = pannable;
     }
+    if (workspacePrototype) {
+      ObjJS.mixinObj(this, workspacePrototype, 'true');
+    }
     if (options.render) {
       this.render();
     }
@@ -88,33 +96,8 @@ BB.Workspace = BB.Component.prototype.create({
       }
       // styling
       this.bgColor = this.colorPalette.background[this.nested ? 'nested' : 'main'];
-      this.borderColor = this.colorPalette.border[this.nested ? 'nested' : 'main'];
-      this.dragBoxColor = this.colorPalette.dragBoxColor;
-      this.resizeBoxColor = this.colorPalette.resizeBoxColor;
-      if (this.stylingFunction) {
-        this.stylingFunction();
-      }
       // render elements
       this.background = this.root.rect(this.width, this.height).fill(this.bgColor);
-      if (this.nested) {
-        this.dragBox = this.workspace.root.rect(10, 10)
-                           .stroke({ color: this.borderColor, opacity: 1, width: 1 })
-                           .fill(this.dragBoxColor).radius(1).move(-5, -5);
-        this.resizeBox = this.workspace.root.rect(10, 10)
-                           .stroke({ color: this.borderColor, opacity: 1, width: 1 })
-                           .fill(this.resizeBoxColor).radius(1).move(this.width-5, this.height-5);
-        //this.borderShadow = this.workspace.root.rect(this.width + 4, this.height + 4).fill('none').radius(7).dmove(-2,-2);
-        this.borderShadow = this.workspace.root.rect(this.width, this.height).fill('none').radius(5);
-        this.border = this.workspace.root.rect(this.width, this.height)
-                          .stroke({ color: this.borderColor, opacity: 1, width: 4 }).fill('none').radius(5);
-        this.container.add(this.borderShadow);
-        this.container.add(this.border);
-        this.container.add(this.dragBox);
-        this.container.add(this.resizeBox);
-        this.borderShadow.addClass(this.style.className);
-      } else {
-        this.root.attr('style', 'border: 1px solid ' + this.borderColor + ';');
-      }
       this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspaces
       this.childContainer = this.root.group();
       this.text = this.root.text(this.level + '');
@@ -129,18 +112,27 @@ BB.Workspace = BB.Component.prototype.create({
         }
       }
       if (this.nested) {
-        this.container.draggable(this, null, [this.dragBox, this.border]);
-        this.container.resizable(this, null, [this.resizeBox]);
         this.workspace.childContainer.add(this.container);
       }
       this.attachPannable = [this.background, this.text];
       if (this.pannable) {
         this.childContainer.pannable(this, null, this.attachPannable, [this.childContainer]);
       }
+      if (this.init) {
+        this.attachedElements = this.init();
+        if (this.workspace) { // attached elements can scale his workspace
+          var i, len = this.attachedElements.length;
+          for (i = 0; i < len; i++) {
+            this.attachedElements[i].scalable(this.workspace, this.attachedElements);
+          }
+        }
+      }
+      if (this.stylingFunction) {
+        this.stylingFunction();
+      }
       // unselect all childrens when pointerdown
       var this_ = this;
-      var els = (this.nested) ? this.attachPannable.concat([this.dragBox, this.border, this.resizeBox]) : this.attachPannable;
-      BB.attachToEls(els, 'down', function() {
+      BB.attachToEls(this.attachPannable, 'down', function() {
         this_.setSelected(true);
         this_.unselectChilds();
       });
@@ -152,13 +144,6 @@ BB.Workspace = BB.Component.prototype.create({
       };
       this.childContainer.scalable(this, null, this.attachScalable);
       this.rendered_ = true;
-      if (this.nested) {
-        var bbox = this.container.bbox();
-        this.offsetX = this.x - bbox.x;
-        this.offsetY = this.y - bbox.y;
-        this.offsetX2 = this.x + this.height + this.offsetX - bbox.x2;
-        this.offsetY2 = this.y + this.width + this.offsetY - bbox.y2;
-      }
     }
     return this;
   },
@@ -190,27 +175,27 @@ BB.Workspace = BB.Component.prototype.create({
   resize: function(width, height) {
     this.width = width;
     this.height = height;
-    this.border.size(width, height);
-    this.borderShadow.size(width, height);
     this.root.size(width, height);
     this.background.size(width, height);
-    this.resizeBox.move(this.width-5, this.height-5);
+    if (this.onResize) {
+      this.onResize(width, height);
+    }
   },
   setWidth: function(width) {
     this.width = width;
-    this.border.width(width);
-    this.borderShadow.width(width);
     this.root.width(width);
     this.background.width(width);
-    this.resizeBox.x(this.width-5);
+    if (this.onWidthChanged) {
+      this.onWidthChanged(width);
+    }
   },
   setHeight: function(height) {
     this.height = height;
-    this.border.height(height);
-    this.borderShadow.height(height);
     this.root.height(height);
     this.background.height(height);
-    this.resizeBox.y(this.height-5);
+    if (this.onHeightChanged) {
+      this.onHeightChanged(height);
+    }
   },
   /**
    * Zooming the workspace centered in (x,y) coordinate with zooming in or out.

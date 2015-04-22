@@ -3,7 +3,7 @@
 // Field text
 BB.FieldButton = BB.Field.prototype.create({
   constructor: function(text, parent, ondown, options)  {
-    this.parentClass_.constructor.call(this, 'Button');
+    BB.Field.prototype.constructor.call(this, 'Button');
     this.children = [];
     this.container = null; // contains attached elements(border) and SVG document
     this.childContainer = null; // svg group that contains all children

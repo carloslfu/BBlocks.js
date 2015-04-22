@@ -16,16 +16,16 @@ ObjJS.prototype.create = function(classPrototype) {
     classPrototype.constructor = function(){};
   }
   // create a class of self class
-  var this_ = this;
   var createdClass = function(){
-    this.parentClass_ = this_;
     classPrototype.constructor.apply(this, arguments);
     delete this.create; // for cleaner tree
   };
-  createdClass.prototype = Object.create(this);
+  //createdClass.prototype = Object.create(this);
+  createdClass.prototype = ObjJS.cloneObject(this);
   // extend createdClass with classPrototype
   ObjJS.mixin(createdClass, classPrototype, 'true');
   createdClass.prototype.create = ObjJS.prototype.create;
+  createdClass.prototype.parentClass_ = this;
   return createdClass;
 };
 
@@ -82,6 +82,29 @@ ObjJS.mixin = function(receivingClass, givingMixin, override) {
       if (!Object.hasOwnProperty.call(receivingClass.prototype, methodName)
           || override) {
         receivingClass.prototype[methodName] = ObjJS.cloneObject(givingMixin[methodName]);
+      }
+    }
+  }
+};
+
+// Extend an existing class with a methods from an object - Mixin pattern
+ObjJS.mixinObj = function(receivingObj, givingMixin, override) {
+  if (override == undefined) {
+    override = false; // 'true' overrides elements
+  }
+  //only provide certain methods
+  if (arguments[3]) {
+    for (var i = 3, len = arguments.length; i < len; i++) {
+      if (!Object.hasOwnProperty.call(receivingObj, arguments[i])
+          || override) {
+        receivingObj[arguments[i]] = ObjJS.cloneObject(givingMixin[arguments[i]]);
+      }
+    }
+  } else { //provide all methods
+    for (var methodName in givingMixin) {
+      if (!Object.hasOwnProperty.call(receivingObj, methodName)
+          || override) {
+        receivingObj[methodName] = ObjJS.cloneObject(givingMixin[methodName]);
       }
     }
   }
