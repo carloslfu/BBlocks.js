@@ -29,6 +29,41 @@ ObjJS.prototype.create = function(classPrototype) {
   return createdClass;
 };
 
+//Clone function extracted from closure library - base.js with some modifications
+/**
+ * Clones a value. The input may be an Object, Array, or basic type. Objects and
+ * arrays will be cloned recursively.
+ *
+ * WARNINGS:
+ * <code>goog.cloneObject</code> does not detect reference loops. Objects that
+ * refer to themselves will cause infinite recursion.
+ *
+ * <code>goog.cloneObject</code> is unaware of unique identifiers, and copies
+ * UIDs created by <code>getUid</code> into cloned results.
+ *
+ * @param {*} obj The value to clone.
+ * @return {*} A clone of the input value.
+ * @deprecated goog.cloneObject is unsafe. Prefer the goog.object methods.
+ */
+ObjJS.cloneObject = function(obj) {
+  var type = typeof(obj);
+  if (obj == null) { // Null is an object in ES5, avoids all the function
+    return null;
+  }
+  if (type == 'object' || type == 'array') {
+    if (obj.clone) {
+      return obj.clone();
+    }
+    var clone = type == 'array' ? [] : {};
+    for (var key in obj) {
+      clone[key] = ObjJS.cloneObject(obj[key]);
+    }
+    return clone;
+  }
+
+  return obj;
+};
+
 // Extend an existing class with a methods from an object - Mixin pattern
 ObjJS.mixin = function(receivingClass, givingMixin, override) {
   if (override == undefined) {
@@ -39,14 +74,14 @@ ObjJS.mixin = function(receivingClass, givingMixin, override) {
     for (var i = 3, len = arguments.length; i < len; i++) {
       if (!Object.hasOwnProperty.call(receivingClass.prototype, arguments[i])
           || override) {
-        receivingClass.prototype[arguments[i]] = givingMixin[arguments[i]];
+        receivingClass.prototype[arguments[i]] = ObjJS.cloneObject(givingMixin[arguments[i]]);
       }
     }
   } else { //provide all methods
     for (var methodName in givingMixin) {
       if (!Object.hasOwnProperty.call(receivingClass.prototype, methodName)
           || override) {
-        receivingClass.prototype[methodName] = givingMixin[methodName];
+        receivingClass.prototype[methodName] = ObjJS.cloneObject(givingMixin[methodName]);
       }
     }
   }

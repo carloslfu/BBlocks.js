@@ -36,11 +36,15 @@
         var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
         var x = context.mousePosition.x;
         var y = context.mousePosition.y;
+        if (context.scalestart)
+          context.scalestart(x , y, delta)
         context.zoom(x , y, delta);
         e.preventDefault();
       };
       
       pinchStart = function(e){
+        if (context.scalestart)
+          context.scalestart(e)
         element.pinchdScale = element.pinchScale;
         element.pinchScale = e.scale;
         var evtPos = {clientX :e.centerX, clientY: e.centerY};

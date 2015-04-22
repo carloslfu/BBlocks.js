@@ -25,9 +25,6 @@
       startResize = function(event) {
         event = event || window.event
 
-        /* invoke any callbacks */
-        if (element.beforeresize)
-          element.beforeresize(event)
         initialWidth = context.width;
         initialHeight = context.height;
         
@@ -35,8 +32,8 @@
         element.startEventResize = event
 
         /* invoke any callbacks */
-        if (element.resizestart)
-          element.resizestart(event)
+        if (context.resizestart)
+          context.resizestart(event)
         
         /* prevent selection resizing */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
@@ -65,8 +62,8 @@
           }
 
           /* invoke any callbacks */
-          if (element.resizemove)
-            element.resizemove(event)
+          if (context.resizemove)
+            context.resizemove(event)
         }
         event.stopPropagation();
       }
@@ -77,10 +74,10 @@
 
         /* reset store */
         element.startEventResize    = null
-
+context
         /* invoke any callbacks */
-        if (element.resizeend)
-          element.resizeend(event);
+        if (context.resizeend)
+          context.resizeend(event);
         event.stopPropagation();
       }
       

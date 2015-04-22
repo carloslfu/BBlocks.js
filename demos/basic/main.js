@@ -28,16 +28,15 @@ var main = function() {
       block2.fields[5].ondown = block1.methods.animation;
     }
     // Nested workspace 1
-    block3 = nested1.addBlock('block3', test_blocks.test);
+    block3 = nested1.addBlock('block3', test_blocks.test_dev);
 	block3.render();
     block3.rotate(0);
-	block3.move(20, 30);
-    nested2.move(350,400);
+	block3.move(20, 20);
     block4 = nested1.addBlock('block4', example_blocks.example);
 	block4.render();
-	block4.move(20, 100);
+	block4.move(20, 160);
     // Nested workspace 2
-    nested2.move(660,10);
+    nested2.move(670,10);
     block6 = nested2.addBlock('block5', example_blocks.example);
 	block6.render();
 	block6.move(50, 165);

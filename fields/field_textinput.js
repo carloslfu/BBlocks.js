@@ -1,13 +1,14 @@
 'use strict';
-// Future inspiration and ideas for implementation http://making.fiftythree.com/fluid-text-inputs/
+// Inspiration and ideas for implementation http://making.fiftythree.com/fluid-text-inputs/
 // TODOs:
+//    - Fluid text input
 //    - Implement granular character handling (user pair evaluation) , this allows have more than 24 characters
-//    - Implement option for expandable fluid text
+//    - Implement doubletap selection (selects all text)
 // Field text input
 BB.FieldTextInput = BB.Field.prototype.create({
   // TODO: invert text color when are selected, note that is not trivial.
   constructor: function(text, parent, options)  {
-    this.parentClass_.constructor.call(this, 'Text');
+    this.parentClass_.constructor.call(this, 'TextInput');
     this.children = [];
     this.container = null; // contains attached elements(border)
     this.childContainer = null; // svg group that contains all children
@@ -40,8 +41,9 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.cursorXY = {x: 0, y: 0};
     this.cursorState = 0; //0: off, 1: on
     this.cursorInterval = null;
-    this.focused = false;
+    this.selectable = true;
     this.draggableIndex = -1; // Index of this in attachDraggable array in the parent (if exists)
+    this.fluid = false;
 
     if (text && typeof(text) == 'string') {
       this.text = text;
@@ -56,20 +58,16 @@ BB.FieldTextInput = BB.Field.prototype.create({
     if (!options) {
       return;
     }
-    if (options.fontColor) {
-      this.fontColor = options.fontColor;
-    }
-    if (options.fontFamily) {
-      this.fontFamily = options.fontFamily;
-    }
-    if (options.fontSize) {
-      this.fontSize = options.fontSize;
-    }
-    if (options.width) {
-      this.width = options.width;
-    }
-    if (options.height) {
-      this.height = options.height;
+    this.optionList = ['fontColor',
+                       'fontFamily',
+                       'fontSize',
+                       'width',
+                       'height',
+                       'fluid'];
+    for (var i = 0,el; el = this.optionList[i]; i++) {
+      if (options.hasOwnProperty(el)) {
+        this[el] = options[el];
+      }
     }
     if (options.render) {
       this.render();
@@ -109,7 +107,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       // avoid some webkit and blink bugs with textinputs when are rotated and scaled.
       this.foreignTextInput = this.container.foreignObject(0,0).attr({id: 'fobj'})
         .appendChild("input", {type: 'text', value: this.text});
-      this.setMaxChars(24); // Android bug when have 25 characters - REPORT this (OMG report all svg foreign object implementation! o.O)
+      this.setMaxChars(24); // Android bug when have 25 characters (TODO: report this bug)
       var this_ = this;
 
       // Keyboard handler
@@ -215,23 +213,23 @@ BB.FieldTextInput = BB.Field.prototype.create({
           this_.mirrorRoot.text(this_.mirrorText.replace(/ /g, '\u00a0'));
           setCaretPosition(this_.foreignTextInput.getChild(0), i);
           if (e.type == 'up' || this_.focused == true) {
-            if (!this_.cursorInterval) {
+            /*if (!this_.cursorInterval) {
               var blur = function (ev) {
                 if (lastviewportElement != ev.target.viewportElement) { // An element in the same viewport can't deactivate the caret
                   PolymerGestures.removeEventListener(window, 'down', blur);
                   this_.foreignTextInput.getChild(0).blur();
                   this_.selectionRoot.width(0); // Hides selectionRoot
                   this_.hideCursor();
-                  this_.setFocused(false);
+                  this_.setSelected(false);
                 }
                 ev.preventDefault();
                 ev.stopPropagation();
               };
               // Next down event blurs textinput
               PolymerGestures.addEventListener(window, 'down', blur);
-            }
+            }*/
             this_.showCursor();
-            this_.setFocused(true);
+            this_.setSelected(true);
           }
         } else {
           this_.trackStarted = false;
@@ -309,7 +307,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
         // Moves and resize selectionRoot
         this_.selectionRoot.move(this_.initialCursorX + this_.offsetX + bbox.width - (reverseSelection?selectionWidth:0), this_.initialCursorY);
         this_.selectionRoot.width(selectionWidth);
-        this_.setFocused(true);
+        this_.setSelected(true);
       };
       if (this.parent.attachDraggable) {
         this.parent.attachDraggable.push(this.container); // This text can drag all parent
@@ -420,36 +418,37 @@ BB.FieldTextInput = BB.Field.prototype.create({
     }
   },
   
-  // All logig when focused
-  setFocused: function (bool) {
-    if (this.focused != bool) {
-      if (bool) {
-        this.background.fill(this.backgroundColor);
-        this.mainBackground.fill(this.backgroundColor);
-        this.container.removeClass('BBFieldTextInput');
-        PolymerGestures.addEventListener(this.root.node, 'track', this.pointerCaretSelectionHandler);
-        if (this.parent.attachDraggable) {
-          // if is focused not drag the parent
-          this.parent.attachDraggable = this.parent.attachDraggable.slice(0, this.draggableIndex)
-            .concat(this.parent.attachDraggable.slice(this.draggableIndex + 1));
-          this.draggableIndex = -1;
-        }
-      } else {
-        this.background.fill(this.backgroundColorBlured);
-        this.mainBackground.fill(this.backgroundColorBlured);
-        this.container.addClass('BBFieldTextInput');
-        PolymerGestures.removeEventListener(this.root.node, 'track', this.pointerCaretSelectionHandler);
-        // if is not focused drag the parent
-        if (this.parent.attachDraggable) {
-          this.parent.attachDraggable.push(this.container); // This text can drag all parent
-          this.draggableIndex = this.parent.attachDraggable.length - 1;
-        }
-      }
-      // Updates parent draggable handler
-      if (this.parent.attachDraggable) {
-        this.parent.updateDraggable();
-      }
-      this.focused = bool;
+  onSelect: function() {
+    this.background.fill(this.backgroundColor);
+    this.mainBackground.fill(this.backgroundColor);
+    this.container.removeClass('BBFieldTextInput');
+    PolymerGestures.addEventListener(this.root.node, 'track', this.pointerCaretSelectionHandler);
+    if (this.parent.attachDraggable) {
+      // if is focused not drag the parent
+      this.parent.attachDraggable = this.parent.attachDraggable.slice(0, this.draggableIndex)
+        .concat(this.parent.attachDraggable.slice(this.draggableIndex + 1));
+      this.draggableIndex = -1;
+    }
+  },
+  onBlur: function() {
+    this.foreignTextInput.getChild(0).blur();
+    this.selectionRoot.width(0); // Hides selectionRoot
+    this.hideCursor();
+    this.setSelected(false);
+    this.background.fill(this.backgroundColorBlured);
+    this.mainBackground.fill(this.backgroundColorBlured);
+    this.container.addClass('BBFieldTextInput');
+    PolymerGestures.removeEventListener(this.root.node, 'track', this.pointerCaretSelectionHandler);
+    // if is not focused drag the parent
+    if (this.parent.attachDraggable) {
+      this.parent.attachDraggable.push(this.container); // This text can drag all parent
+      this.draggableIndex = this.parent.attachDraggable.length - 1;
+    }
+  },
+  onSelectChange: function() {
+    // Updates parent draggable handler
+    if (this.parent.attachDraggable) {
+      this.parent.updateDraggable();
     }
   },
 

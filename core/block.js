@@ -22,6 +22,7 @@ BB.Block = BB.Component.prototype.create({
     this.style = {
       className: 'BBComponentBlock'
     };
+    this.selectedClass = 'BBComponentBlockSelected';
     // Capabilities of block
     this.selectable = true;
     this.draggable_ = true;
@@ -36,8 +37,7 @@ BB.Block = BB.Component.prototype.create({
       bottomRowSpace: 2.5,
       widthType: 'globalWidth',
     };
-    // Intenal attributes
-    this.selected_ = false;
+
     // Options
     if (customOptions) { //options of a custom blocks
       this.customOptions = customOptions;
@@ -160,29 +160,9 @@ BB.Block = BB.Component.prototype.create({
       this.container.fixedDrag(); // Remove dragging from container
     }
     var toTopClosure = function() {
-      this_.toTopPropagate();
       this_.setSelected(true);
     };
     BB.attachToEls(this.attachDraggable, 'down', toTopClosure);
-  },
-
-  //TODO: implement onSelect and onBlur callbacks
-  setSelected: function(bool) {
-    if (this.selectable && this.selected_ != bool) { // performance optimization
-      this.selected_ = bool;
-      if (this.selected_) {
-        this.root.addClass('BBComponentBlockSelected');
-      } else {
-        this.root.removeClass('BBComponentBlockSelected');
-      }
-      // Notify parent about this change
-      if (this.selected_ && this.parent.childSelected) {
-        this.parent.childSelected(this);
-      }
-      if (!this.selected_ && this.parent.childUnselected) {
-        this.parent.childUnselected(this);
-      }
-    }
   },
 
   dragstart: function() {
@@ -357,12 +337,25 @@ BB.Block = BB.Component.prototype.create({
     this.root.q({x: 0, y: radius}, {x: -radius, y: radius})
              .h(-finalWidth + 2*radius)
              // TODO: report border bug in svg, when drag a block with black border, this project dont use that, use svg rect
-    // this bug is resolved in chromium 43, TODO: test in chrome 41
+    // this bug is resolved in chromium 44, TODO: test in chrome 42
              /*.stroke({ color: this.borderColor,
                        opacity: 1,
                        width: this.metrics.borderWidth
               }).fill(this.bgColor);*/
     this.root.fill(this.bgColor);
     this.root.addClass(this.style.className);
+  },
+
+  onSelect: function() {
+    this.toTopPropagate();
+  },
+
+  onBlur: function() { // Unselect all fields
+    var i, len = this.fields.length;
+    for (i = 0; i < len; i++) {
+      if (typeof(this.fields[i]) == 'object' && this.fields[i].setSelected) {
+        this.fields[i].setSelected(false);
+      }
+    }
   }
 });

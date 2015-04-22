@@ -6,16 +6,6 @@
 // namespace for BBlocks (BB)
 var BB = {};
 
-// attach a event handler to an array of svg.js elements
-BB.attachToEls = function(els ,eventName, func) {
-  var i;
-  var len = els.length;
-  for (i = 0; i < len; i++) {
-    PolymerGestures.removeEventListener(els[i].node, eventName, func);
-    PolymerGestures.addEventListener(els[i].node, eventName, func);
-  }
-};
-
 // Component class, all derivates of this
 
 BB.Component = ObjJS.prototype.create({
@@ -31,7 +21,64 @@ BB.Component = ObjJS.prototype.create({
     this.offsetX2 = 0;
     this.offsetY2 = 0;
     this.rendered_ = false;
+    this.selectable = false;
+    this.selected_ = false;
+    this.preserveChildsOnUnselect = false; // Don't unselect childs when unselect component
+    this.selectedClass = '';
   },
+
+  setSelected: function(bool) {
+    if (this.selectable && this.selected_ != bool) { // performance optimization
+      this.selected_ = bool;
+      if (this.selected_) {
+        this.root.addClass(this.selectedClass);
+        if (this.onSelect) {
+          this.onSelect();
+        }
+      } else {
+        this.root.removeClass(this.selectedClass);
+        if (this.onBlur) {
+          this.onBlur();
+        }
+        if (!this.preserveChildsOnUnselect) {
+          this.unselectChilds();
+        }
+      }
+      if (this.onSelectedChange) {
+        this.onSelectedChange();
+      }
+      // Notify parent about this change
+      if (this.parent) {
+        if (this.selected_ && this.parent.childSelected) {
+          this.parent.childSelected(this);
+        }
+        if (!this.selected_ && this.parent.childUnselected) {
+          this.parent.childUnselected(this);
+        }
+      }
+    }
+  },
+
+  childSelected: function(child) {
+    this.setSelected(true);
+    var i, len = this.children.length;
+    for (i = 0; i < len; i++) {
+      // unselect all childrens except 'child'
+      if (this.children[i] != child && this.children[i].setSelected) {
+        this.children[i].setSelected(false);
+      }
+    }
+  },
+
+  unselectChilds: function() {
+    var i, len = this.children.length;
+    for (i = 0; i < len; i++) {
+      if (this.children[i].setSelected) {
+        this.children[i].setSelected(false);
+      }
+    }
+  },
+
   addWorkspace: function(workspace, options) {
     if (this.type == 'Block') {
       throw 'Blocks can\'t have Workspaces attached';
@@ -52,6 +99,8 @@ BB.Component = ObjJS.prototype.create({
       throw 'This function only receives workspace name or Workspace object';
     }
     this.children[this.children.length-1].level = this.level + 1;
+    this.children[this.children.length-1].parent = this;
+    this.children[this.children.length-1].workspace = this;
     if (this.childAdded) {
       this.childAdded(this.children[this.children.length-1]); //callback
     }
@@ -86,12 +135,11 @@ BB.Component = ObjJS.prototype.create({
       throw 'Block protoype must have a init function';
       return;
     }
-    // generate the block object
-    var block = function(options){
+    // Add a constructor to prototype
+    blockPrototype.constructor = function(options){
       BB.Block.call(this, name, options);
     };
-    block.prototype = Object.create(BB.Block.prototype);
-    ObjJS.mixin(block, blockPrototype, true); // extend block with blockPrototype
+    var block = BB.Block.prototype.create(blockPrototype);
     return block;
   },
   //this object to top of this parent Workspace
@@ -132,8 +180,8 @@ BB.Component = ObjJS.prototype.create({
   },
   move: function(x, y) {
     if (this.container) { // main Workspaces don't have container
-      this.x = x + this.offsetX;
-      this.y = y + this.offsetY;
+      this.x = x;
+      this.y = y;
       return this.container.move(this.x, this.y);
     } else {
       throw "Main Workspaces don't have container";
@@ -156,3 +204,13 @@ BB.Component = ObjJS.prototype.create({
     }
   }
 });
+
+// attach a event handler to an array of svg.js elements
+BB.attachToEls = function(els ,eventName, func) {
+  var i;
+  var len = els.length;
+  for (i = 0; i < len; i++) {
+    PolymerGestures.removeEventListener(els[i].node, eventName, func);
+    PolymerGestures.addEventListener(els[i].node, eventName, func);
+  }
+};

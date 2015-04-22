@@ -1,7 +1,6 @@
 'use strict'
 
-//A Workspace is an SVG document that can contain Blocks, Workspaces and Fields (TODO: find the best way for attach Fields - An idea is a separated GUI class)
-// TODO: implement activeWorkspace for selection and event handling
+//A Workspace is an SVG document that can contain Blocks, Workspaces and Fields.
 BB.Workspace = BB.Component.prototype.create({
   constructor: function(name, workspace, options) {
     this.parentClass_.constructor.call(this, 'Workspace');
@@ -30,6 +29,7 @@ BB.Workspace = BB.Component.prototype.create({
     this.centerOffsetX = 0;
     this.centerOffsetY = 0;
     this.pannable = true;
+    this.selectable = true;
     this.style = {
       className: 'BBComponentWorkspace'
     };
@@ -50,7 +50,8 @@ BB.Workspace = BB.Component.prototype.create({
                        'stylingFunction',
                        'colorPalette',
                        'metrics',
-                       'selectable'];
+                       'selectable',
+                       'preserveChildsOnSelect'];
     for (var i = 0,el; el = this.optionList[i]; i++) {
       if (options[el]) {
         this[el] = options[el];
@@ -149,6 +150,7 @@ BB.Workspace = BB.Component.prototype.create({
       // unselect all childrens when pointerdown
       var this_ = this;
       BB.attachToEls(this.attachPannable, 'down', function() {
+        this_.setSelected(true);
         this_.unselectChilds();
       });
       this.attachScalable = [this.background, this.text];
@@ -174,25 +176,6 @@ BB.Workspace = BB.Component.prototype.create({
     if (child.type == 'Block') {
       this.attachScalable.push(child.container);
       this.childContainer.scalable(this, null, this.attachScalable);
-    }
-  },
-
-  childSelected: function(child) {
-    var i, len = this.children.length;
-    for (i = 0; i < len; i++) {
-      // unselect all childrens except 'child'
-      if (this.children[i] != child && this.children[i].setSelected) {
-        this.children[i].setSelected(false);
-      }
-    }
-  },
-
-  unselectChilds: function() {
-    var i, len = this.children.length;
-    for (i = 0; i < len; i++) {
-      if (this.children[i].setSelected) {
-        this.children[i].setSelected(false);
-      }
     }
   },
 
@@ -264,5 +247,25 @@ BB.Workspace = BB.Component.prototype.create({
       this.toScale(matrix.a);
       this.childContainer.move(matrix.e, matrix.f);
     }
+  },
+
+  dragstart: function() {
+    this.setSelected(true);
+  },
+
+  resizestart: function() {
+    this.setSelected(true);
+  },
+
+  scalestart: function() {
+    this.setSelected(true);
+  },
+
+  panstart: function() {
+    this.setSelected(true);
+  },
+
+  onSelect: function() {
+    this.toTopPropagate();
   }
 });
