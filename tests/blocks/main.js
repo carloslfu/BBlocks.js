@@ -1,6 +1,6 @@
 var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2, block3; // global variables for debugging
 var main = function() {
-	mainWorkspace = new BB.Workspace('main', 'mainWorkspaceDiv');
+	mainWorkspace = new BB.Workspace('main', BB.WorkspaceBasic, 'mainWorkspaceDiv');
 	//BB.Workspace.prototype.colorPalette = BB.colorPalettes.workspace.dark;
 	//BB.Block.prototype.colorPalette = BB.colorPalettes.block.dark;
 	mainWorkspace.render();

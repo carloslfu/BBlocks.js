@@ -1,7 +1,6 @@
 'use strict'
 
 //GLOBAL TODOs:
-// - Fix all tests (last commit changes some APIs, see basic-demo)
 // - Make all unrender methods (Allows rerender a component)
 
 // namespace for BBlocks (BB)
