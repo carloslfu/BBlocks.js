@@ -71,8 +71,8 @@ Workspace:
 - *blocks*: Definitions of custom blocks using the Block API, in this folder there are some example and testing blocks.
 - *fields*:  Definitions of custom fields using the Field API.
   - *FieldSVG, FieldText, FieldTextInput and FieldButton are implemented here*.
-- *themes*: Styles for all objects.
-  - *default*: Default theme files.
+- *workspaces*:  Definitions of custom fields using the Field API.
+  - *WorkspaceBasic are implemented here*.
 - *core*: Main BBlocks classes
   - *BB.js*: This contains the namespace for all BBlocks clases this use the utils.js ObjJS library. All BBlock classes inherits from BB.Component.
   - *block.js*: BB.Block class: all blocks inherits from this. This implements the Block API.
@@ -84,6 +84,8 @@ Workspace:
   - *workspaces*: Tests for workspaces.
   - *playground.html*: Tests of integration of all components.
 - *demos*: All demos of this project.
+- *themes*: Styles for all objects.
+  - *default*: Default theme files.
 - *libs*: Libraries used in this project.
   - *utils.js*: Useful functions and ObjJS class for dinamically creating classes.
   - *draggable.js*: Svg.js extension for make a component dragabble.
