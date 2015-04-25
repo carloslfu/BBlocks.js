@@ -14,7 +14,7 @@ Some recomendations for GUI performance:
 
 ## Cross browser
 
-I test this proyect for Chrome and Firefox browsers but the goal is supports all modern browsers if possible.
+I test this project for Chrome and Firefox browsers but the goal is supports all modern browsers if possible.
 
 Avoid use foreign objects that contains text for selection and text inputs (this is largely bugged in all rendering engines).
 

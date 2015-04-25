@@ -1,8 +1,8 @@
 # BBlocks.js (alpha version)
 
-BBlocks is lightweight, flexible, simplist and hackable graphical library for building GUIs based on SVG components. This project is mainly inspired in [Blockly][blockly-git] and [Snap-BYOB][snap-git] awesome proyects.
+BBlocks is lightweight, flexible, simplist and hackable graphical library for building GUIs based on SVG components. This project is mainly inspired in [Blockly][blockly-git] and [Snap-BYOB][snap-git] awesome projects.
 
-The main idea is make a graphical library with some advanced features for use in a block editor, but can be used in anything. The goal is construct an advanced visual programming editor in top of this proyect. The editor should be able to be used in production, either individually or as embedded editor, see [Blocklify][blocklify-git] proyect.
+The main idea is make a graphical library with some advanced features for use in a block editor, but can be used in anything. The goal is construct an advanced visual programming editor in top of this project. The editor should be able to be used in production, either individually or as embedded editor, see [BB editor][bb-editor-git] project.
 
 A [live demo][livedemo].
 [livedemo]: https://carloslfu.github.io/BBlocks.js/demos/basic/demo.html
@@ -51,7 +51,7 @@ Board on trello [BBlocks][BBlocks-trello].
 
 [blockly-git]: https://github.com/google/blockly
 [snap-git]: https://github.com/jmoenig/Snap--Build-Your-Own-Blocks
-[blocklify-git]: https://github.com/carloslfu/blocklify
+[bb-editor-git]: https://github.com/carloslfu/BB-editor
 [pep-git]: https://github.com/jquery/PEP
 [svgjs-git]: https://github.com/wout/svg.js
 [polymer-gestures-git]:https://github.com/Polymer/polymer-gestures
