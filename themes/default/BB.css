@@ -1,3 +1,8 @@
+/* General styles*/
+.BBEditableTextBackground {
+  fill: #fff;
+  fill-opacity: 0.6;
+}
 /* Styles for FieldButton*/
 .BBFieldButton rect{
   fill: #1d58d4;
@@ -17,21 +22,18 @@
 .BBFieldButton.BBFieldButtonPressed text{
   fill: #d3dfe2;
 }
+/* Styles for FieldTextInput*/
 .BBFieldTextInput:hover>rect {
   stroke-width: 2;
   stroke: #fff;
 }
+/* Styles for Block*/
 .BBComponentBlock {
   stroke: #000;
   stroke-width: 1px;
   stroke-opacity: 0.4;
 }
-.BBComponentWorkspace {
-  stroke: #000;
-  stroke-width: 6px;
-  stroke-opacity: 0.4;
-}
-.BBComponentBlockSelected {
+.BBComponentBlockSelected { /* this have more priority*/
   stroke: #fc3;
   stroke-width: 3px;
   stroke-opacity: 1;
@@ -41,4 +43,10 @@
 }
 .BBComponentBlockDragging.BBComponentBlockSelected {
   stroke-opacity: 0.8;
+}
+/* Styles for Workspace*/
+.BBComponentWorkspace {
+  stroke: #000;
+  stroke-width: 6px;
+  stroke-opacity: 0.4;
 }

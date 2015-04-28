@@ -34,7 +34,7 @@
         /* invoke any callbacks */
         if (context.resizestart)
           context.resizestart(event)
-        
+
         /* prevent selection resizing */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
         event.stopPropagation();

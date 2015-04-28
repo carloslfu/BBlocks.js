@@ -30,7 +30,7 @@
         /* invoke any callbacks */
         if (context.dragstart)
           context.dragstart(event)
-        
+
         /* prevent selection dragging */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
         event.stopPropagation();

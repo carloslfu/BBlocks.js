@@ -4,7 +4,9 @@
 //  This is an abstract Block class, don't instance this.
 //  All block prototypes live in blocks folder or create your own using the Block API
 //  Block can be instantiable from workspaces with addBlock method, see the basic-demo
-// TODO: documentation for Block API
+// TODOs:
+//  - delete a block with remove method and delete key when selected (methods and animation).
+//  - documentation for Block API
 
 BB.Block = BB.Component.prototype.create({
   constructor: function(name, options, customOptions)  {
@@ -46,6 +48,7 @@ BB.Block = BB.Component.prototype.create({
     if (customOptions) { //options of a custom blocks
       this.customOptions = customOptions;
     }
+    
     if (!options) {
       return;
     }
@@ -66,14 +69,18 @@ BB.Block = BB.Component.prototype.create({
     if (options.hasOwnProperty('draggable')) {
       this.draggable_ = options.draggable;
     }
+    if (options.hasOwnProperty('selected')) {
+      this.selected_ = options.selected;
+    }
     if (options.render) {
       this.render();
     }
   },
 
   appendField: function(field) {
-      this.fields.push(field);
-      return field;
+    field.index = this.fields.length;
+    this.fields.push(field);
+    return field;
   },
 
   newRow: function() {
@@ -98,7 +105,12 @@ BB.Block = BB.Component.prototype.create({
       return;
     }
     if (!this.rendered_) {
-      this.init(this.customOptions); // attributes of custom Block
+      if (!this.initialized_) {
+        this.init(this.customOptions); // attributes of custom Block
+        this.initialized_ = true;
+      } else {
+        this.root.remove();
+      }
       //needs create container before initSVG, because it render the fields
       this.container = this.workspace.root.group();
       this.container.move(this.x, this.y);
@@ -141,6 +153,11 @@ BB.Block = BB.Component.prototype.create({
       if (this.attach) {
         this.attach(); // attach additional svg elements to block
       }
+      if (this.selected_) {
+        this.root.addClass(this.selectedClass);
+      } else {
+        this.root.removeClass(this.selectedClass);
+      }
       this.rendered_ = true;
     }
   },
@@ -150,7 +167,7 @@ BB.Block = BB.Component.prototype.create({
     this.container.draggable(this.workspace, null, this.attachDraggable);
   },
 
-  updateDraggable: function(child) {
+  updateDraggable: function() {
     // Prevents text selection and default behavior
     var this_ = this;
     var pereventDefaultClosure = function(e) {
@@ -231,7 +248,11 @@ BB.Block = BB.Component.prototype.create({
           widthType: this.metrics.widthType
         };
         this.fields[i].row = this.metrics.numRows;
-        this.fields[i].render();
+        if (this.fields[i].rendered_) {
+          this.container.add(this.fields[i].container);
+        } else {
+          this.fields[i].render();
+        }
         box = this.fields[i].bbox();
         this.fields[i].container.move(metrics.width, metrics.y + this.metrics.topRowSpace); // position of field
         metrics.width += box.width + this.metrics.fieldSpace;
@@ -255,7 +276,7 @@ BB.Block = BB.Component.prototype.create({
       if (this.metrics.rows[i].widthType == 'groupedWidth') {
         if (groupFound == false) {
           maxWidth = this.metrics.rows[i].width;
-          for (j=i+1;j<this.metrics.rows.length && this.metrics.rows[j].widthType=='groupedWidth'; j++) {
+          for (j=i+1;j<this.metrics.rows.length && this.metrics.rows[j].widthType == 'groupedWidth'; j++) {
             maxWidth = Math.max(maxWidth, this.metrics.rows[j].width);
           }
           groupFound = true;
@@ -293,7 +314,12 @@ BB.Block = BB.Component.prototype.create({
     //TODO: block root must be a group
     var radius = this.metrics.borderRadius; // for typing
     var rowSpace = this.metrics.rowSpace; // for typing
-    this.root = this.workspace.root.path().M({x: radius, y: this.height})
+    if (!this.root) {
+      this.root = this.container.path();
+    } else {
+      this.root.clear();
+    }
+    this.root.M({x: radius, y: this.height})
                 .q({x: -radius, y: 0}, {x: -radius, y: -radius})
                 .v(-this.height + 2*radius) // left side
                 .q({x: 0, y: -radius}, {x: radius, y: -radius});
@@ -350,11 +376,30 @@ BB.Block = BB.Component.prototype.create({
     this.root.addClass(this.style.className);
   },
 
+  fieldChanged: function(index) {
+    // Redraw path
+    this.initSvg();
+    this.renderBlock_();
+    if (this.fields[index].setSelected) {
+      var tempSelected = this.fields[index].selected_;
+      this.fields[index].setSelected(!tempSelected);
+      this.fields[index].setSelected(tempSelected);
+    }
+  },
+
   onBlur: function() { // Unselect all fields
     var i, len = this.fields.length;
     for (i = 0; i < len; i++) {
       if (typeof(this.fields[i]) == 'object' && this.fields[i].setSelected) {
         this.fields[i].setSelected(false);
+      }
+    }
+  },
+  onUnRender: function() {
+    var i, len = this.fields.length;
+    for (i = 0; i < len; i++) {
+      if (this.fields[i].unRender) {
+        this.fields[i].unRender();
       }
     }
   }

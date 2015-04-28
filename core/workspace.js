@@ -3,7 +3,10 @@
 // A Workspace is an SVG document that can contain Blocks, Workspaces and Fields.
 //  This is an abstract Workspace class, don't instance this.
 //  All instantiable workspaces live in workspaces folder or create your own using the Workspace API
-// TODO: documentation for Workspace API
+// TODOs:
+//  - scrolling of workspaces
+//  - trash (after allows blocks to be removed)
+//  - documentation for Workspace API
 
 BB.Workspace = BB.Component.prototype.create({
   constructor: function(name, workspacePrototype, workspace, options) {
@@ -42,6 +45,9 @@ BB.Workspace = BB.Component.prototype.create({
       return;
     }
     this.workspace = workspace;
+    if (workspacePrototype) {
+      ObjJS.mixinObj(this, workspacePrototype, 'true');
+    }
     // options
     if (!options) {
     // default options
@@ -64,9 +70,6 @@ BB.Workspace = BB.Component.prototype.create({
     }
     if (options.pannable != undefined) {
       this.pannable = pannable;
-    }
-    if (workspacePrototype) {
-      ObjJS.mixinObj(this, workspacePrototype, 'true');
     }
     if (options.render) {
       this.render();
@@ -135,6 +138,10 @@ BB.Workspace = BB.Component.prototype.create({
       BB.attachToEls(this.attachPannable, 'down', function() {
         this_.setSelected(true);
         this_.unselectChilds();
+      });
+      // attached elements selects workspace
+      BB.attachToEls(this.attachedElements, 'down', function() {
+        this_.setSelected(true);
       });
       this.attachScalable = [this.background, this.text];
       for (var i = 0; i < this.children.length; i++) {
@@ -223,5 +230,5 @@ BB.Workspace = BB.Component.prototype.create({
       this.toScale(matrix.a);
       this.childContainer.move(matrix.e, matrix.f);
     }
-  }
+  },
 });

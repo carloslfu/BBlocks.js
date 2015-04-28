@@ -31,7 +31,8 @@ BB.FieldSvg = BB.Field.prototype.create({
       return;
     }
     if (!this.rendered_) {
-      this.container = this.svg;
+      this.container = this.parent.container.group();
+      this.container.add(this.svg);
     }
     if (this.parent.attachDraggable) {
       this.parent.attachDraggable.push(this.container); // This text can drag all parent

@@ -42,9 +42,8 @@ var main = function() {
   block6.render();
   block6.move(50, 165);
   // Nested workspace 2 - 1
-  nested21.move(30,30);
-  nested21.rotate(15);
+  nested21.move(30,30).rotate(15);
   block5 = nested21.addBlock('block6', test_blocks.test);
   block5.render();
-  block5.move(50, 10);
+  block5.move(50, 30);
 };

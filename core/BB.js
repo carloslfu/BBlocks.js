@@ -1,7 +1,7 @@
 'use strict'
 
-//GLOBAL TODOs:
-// - Make all unrender methods (Allows rerender a component)
+// GLOBAL TODOs:
+//  - All code documentation following JSDOC
 
 // namespace for BBlocks (BB)
 var BB = {};
@@ -13,6 +13,7 @@ var BB = {};
 //    if you want to do a very different thing that you can not to do with existing components
 //    (workspaces, blocks and fields)
 // Components that will be implemented (in order of priority)(TODO):
+//  - Dropdown field
 //  - Menu (for context menus and static menus)
 //  - Dialog box
 //  - Tab (for tabs handling)
@@ -32,6 +33,7 @@ BB.Component = ObjJS.prototype.create({
     this.offsetX2 = 0;
     this.offsetY2 = 0;
     this.rendered_ = false;
+    this.initialized_ = false;
     this.selectable = false;
     this.selected_ = false;
     this.preserveChildsOnUnselect = false; // Don't unselect childs when unselect component
@@ -39,7 +41,7 @@ BB.Component = ObjJS.prototype.create({
   },
 
   setSelected: function(bool) {
-    if (this.selectable && this.selected_ != bool) { // performance optimization
+    if (this.selectable && this.selected_ != bool) { // performance optimization and avoids infinite loops
       this.selected_ = bool;
       if (this.selected_) {
         this.root.addClass(this.selectedClass);
@@ -90,35 +92,6 @@ BB.Component = ObjJS.prototype.create({
       }
     }
   },
-
-  /*addWorkspace: function(workspace, options) {
-    if (this.type == 'Block') {
-      throw 'Blocks can\'t have Workspaces attached';
-      return; //blocks can't have Workspaces attached
-    }
-    if (typeof(workspace) == 'string') {
-      var temp = new BB.Workspace(workspace, this, options);
-      // inherits absolute rotation
-      temp.absoluteRotation = temp.absoluteRotation + this.absoluteRotation;
-      this.children.push(temp);
-    } else if (typeof(workspace) == 'object'){
-      if (workspace.type != 'Workspace') {
-        throw 'The type of object must be Workspace';
-        return;
-      }
-      workspace.absoluteRotation = workspace.absoluteRotation + this.absoluteRotation;
-      this.children.push(workspace);
-    } else {
-      throw 'This function only receives workspace name or Workspace object';
-    }
-    this.children[this.children.length-1].level = this.level + 1;
-    this.children[this.children.length-1].parent = this;
-    this.children[this.children.length-1].workspace = this;
-    if (this.childAdded) {
-      this.childAdded(this.children[this.children.length-1]); //callback
-    }
-    return this.children[this.children.length-1];
-  },*/
 
   addWorkspace: function(name, workspacePrototype, options) {
     // generate the block object
@@ -238,11 +211,33 @@ BB.Component = ObjJS.prototype.create({
     } else {
       throw "Main Workspaces don't have container";
     }
+  },
+
+  updateRender: function() {
+    this.unRender();
+    this.render();
+  },
+  unRender: function() {
+    var i, len = this.children.length;
+    for (i = 0; i < len; i++) {
+      if (this.children[i].unRender) {
+        this.children[i].unRender();
+      }
+    }
+    if (this.onUnRender) {
+      this.onUnRender();
+    }
+    if (this.container) {
+      this.container.remove();
+    } else {
+      this.root.remove();
+    }
+    this.rendered_ = false;
   }
 });
 
 // attach a event handler to an array of svg.js elements
-BB.attachToEls = function(els ,eventName, func) {
+BB.attachToEls = function(els, eventName, func) {
   var i;
   var len = els.length;
   for (i = 0; i < len; i++) {

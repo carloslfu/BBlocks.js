@@ -10,7 +10,7 @@ test_blocks.test = {
     this.appendField(new BB.FieldText('hello! \n this is a text field', this));
   },
   attach: function(){
-    this.rotate(45);
+    //this.rotate(45); // rotate have a bug, this is temporaly disabled for demos
   }
 };
 
