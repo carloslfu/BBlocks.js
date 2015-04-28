@@ -1,4 +1,7 @@
 'use strict';
+
+// Field text input
+
 // Inspiration and ideas for implementation http://making.fiftythree.com/fluid-text-inputs/
 // TODOs:
 //    - Report Android bug when have 25 characters (TODO: report this bug)
@@ -6,7 +9,7 @@
 //    - Implement doubletap selection (selects all text)
 //    - Better handling of draggable parent
 //    - Fix bug when scroll rigth and delete with backspace, bad repositioning (may be bad offset handling).
-// Field text input
+
 BB.FieldTextInput = BB.Field.prototype.create({
   // TODO: invert text color when are selected, note that is not trivial.
   constructor: function(text, parent, options)  {

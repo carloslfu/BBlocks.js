@@ -1,6 +1,7 @@
 'use strict'
 
 // Field text
+
 BB.FieldText = BB.Field.prototype.create({
   constructor: function(text, parent, options)  {
     BB.Field.prototype.constructor.call(this, 'Text');

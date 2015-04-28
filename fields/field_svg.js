@@ -1,6 +1,10 @@
 'use strict'
 
-// Field text
+// Field svg (a field that contains a pure svg)
+
+// TODOs:
+//  - add margins
+
 BB.FieldSvg = BB.Field.prototype.create({
   constructor: function(svg, parent, options)  {
     BB.Field.prototype.constructor.call(this, 'Svg');

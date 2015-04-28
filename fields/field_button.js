@@ -1,6 +1,7 @@
 'use strict'
 
-// Field text
+// Field button
+
 BB.FieldButton = BB.Field.prototype.create({
   constructor: function(text, parent, ondown, options)  {
     BB.Field.prototype.constructor.call(this, 'Button');
@@ -74,7 +75,7 @@ BB.FieldButton = BB.Field.prototype.create({
         this_.ondown();
       } else {
         // for debugging
-        console.log('(Degug) FieldButton don\'t have a ondown handler! .\n Text: ' + this_.text);
+        console.log('(Debug) FieldButton don\'t have a ondown handler! .\n Text: ' + this_.text);
       }
       event.preventDefault(); // Don't select text
     });
