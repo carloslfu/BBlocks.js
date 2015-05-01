@@ -20,6 +20,10 @@ var main = function() {
   block2 = mainWorkspace.addBlock('block2', example_blocks.example);
   block2.render();
   block2.move(50, 170);
+  block3 = mainWorkspace.addBlock('blockBlue', test_blocks.test);
+  block3.render();
+  block3.setColor('#2870b7');
+  block3.move(30, 20);
   //field button fires animation
   block2.fields[5].ondown = block1.methods.animation;
   block1.methods.animationStart = function () {

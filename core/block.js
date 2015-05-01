@@ -105,6 +105,15 @@ BB.Block = BB.Component.prototype.create({
       return;
     }
     if (!this.rendered_) {
+      if (!this.colorPalette) {
+        this.colorPalette = BB.colorPalettes.block.light; //default palette
+      }
+      // styling
+      this.bgColor = this.colorPalette.background;
+      this.borderColor = this.colorPalette.border;
+      if (this.stylingFunction) {
+        this.stylingFunction();
+      }
       if (!this.initialized_) {
         this.init(this.customOptions); // attributes of custom Block
         this.initialized_ = true;
@@ -115,17 +124,6 @@ BB.Block = BB.Component.prototype.create({
       this.container = this.workspace.root.group();
       this.container.move(this.x, this.y);
       this.initSvg(); // compute graphics for rendering
-      if (!this.colorPalette) {
-        this.colorPalette = BB.colorPalettes.block.light; //default palette
-      }
-      // styling
-      this.bgColor = this.colorPalette.background;
-      this.shadowColor = this.colorPalette.shadowColor;
-      this.lightColor = this.colorPalette.lightColor;
-      this.borderColor = this.colorPalette.border;
-      if (this.stylingFunction) {
-        this.stylingFunction();
-      }
       //render block - render fields and all block svg
       this.renderBlock_();
       // render children
@@ -134,8 +132,6 @@ BB.Block = BB.Component.prototype.create({
         this.children[i].render();
         this.childContainer.add(this.children[i].container);
       }
-      //this.container.add(this.rootDark);
-      //this.container.add(this.rootLight);
       this.container.add(this.root);
       this.container.add(this.childContainer);
       // add fields to top of container
@@ -144,8 +140,6 @@ BB.Block = BB.Component.prototype.create({
           this.fields[i].toTop();
         }
       }
-      //this.attachDraggable.push(this.rootDark);
-      //this.attachDraggable.push(this.rootLight);
       this.attachDraggable.push(this.root);
       this.updateDraggable();
       this.workspace.childContainer.add(this.container);
@@ -374,6 +368,13 @@ BB.Block = BB.Component.prototype.create({
               }).fill(this.bgColor);*/
     this.root.fill(this.bgColor);
     this.root.addClass(this.style.className);
+  },
+
+  setColor: function(color) {
+    this.bgColor = color;
+    if (this.rendered_) {
+      this.root.fill(color);
+    }
   },
 
   fieldChanged: function(index) {
