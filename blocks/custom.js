@@ -5,18 +5,18 @@
 var test_blocks = {};
 
 test_blocks.test = {
-  init: function(){
+  init: function() {
     this.id = 0;
     this.appendField(new BB.FieldText('hello! \n this is a text field', this));
   },
-  attach: function(){
+  attach: function() {
     //this.rotate(45); // rotate have a bug, this is temporaly disabled for demos
   }
 };
 
 // test_dev block for debugging fields
 test_blocks.test_dev = {
-  init: function(){
+  init: function() {
     // fields can be anything :D (like the follow group)
     var group2 = this.workspace.root.group();
     var margin2 = this.workspace.root.rect(110, 110).fill('none');
