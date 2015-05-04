@@ -7,7 +7,7 @@
 
 BB.Field = BB.Component.prototype.create({
   constructor: function(type){
-    this.type = type;
+    BB.Component.prototype.constructor.call(this, type);
     this.rendered_ = false;
     this.index_ = null; // index of field in it parent
   },
