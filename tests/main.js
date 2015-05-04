@@ -28,6 +28,10 @@ var main = function() {
   block3 = nested2.addBlock('block3', test_blocks.test);
   block3.render();
   block3.move(100, 100);
+  block6 = mainWorkspace.addBlock('blockBlue', test_blocks.test);
+  block6.render();
+  block6.setColor('#2870b7');
+  block6.move(30, 20);
   nested2.move(350,50);
   block4 = nested2.addBlock('block4', example_blocks.example);
   block4.render();

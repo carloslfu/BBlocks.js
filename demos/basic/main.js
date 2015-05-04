@@ -1,4 +1,4 @@
-var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2, block3, block4;
+var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2, block3, block4, blockBlue;
 var main = function() {
   mainWorkspace = new BB.Workspace('main', BB.WorkspaceBasic, 'mainWorkspaceDiv');
   nested1 = mainWorkspace.addWorkspace('nested1', BB.WorkspaceBasic, {width : 300, height: 400, x: 350, y: 10});
@@ -20,10 +20,10 @@ var main = function() {
   block2 = mainWorkspace.addBlock('block2', example_blocks.example);
   block2.render();
   block2.move(50, 170);
-  block3 = mainWorkspace.addBlock('blockBlue', test_blocks.test);
-  block3.render();
-  block3.setColor('#2870b7');
-  block3.move(30, 20);
+  blockBlue = mainWorkspace.addBlock('blockBlue', test_blocks.test);
+  blockBlue.render();
+  blockBlue.setColor('#2870b7');
+  blockBlue.move(30, 20);
   //field button fires animation
   block2.fields[5].ondown = block1.methods.animation;
   block1.methods.animationStart = function () {
