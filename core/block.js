@@ -215,7 +215,7 @@ BB.Block = BB.Component.prototype.create({
       if (typeof(this.fields[i]) == 'string') { //field control commands
         switch (this.fields[i]) {
             case 'newRow':
-              metrics.y += maxHeight + this.metrics.bottomRowSpace + this.metrics.initialSpace.y + this.metrics.topRowSpace;
+              metrics.y += maxHeight + this.metrics.bottomRowSpace + this.metrics.topRowSpace;
               metrics.width  += this.metrics.finalSpace.x - this.metrics.fieldSpace;
               this.metrics.rows[this.metrics.numRows] = {
                 width: metrics.width,
@@ -332,7 +332,7 @@ BB.Block = BB.Component.prototype.create({
     this.root.H(row.width - radius)
               .q({x: radius, y: 0}, {x: radius, y: radius});
     //render by row rigth line - middle
-    for (var i = 1; i < this.metrics.rows.length - 1 ; i++) {
+    for (var i = 1; i < this.metrics.rows.length ; i++) {
       row = this.metrics.rows[i];
       height = row.y;
       height -= radius;
@@ -351,16 +351,6 @@ BB.Block = BB.Component.prototype.create({
       } else {
         throw 'Unsopported type of radius: ' + row.lastRadius;
       }
-    }
-    //last row
-    row = this.metrics.rows[this.metrics.rows.length-1];
-    if (row.lastRadius == 'plane') {
-      this.root.V(row.y - radius);
-    } else {
-      this.root.q({x: 0, y: radius}, {x: radius, y: radius})
-                .H(row.width - radius)
-                .q({x: radius, y: 0}, {x: radius, y: radius})
-                .V(row.y - radius);
     }
     var finalRow = this.metrics.rows[this.metrics.rows.length - 1]; //for typing
     var finalWidth = finalRow.width;
@@ -388,11 +378,11 @@ BB.Block = BB.Component.prototype.create({
     // Redraw path
     this.initSvg();
     this.renderBlock_();
-    if (this.fields[index].setSelected) {
+    /*if (this.fields[index].setSelected) {
       var tempSelected = this.fields[index].selected_;
       this.fields[index].setSelected(!tempSelected);
       this.fields[index].setSelected(tempSelected);
-    }
+    }*/
   },
 
   onBlur: function() { // Unselect all fields

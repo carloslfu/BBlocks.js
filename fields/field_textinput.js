@@ -40,6 +40,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.initialSpaceY_ = 1;
     this.finalSpaceX_ = 1;
     this.finalSpaceY_ = 1;
+    this.textRootOffset_ = 1;
     this.offsetX_ = 0; // X scroll offset relative to the text (one line textInput doesn't need offsetY)
     this.initialCursorY_ = 1; // Vertical cursor initial separation relative to SVG element
     this.initialCursorX_ = 0; // Horizontal cursor initial separation relative to SVG element
@@ -95,7 +96,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       //Mirror root for cursor position, this contains 0 to cursorPosition text (metrics)
       this.mirrorRoot = this.root.text(this.text).font({
         family: this.fontFamily
-        , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
+        , size: this.fontSize}).fill(this.fontColor).move(this.textRootOffset_, 0) //BUG: svg.js bug when add text to a group
         .style('text-rendering: geometricPrecision');
       // Computes text length
       var textLength = this.mirrorRoot.node.getComputedTextLength();
@@ -105,11 +106,11 @@ BB.FieldTextInput = BB.Field.prototype.create({
         .move(0, 0).addClass(this.style.editableTextBackground).radius(4);
       this.root.size(this.width_, this.height_).move(this.initialSpaceX_, this.initialSpaceY_);
       // Background hides mirrorRoot
-      this.background = this.root.rect(this.width_, this.height_).move(0, 0).addClass(this.style.editableTextBackground);
+      this.background = this.root.rect(this.width_, this.height_).move(0, 0);
       this.selectionRoot =  this.root.rect(0, this.initialCursorY_ + this.size).move(0, 0).fill(this.selectionColor);
       this.textRoot = this.root.text(this.text.replace(/ /g, '\u00a0')).font({
         family: this.fontFamily
-        , size: this.fontSize}).fill(this.fontColor).move(0, 0) //BUG: svg.js bug when add text to a group
+        , size: this.fontSize}).fill(this.fontColor).move(this.textRootOffset_, 0) //BUG: svg.js bug when add text to a group
         .style('text-rendering: geometricPrecision'); // when scales keeps proportions
       // Text metrics
       this.getTextMetrics_();
@@ -196,10 +197,10 @@ BB.FieldTextInput = BB.Field.prototype.create({
             this_.offsetX_ = this_.width_ - textLength;
           }
         }
-        this_.cursor.move(this_.initialCursorX_ + this_.offsetX_ + textLength, this_.initialCursorY_); // Position of cursor
-        this_.textRoot.x(this_.initialCursorX_ + this_.offsetX_); // Scrolls the text
+        this_.cursor.move(this_.initialCursorX_ + this_.textRootOffset_ + this_.offsetX_ + textLength, this_.initialCursorY_); // Position of cursor
+        this_.textRoot.x(this_.initialCursorX_ + this_.offsetX_ + this_.textRootOffset_); // Scrolls the text
         // Moves and resize selectionRoot
-        this_.selectionRoot.move(this_.initialCursorX_ + this_.offsetX_ + textLength, this_.initialCursorY_);
+        this_.selectionRoot.move(this_.initialCursorX_ + this_.textRootOffset_ + this_.offsetX_ + textLength, this_.initialCursorY_);
         this_.selectionRoot.width(selectionWidth);
         if (textChanged && this_.fluid) {
           this_.setWidth(this_.textWidth_);
@@ -296,6 +297,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
         }
         //console.log('up:' + selectionWidth);
         var textLength = this_.mirrorRoot.node.getComputedTextLength();
+        if (!this_.fluid)
         // Scrolling logic
         var selectionDx = (reverseSelection?-1:1)*selectionWidth;
         if (-this_.offsetX_ > textLength + selectionDx) {
@@ -304,9 +306,9 @@ BB.FieldTextInput = BB.Field.prototype.create({
         if (this_.width_ - this_.offsetX_ <= textLength + selectionDx) {
           this_.offsetX_ = this_.width_ - textLength - selectionDx;
         }
-        this_.textRoot.x(this_.initialCursorX_ + this_.offsetX_); // Scrolls the text
+        this_.textRoot.x(this_.initialCursorX_ + this_.offsetX_ + this_.textRootOffset_); // Scrolls the text
         // Moves and resize selectionRoot
-        this_.selectionRoot.move(this_.initialCursorX_ + this_.offsetX_ + textLength - (reverseSelection?selectionWidth:0), this_.initialCursorY_);
+        this_.selectionRoot.move(this_.initialCursorX_ + this_.textRootOffset_ + this_.offsetX_ + textLength - (reverseSelection?selectionWidth:0), this_.initialCursorY_);
         this_.selectionRoot.width(selectionWidth);
         this_.setSelected(true);
       };
@@ -325,7 +327,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
       this.cursorXY = pos;
     } else {
       var textLength = this.mirrorRoot.node.getComputedTextLength();
-      this.cursorXY.x = this.initialCursorX_ + this.offsetX_ + textLength;
+      this.cursorXY.x = this.initialCursorX_ + this.textRootOffset_ + this.offsetX_ + textLength;
       this.cursorXY.y = this.initialCursorY_;
     }
     var x = this.cursorXY.x, y = this.cursorXY.y;
@@ -473,7 +475,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
   setWidth: function(width){
     if (width != undefined && typeof(width) == 'number') {
       if (width != this.width_) {
-        this.width_ = Math.max(width + 1, this.minWidth);
+        this.width_ = Math.max(width + 2, this.minWidth);
         if (this.rendered_) {
           this.mainBackground.width(this.width_ + this.initialSpaceX_ + this.finalSpaceX_);
           this.background.width(this.width_);
