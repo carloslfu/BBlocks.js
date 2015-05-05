@@ -17,12 +17,30 @@ A [live demo][livedemo].
 - Zoomable, resizable and pannabble workspaces.
 - Touch Gestures support (uses [polymer-gestures][polymer-gestures-git]).
 
-Fields:
+### Core components
+
+- Workspace.
+- Block (An abstraction similar to Blockly and Snap blocks).
+- Field.
+
+### Workspaces
+
+- Basic Workspace: resize box, drag box and some styles.
+
+### Fields
 
 - Svg.
 - Button.
 - Text.
 - Text input.
+
+### Blocks
+
+Some examples and test blocks:
+
+- test: Simple block with a text field.
+- test_dev: Block with an animation.
+- example: Block with many fields.
 
 ## Getting started
 
