@@ -50,9 +50,10 @@ See the demos folder. All documentation is in construction... (github wiki comin
 
 - Interaction between objects (Workspaces, blocks ...).
 - SVG textarea input field.
-- Multiple blocks selection.
+- Menu component.
+- Dropdown field.
 - SVG contextmenu.
-- Custom menus.
+- Multiple blocks selection.
 - Pugins API.
 - Styling API.
 
