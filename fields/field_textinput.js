@@ -213,42 +213,41 @@ BB.FieldTextInput = BB.Field.prototype.create({
       this.trackStarted = false;
       // Sets caret position with pointer
       this.pointerCaretHandler = function (e) {
+        var mousePos = mouseToSvg(e, this_.root.node), i, len, pos1 = 0, pos2 = 0;
+        // Mouse position relative to scroll
+        mousePos.x -= this_.initialCursorX_ + this_.offsetX_;
+        // Find the caret position for this pointerdown event
+        for (i = 0, len = this_.textMetrics_.length; i <= len; i++) {
+          pos1 = pos2;
+          pos2 += ((i == 0) ? 0 : this_.textMetrics_[i - 1]/2) + ((i == len) ? 0 : this_.textMetrics_[i]/2);
+          //console.log(pos1 + '<=' + mousePos.x + '<' + pos2) // DEBUGGING LINE
+          if (pos1 <= mousePos.x && mousePos.x < pos2) {
+            break;
+          }
+        }
+        this_.selectionRoot.width(0);
+        this_.mirrorText = this_.text.substr(0, i);
+        this_.mirrorRoot.text(this_.mirrorText.replace(/ /g, '\u00a0'));
+        setCaretPosition(this_.foreignTextInput.getChild(0), i);
+      };
+      PolymerGestures.addEventListener(this.root.node, 'up', function(e) {
         if (this_.trackStarted == false) {
-          // Keeps reference to viewport
-          var lastviewportElement = e.target.viewportElement;
-          var mousePos = mouseToSvg(e, this_.root.node), i, len, pos1 = 0, pos2 = 0;
-          // Mouse position relative to scroll
-          mousePos.x -= this_.initialCursorX_ + this_.offsetX_;
-          // Find the caret position for this pointerdown event
-          for (i = 0, len = this_.textMetrics_.length; i <= len; i++) {
-            pos1 = pos2;
-            pos2 += ((i == 0) ? 0 : this_.textMetrics_[i - 1]/2) + ((i == len) ? 0 : this_.textMetrics_[i]/2);
-            //console.log(pos1 + '<=' + mousePos.x + '<' + pos2) // DEBUGGING LINE
-            if (pos1 <= mousePos.x && mousePos.x < pos2) {
-              break;
-            }
-          }
-          this_.selectionRoot.width(0);
-          this_.mirrorText = this_.text.substr(0, i);
-          this_.mirrorRoot.text(this_.mirrorText.replace(/ /g, '\u00a0'));
-          setCaretPosition(this_.foreignTextInput.getChild(0), i);
-          if (e.type == 'up' || this_.focused == true) {
-            this_.showCursor();
-            this_.setSelected(true);
-          }
+          this_.pointerCaretHandler(e);
+          this_.showCursor();
+          this_.setSelected(true);
         } else {
           this_.trackStarted = false;
         }
-      };
-      PolymerGestures.addEventListener(this.root.node, 'up', this.pointerCaretHandler);
-      PolymerGestures.addEventListener(this.root.node, 'trackstart', this.pointerCaretHandler);
-      
+      });
       //Pointertrackstart handler
       PolymerGestures.addEventListener(this.root.node, 'trackstart', function (e) {
         //console.log('trackstart')
         this_.trackStarted = true;
-        this_.referenceCursorSelection = this_.foreignTextInput.getChild(0).selectionStart;
-        this_.referenceOffsetX_ = this_.offsetX_;
+        if (this_.selected_) {
+          this_.pointerCaretHandler(e);
+          this_.referenceCursorSelection = this_.foreignTextInput.getChild(0).selectionStart;
+          this_.referenceOffsetX_ = this_.offsetX_;
+        }
       });
       // Selects text with pointer
       this.pointerCaretSelectionHandler = function (e) {
@@ -316,8 +315,6 @@ BB.FieldTextInput = BB.Field.prototype.create({
       var tempSelected = this.selected_;
       this.selected_ = !this.selected_;
       this.setSelected(tempSelected);
-    } else {
-      this.updateRender();
     }
   
   },
@@ -426,6 +423,7 @@ BB.FieldTextInput = BB.Field.prototype.create({
     this.container.removeClass('BBFieldTextInput');
     this.showCursor();
     PolymerGestures.addEventListener(this.root.node, 'track', this.pointerCaretSelectionHandler);
+    //PolymerGestures.addEventListener(this.root.node, 'trackstart', this.pointerCaretHandler);
     if (this.parent.attachDraggable) {
       // if is focused not drag the parent
       if (this.parent.container.fixedDrag) {
