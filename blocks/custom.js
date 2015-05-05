@@ -14,6 +14,15 @@ test_blocks.test = {
   }
 };
 
+//Task block
+test_blocks.task = {
+  init: function() {
+    this.id = 0;
+    this.appendField(new BB.FieldText('Do anything ...', this));
+    //this.setBottomConnection(true);
+  }
+};
+
 // test_dev block for debugging fields
 test_blocks.test_dev = {
   init: function() {
