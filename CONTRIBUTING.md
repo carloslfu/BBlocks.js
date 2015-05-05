@@ -18,12 +18,13 @@ This is the group for this project: [BBlocks group][BBlocks-group].
 
 For coding TODOs search 'TODO' in the project or visit the [trello board][BBlocks-trello].
 
-##Features that will be implemented.
+##Pending features.
 
 - Interaction between objects (Workspaces, blocks ...).
-- SVG textarea input field.
-- Multiple blocks selection.
+- Menu component.
+- Dropdown field.
 - SVG contextmenu.
-- Custom menus.
+- Multiple blocks selection.
+- SVG textarea input field.
 - Pugins API.
 - Styling API.

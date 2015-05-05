@@ -49,11 +49,11 @@ See the demos folder. All documentation is in construction... (github wiki comin
 ## Features that will be implemented
 
 - Interaction between objects (Workspaces, blocks ...).
-- SVG textarea input field.
 - Menu component.
 - Dropdown field.
 - SVG contextmenu.
 - Multiple blocks selection.
+- SVG textarea input field.
 - Pugins API.
 - Styling API.
 
