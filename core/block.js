@@ -164,20 +164,27 @@ BB.Block = BB.Component.prototype.create({
   updateDraggable: function() {
     // Prevents text selection and default behavior
     var this_ = this;
-    var pereventDefaultClosure = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-    BB.attachToEls(this.attachDraggable, 'down', pereventDefaultClosure);
+    if (this.toTopClosure == undefined) {
+      this.pereventDefaultClosure = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+    }
+    BB.attachToEls(this.attachDraggable, 'down', this.pereventDefaultClosure);
     if (this.draggable_) {
       this.container.draggable(this, null, this.attachDraggable);
     } else if (this.rendered_) {
       this.container.fixedDrag(); // Remove dragging from container
     }
-    var toTopClosure = function() {
-      this_.setSelected(true);
-    };
-    BB.attachToEls(this.attachDraggable, 'down', toTopClosure);
+    if (this.toTopClosure == undefined) {
+      this.toTopClosure = function(e) {
+        console.log(this_.name + ' down');
+        this_.setSelected(true);
+        e.preventDefault();
+        e.stopPropagation();
+      };
+    }
+    BB.attachToEls(this.attachDraggable, 'down', this.toTopClosure);
   },
 
   dragstart: function() {
