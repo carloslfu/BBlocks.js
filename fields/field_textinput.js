@@ -231,10 +231,21 @@ BB.FieldTextInput = BB.Field.prototype.create({
         setCaretPosition(this_.foreignTextInput.getChild(0), i);
       };
       PolymerGestures.addEventListener(this.root.node, 'up', function(e) {
-        if (this_.trackStarted == false) {
+        if (this_.trackStarted == false && this_.selected_ == false) {
           this_.pointerCaretHandler(e);
           this_.showCursor();
           this_.setSelected(true);
+        } else {
+          this_.trackStarted = false;
+        }
+      });
+      PolymerGestures.addEventListener(this.root.node, 'down', function(e) {
+        if (this_.trackStarted == false && this_.selected_ == true) {
+          this_.pointerCaretHandler(e);
+          this_.showCursor();
+          this_.setSelected(true);
+          this_.referenceCursorSelection = this_.foreignTextInput.getChild(0).selectionStart;
+          this_.referenceOffsetX_ = this_.offsetX_;
         } else {
           this_.trackStarted = false;
         }
@@ -243,11 +254,6 @@ BB.FieldTextInput = BB.Field.prototype.create({
       PolymerGestures.addEventListener(this.root.node, 'trackstart', function (e) {
         //console.log('trackstart')
         this_.trackStarted = true;
-        if (this_.selected_) {
-          this_.pointerCaretHandler(e);
-          this_.referenceCursorSelection = this_.foreignTextInput.getChild(0).selectionStart;
-          this_.referenceOffsetX_ = this_.offsetX_;
-        }
       });
       // Selects text with pointer
       this.pointerCaretSelectionHandler = function (e) {
