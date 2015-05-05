@@ -202,7 +202,7 @@ BB.Block = BB.Component.prototype.create({
     }
   },
 
-  // calculate metrics
+  // calculate metrics ,render fields if not are rendered or if rendered adds
   initSvg: function() {
     var globalWidth = this.metrics.initialSpace.x, box, maxHeight = 0;
     var metrics = {
@@ -318,7 +318,7 @@ BB.Block = BB.Component.prototype.create({
     if (!this.root) {
       this.root = this.container.path();
     } else {
-      this.root.clear();
+      this.root.clear(); // if rendered clear and update segments
     }
     this.root.M({x: radius, y: this.height})
                 .q({x: -radius, y: 0}, {x: -radius, y: -radius})
