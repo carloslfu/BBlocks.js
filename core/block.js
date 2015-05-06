@@ -35,11 +35,11 @@ BB.Block = BB.Component.prototype.create({
     this.metrics = {
       borderRadius: 2,
       borderWidth: 1,
-      initialSpace: {x: 4, y: 0},
+      initialSpace: {x: 4, y: 4},
       finalSpace: {x: 4, y: 4},
       fieldSpace: 5,
-      topRowSpace: 2.5,
-      bottomRowSpace: 2.5,
+      topRowSpace: 1.25,
+      bottomRowSpace: 1.25,
       widthType: 'globalWidth',
     };
 
@@ -210,19 +210,22 @@ BB.Block = BB.Component.prototype.create({
     };
     this.metrics.rows = [];
     this.metrics.numRows = 0;
+    var topRowSpace = 0;
+    var bottomRowSpace = this.metrics.bottomRowSpace;
     for (var i = 0; i < this.fields.length; i++) {
       if (typeof(this.fields[i]) == 'string') { //field control commands
         switch (this.fields[i]) {
             case 'newRow':
-              metrics.y += maxHeight + this.metrics.bottomRowSpace + this.metrics.topRowSpace;
+              metrics.y += maxHeight + bottomRowSpace + topRowSpace;
               metrics.width  += this.metrics.finalSpace.x - this.metrics.fieldSpace;
               this.metrics.rows[this.metrics.numRows] = {
                 width: metrics.width,
                 y: metrics.y,
-                height: maxHeight + this.metrics.topRowSpace,
+                height: maxHeight + bottomRowSpace + topRowSpace,
                 widthType: this.metrics.widthType
               };
               this.metrics.numRows++;
+              topRowSpace = this.metrics.topRowSpace;
               globalWidth = Math.max(metrics.width, globalWidth);
               metrics.width = this.metrics.initialSpace.x;
               maxHeight = 0;
@@ -244,7 +247,7 @@ BB.Block = BB.Component.prototype.create({
         this.metrics.rows[this.metrics.numRows] = {
           width: metrics.width,
           y: metrics.y,
-          height: maxHeight + this.metrics.topRowSpace,
+          height: maxHeight + bottomRowSpace + topRowSpace,
           widthType: this.metrics.widthType
         };
         this.fields[i].row = this.metrics.numRows;
@@ -254,14 +257,14 @@ BB.Block = BB.Component.prototype.create({
           this.fields[i].render();
         }
         box = this.fields[i].bbox();
-        this.fields[i].container.move(metrics.width, metrics.y + this.metrics.topRowSpace); // position of field
+        this.fields[i].container.move(metrics.width, metrics.y + bottomRowSpace + topRowSpace); // positions the field
         metrics.width += box.width + this.metrics.fieldSpace;
-        maxHeight = Math.max(maxHeight, box.height);
+        maxHeight = Math.max(maxHeight, box.height + bottomRowSpace + topRowSpace);
       }
     }
     metrics.width += this.metrics.finalSpace.x - this.metrics.fieldSpace;
     globalWidth = Math.max(metrics.width, globalWidth);
-    metrics.y += box.height + this.metrics.finalSpace.y;
+    metrics.y += box.height + bottomRowSpace + topRowSpace + this.metrics.finalSpace.y;
     this.metrics.rows.push({
       width: metrics.width,
       y: metrics.y,
@@ -355,7 +358,7 @@ BB.Block = BB.Component.prototype.create({
     var finalWidth = finalRow.width;
     // bottom line
     this.root.q({x: 0, y: radius}, {x: -radius, y: radius})
-             .h(-finalWidth + 2*radius)
+             .h(-finalWidth + 2*radius).Z();
              // TODO: report border bug in svg, when drag a block with black border, this project dont use that, use svg rect
     // this bug is resolved in chromium 44, TODO: test in chrome 42
              /*.stroke({ color: this.borderColor,
