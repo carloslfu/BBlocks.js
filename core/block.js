@@ -21,7 +21,6 @@ BB.Block = BB.Component.prototype.create({
     this.childContainer = null; // svg group that contains all children
     this.statement = true;
     this.root = null;
-    this.rootDark = null; //shadow effect
     this.nested = true; // Blocks are nested by default, allows toTopPropagate
     this.fields = [];
     this.attachDraggable = [];
