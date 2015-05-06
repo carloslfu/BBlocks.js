@@ -12,6 +12,7 @@ BB.Workspace = BB.Component.prototype.create({
   constructor: function(name, workspacePrototype, workspace, options) {
     BB.Component.prototype.constructor.call(this, 'Workspace');
     this.name = name;
+    this.title = '';
     this.width = 200;
     this.height = 200;
     this.x = 0;
@@ -62,6 +63,7 @@ BB.Workspace = BB.Component.prototype.create({
                        'colorPalette',
                        'metrics',
                        'selectable',
+                       'title',
                        'preserveChildsOnSelect'];
     for (var i = 0,el; el = this.optionList[i]; i++) {
       if (options[el]) {

@@ -1,9 +1,9 @@
 var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2, block3, block4, blockBlue;
 var main = function() {
   mainWorkspace = new BB.Workspace('main', BB.WorkspaceBasic, 'mainWorkspaceDiv');
-  nested1 = mainWorkspace.addWorkspace('nested1', BB.WorkspaceBasic, {width : 300, height: 400, x: 350, y: 10});
-  nested2 = mainWorkspace.addWorkspace('nested2', BB.WorkspaceBasic, {width : 300, height: 400});
-  nested21 = nested2.addWorkspace('nested21', BB.WorkspaceBasic, {width : 210, height: 140});
+  nested1 = mainWorkspace.addWorkspace('nested1', BB.WorkspaceBasic, {title: 'Nested1', width : 300, height: 400, x: 350, y: 40});
+  nested2 = mainWorkspace.addWorkspace('nested2', BB.WorkspaceBasic, {title: 'Nested2', width : 300, height: 400});
+  nested21 = nested2.addWorkspace('nested21', BB.WorkspaceBasic, {title: 'Nested21', width : 210, height: 140});
 
   //BB.Workspace.prototype.colorPalette = BB.colorPalettes.workspace.dark;
   //BB.Block.prototype.colorPalette = BB.colorPalettes.block.dark;
@@ -41,7 +41,7 @@ var main = function() {
   block4.render();
   block4.move(20, 160);
   // Nested workspace 2
-  nested2.move(670,10);
+  nested2.move(670,40);
   block6 = nested2.addBlock('block5', example_blocks.example);
   block6.render();
   block6.move(50, 165);

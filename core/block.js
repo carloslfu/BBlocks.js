@@ -177,7 +177,7 @@ BB.Block = BB.Component.prototype.create({
     }
     if (this.toTopClosure == undefined) {
       this.toTopClosure = function(e) {
-        console.log(this_.name + ' down');
+        //console.log(this_.name + ' down');
         this_.setSelected(true);
         e.preventDefault();
         e.stopPropagation();
