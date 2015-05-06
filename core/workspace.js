@@ -103,12 +103,12 @@ BB.Workspace = BB.Component.prototype.create({
       this.background = this.root.rect(this.width, this.height).fill(this.bgColor);
       this.root.attr('style', 'overflow: hidden;'); // hide content out of workspace in nested workspaces
       this.childContainer = this.root.group();
-      this.text = this.root.text(this.level + '');
+      //this.text = this.root.text(this.level + ''); //TODO: add this to WorkspaceBasic like an example of how attach elements manually
       //this.text = this.root.text(this.name + ' ( level: ' + this.level + ')'); // for debugging
-      this.children.push({container: this.text,
+      /*this.children.push({container: this.text,
                           move: function(x,y){this.container.move(x,y)}
                          });
-      this.childContainer.add(this.text);
+      this.childContainer.add(this.text);*/
       for (var i = 0; i < this.children.length; i++) {
         if (!this.children[i].rendered && this.children[i].render) {
           this.children[i].render();
@@ -117,7 +117,7 @@ BB.Workspace = BB.Component.prototype.create({
       if (this.nested) {
         this.workspace.childContainer.add(this.container);
       }
-      this.attachPannable = [this.background, this.text];
+      this.attachPannable = [this.background];//, this.text];
       if (this.pannable) {
         this.childContainer.pannable(this, null, this.attachPannable, [this.childContainer]);
       }
@@ -143,7 +143,7 @@ BB.Workspace = BB.Component.prototype.create({
       BB.attachToEls(this.attachedElements, 'down', function() {
         this_.setSelected(true);
       });
-      this.attachScalable = [this.background, this.text];
+      this.attachScalable = [this.background];//, this.text];
       for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].type == 'Block') {
           this.attachScalable.push(this.children[i]);
