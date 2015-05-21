@@ -96,6 +96,10 @@ BB.Workspace = BB.Component.prototype.create({
         this.width = '100%';
         this.height = '100%';
       }
+      this.style.blockDisabledPattern = this.root.pattern(10, 10, function(add) {
+        add.rect(10,10).fill('#aaa')
+        add.path('M 0 0 L 10 10 M 10 0 L 0 10').stroke('#cc0')
+      });
       if (!this.colorPalette) {
         this.colorPalette = BB.colorPalettes.workspace.light; //default palette
       }

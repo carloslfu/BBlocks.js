@@ -31,6 +31,7 @@ BB.Block = BB.Component.prototype.create({
     // Capabilities of block
     this.selectable = true;
     this.draggable_ = true;
+    this.disabled_ = false;
     
     this.metrics = {
       borderRadius: 2,
@@ -56,20 +57,21 @@ BB.Block = BB.Component.prototype.create({
                        'y',
                        'stylingFunction',
                        'colorPalette',
-                       'metrics'];
+                       'metrics',
+                       'selectable'];
     for (var i = 0,el; el = this.optionList[i]; i++) {
       if (options.hasOwnProperty(el)) {
         this[el] = options[el];
       }
-    }
-    if (options.hasOwnProperty('selectable')) {
-      this.selectable = options.selectable;
     }
     if (options.hasOwnProperty('draggable')) {
       this.draggable_ = options.draggable;
     }
     if (options.hasOwnProperty('selected')) {
       this.selected_ = options.selected;
+    }
+    if (options.hasOwnProperty('disabled')) {
+      this.disabled_ = options.disabled;
     }
     if (options.render) {
       this.render();
@@ -150,6 +152,11 @@ BB.Block = BB.Component.prototype.create({
         this.root.addClass(this.selectedClass);
       } else {
         this.root.removeClass(this.selectedClass);
+      }
+      if (this.disabled_) {
+        this.root.fill(this.workspace.style.blockDisabledPattern);
+      } else {
+        this.root.fill(this.bgColor);
       }
       this.rendered_ = true;
     }
@@ -375,16 +382,21 @@ BB.Block = BB.Component.prototype.create({
       this.root.fill(color);
     }
   },
+  setDisabled: function(bool) {
+    this.disabled_ = bool;
+    if (this.rendered_) {
+      if (this.disabled_) {
+        this.root.fill(this.workspace.style.blockDisabledPattern);
+      } else {
+        this.root.fill(this.bgColor);
+      }
+    }
+  },
 
   fieldChanged: function(index) {
     // Redraw path
     this.initSvg();
     this.renderBlock_();
-    /*if (this.fields[index].setSelected) {
-      var tempSelected = this.fields[index].selected_;
-      this.fields[index].setSelected(!tempSelected);
-      this.fields[index].setSelected(tempSelected);
-    }*/
   },
 
   onBlur: function() { // Unselect all fields
