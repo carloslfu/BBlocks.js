@@ -36,7 +36,7 @@ BB.Component = ObjJS.prototype.create({
     this.initialized_ = false;
     this.selectable = false;
     this.selected_ = false;
-    this.preserveChildsOnUnselect = false; // Don't unselect childs when unselect component
+    this.preserveChildsOnUnselect = false; // Don't unselect childs when unselect the component
     this.selectedClass = '';
   },
 
@@ -163,7 +163,7 @@ BB.Component = ObjJS.prototype.create({
       this.workspace.childContainer.node.appendChild(this.container.node); // this in top of SVG
     }
   },
-  //this object to top of this parent Workspace and all parents
+  //this object to top of this parent Workspace and all parents (now isn't used)
   toTopPropagate: function() {
     var obj = this;
     if (this.nested) {
