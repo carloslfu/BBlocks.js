@@ -104,12 +104,13 @@ BB.Component = ObjJS.prototype.create({
       return; //blocks can't have Workspaces attached
     }
     this.children.push(workspace);
-    this.children[this.children.length-1].level = this.level + 1;
-    this.children[this.children.length-1].parent = this;
+    this.children[this.children.length - 1].index_ = this.children.length - 1;
+    this.children[this.children.length - 1].level = this.level + 1;
+    this.children[this.children.length - 1].parent = this;
     if (this.childAdded) {
-      this.childAdded(this.children[this.children.length-1]); //callback
+      this.childAdded(this.children[this.children.length - 1]); //callback
     }
-    return this.children[this.children.length-1];
+    return this.children[this.children.length - 1];
   }, 
 
   addBlock: function(name, blockPrototype, options) {
@@ -124,12 +125,20 @@ BB.Component = ObjJS.prototype.create({
     }
     this.children.push(block);
     block.workspace = this;
+    block.index_ = this.children.length - 1;
     block.parent = this;
     block.absoluteRotation = block.absoluteRotation + this.absoluteRotation;
     if (this.childAdded) {
-      this.childAdded(this.children[this.children.length-1]); //callback
+      this.childAdded(this.children[this.children.length - 1]); //callback
     }
-    return this.children[this.children.length-1];
+    return this.children[this.children.length - 1];
+  },
+  // remove children
+  removeChild: function(index) {
+    this.children.splice(index, 1);
+    for (var i = index, len = this.children.length; i < len; i++) {
+      this.children[i].index_--;
+    }
   },
   // create a block object from a protoype
   createBlock: function(name, blockPrototype) {
