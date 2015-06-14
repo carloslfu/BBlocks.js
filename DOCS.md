@@ -86,6 +86,9 @@ Workspace:
 - *demos*: All demos of this project.
 - *themes*: Styles for all objects.
   - *default*: Default theme files.
+- *dist*: debug and production core files.
+  - *BBlocks_compressed.js*: minified core.
+  - *BBlocks_uncompressed.js*: concatenated core (for debugging).
 - *libs*: Libraries used in this project.
   - *utils.js*: Useful functions and ObjJS class for dinamically creating classes.
   - *draggable.js*: Svg.js extension for make a component dragabble.

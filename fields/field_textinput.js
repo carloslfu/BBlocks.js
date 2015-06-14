@@ -3,8 +3,9 @@
 // Field text input
 
 // Inspiration and ideas for implementation http://making.fiftythree.com/fluid-text-inputs/
+// NOTES:
+//    - Chromium Android bug when have 25 characters (https://code.google.com/p/chromium/issues/detail?id=483497)
 // TODOs:
-//    - Report Android bug when have 25 characters (TODO: report this bug)
 //    - Implement granular character handling (user pair evaluation), performance issue with more than 250 characters
 //    - Implement doubletap selection (selects all text)
 //    - Better handling of draggable parent
