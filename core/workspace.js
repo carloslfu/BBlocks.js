@@ -42,13 +42,10 @@ BB.Workspace = BB.Component.prototype.create({
     this.style = {
       className: 'BBComponentWorkspace'
     };
-    if (!workspace) {
-      return;
-    }
-    this.workspace = workspace;
     if (workspacePrototype) {
       ObjJS.mixinObj(this, workspacePrototype, 'true');
     }
+    this.workspace = workspace;
     // options
     if (!options) {
     // default options
@@ -73,7 +70,7 @@ BB.Workspace = BB.Component.prototype.create({
     if (options.pannable != undefined) {
       this.pannable = pannable;
     }
-    if (options.render) {
+    if (options.render && !!workspace) {
       this.render();
     }
   },
@@ -236,5 +233,75 @@ BB.Workspace = BB.Component.prototype.create({
       this.toScale(matrix.a);
       this.childContainer.move(matrix.e, matrix.f);
     }
+  },
+
+  // Methods to adding components to the workspace
+
+  addWorkspace: function(name, workspacePrototype, options) {
+    // generate the block object
+    //var workspace = this.createWorkspace(name, workspacePrototype);
+    return this.addWorkspace_(new BB.Workspace(name, workspacePrototype, this, options));
+  },
+  addWorkspace_: function(workspace) {
+    if (this.type == 'Block') {
+      throw 'Blocks can\'t have Workspaces attached';
+      return; //blocks can't have Workspaces attached
+    }
+    this.children.push(workspace);
+    this.children[this.children.length - 1].index_ = this.children.length - 1;
+    this.children[this.children.length - 1].level = this.level + 1;
+    this.children[this.children.length - 1].parent = this;
+    if (this.childAdded) {
+      this.childAdded(this.children[this.children.length - 1]); //callback
+    }
+    return this.children[this.children.length - 1];
+  }, 
+
+  addBlock: function(name, blockPrototype, options) {
+    // generate the block object
+    var block = this.createBlock(name, blockPrototype);
+    return this.addBlock_(new block(options));
+  },
+  addBlock_: function(block) {
+    if (block.type != 'Block') {
+      throw 'The type of object must be Block';
+      return;
+    }
+    this.children.push(block);
+    block.workspace = this;
+    block.index_ = this.children.length - 1;
+    block.parent = this;
+    block.absoluteRotation = block.absoluteRotation + this.absoluteRotation;
+    if (this.childAdded) {
+      this.childAdded(this.children[this.children.length - 1]); //callback
+    }
+    return this.children[this.children.length - 1];
+  },
+  // create a block object from a protoype
+  createBlock: function(name, blockPrototype) {
+    if (!blockPrototype) {
+      throw 'Must have a block protoype as argument';
+      return;
+    }
+    if (!blockPrototype.init) {
+      throw 'Block protoype must have a init function';
+      return;
+    }
+    // Add a constructor to prototype
+    blockPrototype.constructor = function(options){
+      BB.Block.call(this, name, options);
+    };
+    var block = BB.Block.prototype.create(blockPrototype);
+    return block;
+  },
+  addBlockSequence: function(name) {
+    var container = (new BB.BlockSequence(name, this)).render();
+    this.children.push(container);
+    container.index_ = this.children.length - 1;
+    container.parent = this;
+    if (this.childAdded) {
+      this.childAdded(this.children[this.children.length - 1]); //callback
+    }
+    return this.children[this.children.length - 1];
   },
 });

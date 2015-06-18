@@ -1,3 +1,5 @@
+'use strict';
+
 var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2, block3, block4, blockBlue;
 var main = function() {
   mainWorkspace = new BB.Workspace('main', BB.WorkspaceBasic, 'mainWorkspaceDiv');

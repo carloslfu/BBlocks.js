@@ -47,6 +47,9 @@ ObjJS.prototype.create = function(classPrototype) {
  */
 ObjJS.cloneObject = function(obj) {
   var type = typeof(obj);
+  if (obj instanceof Array) {
+    type = 'array';
+  }
   if (obj == null) { // Null is an object in ES5, avoids all the function
     return null;
   }

@@ -29,7 +29,7 @@
 
         /* invoke any callbacks */
         if (context.dragstart)
-          context.dragstart(event)
+          BB.runCallbacks(context.dragstart, context, []);
 
         /* prevent selection dragging */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
@@ -89,7 +89,7 @@
 
           /* invoke any callbacks */
           if (context.dragmove)
-            context.dragmove(event)
+            BB.runCallbacks(context.dragmove, context, [ddx, ddy]);
         }
         event.stopPropagation();
       }
@@ -104,7 +104,7 @@
 
         /* invoke any callbacks */
         if (context.dragend)
-          context.dragend(event)
+          BB.runCallbacks(context.dragend, context, []);
         event.stopPropagation();
       }
       

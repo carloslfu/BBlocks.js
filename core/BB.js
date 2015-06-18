@@ -24,6 +24,7 @@ BB.Component = ObjJS.prototype.create({
   constructor: function(type) {
     this.type = type;
     this.children = [];
+    this.connections = [];
     this.nested = false;
     this.level = 0; //level of nesting 0 - main Object
     this.absoluteRotation = 0;
@@ -92,85 +93,28 @@ BB.Component = ObjJS.prototype.create({
       }
     }
   },
-
-  addWorkspace: function(name, workspacePrototype, options) {
-    // generate the block object
-    //var workspace = this.createWorkspace(name, workspacePrototype);
-    return this.addWorkspace_(new BB.Workspace(name, workspacePrototype, this, options));
-  },
-  addWorkspace_: function(workspace) {
-    if (this.type == 'Block') {
-      throw 'Blocks can\'t have Workspaces attached';
-      return; //blocks can't have Workspaces attached
-    }
-    this.children.push(workspace);
-    this.children[this.children.length - 1].index_ = this.children.length - 1;
-    this.children[this.children.length - 1].level = this.level + 1;
-    this.children[this.children.length - 1].parent = this;
-    if (this.childAdded) {
-      this.childAdded(this.children[this.children.length - 1]); //callback
-    }
-    return this.children[this.children.length - 1];
-  }, 
-
-  addBlock: function(name, blockPrototype, options) {
-    // generate the block object
-    var block = this.createBlock(name, blockPrototype);
-    return this.addBlock_(new block(options));
-  },
-  addBlock_: function(block) {
-    if (block.type != 'Block') {
-      throw 'The type of object must be Block';
-      return;
-    }
-    this.children.push(block);
-    block.workspace = this;
-    block.index_ = this.children.length - 1;
-    block.parent = this;
-    block.absoluteRotation = block.absoluteRotation + this.absoluteRotation;
-    if (this.childAdded) {
-      this.childAdded(this.children[this.children.length - 1]); //callback
-    }
-    return this.children[this.children.length - 1];
-  },
   // remove children
   removeChild: function(index) {
+    this.childContainer.node.removeChild(this.children[index].container.node);
     this.children.splice(index, 1);
     for (var i = index, len = this.children.length; i < len; i++) {
       this.children[i].index_--;
     }
   },
-  // create a block object from a protoype
-  createBlock: function(name, blockPrototype) {
-    if (!blockPrototype) {
-      throw 'Must have a block protoype as argument';
-      return;
-    }
-    if (!blockPrototype.init) {
-      throw 'Block protoype must have a init function';
-      return;
-    }
-    // Add a constructor to prototype
-    blockPrototype.constructor = function(options){
-      BB.Block.call(this, name, options);
-    };
-    var block = BB.Block.prototype.create(blockPrototype);
-    return block;
-  },
   //this object to top of this parent Workspace
   toTop: function() {
     if (this.nested) {
-      this.workspace.childContainer.node.appendChild(this.container.node); // this in top of SVG
+      this.parent.childContainer.node.appendChild(this.container.node); // this in top of SVG
     }
   },
-  //this object to top of this parent Workspace and all parents (now isn't used)
+  //this object to top of this parent Workspace and all parents (now isn't used - Tag: DEPRECATION_LIST)
   toTopPropagate: function() {
     var obj = this;
     if (this.nested) {
-      this.workspace.childContainer.node.appendChild(this.container.node); // this in top of SVG
-      while (obj.workspace.nested) { //parents in top of our respectives SVGs
-        obj = obj.workspace;
-        obj.workspace.childContainer.node.appendChild(obj.container.node);
+      this.parent.childContainer.node.appendChild(this.container.node); // this in top of SVG
+      while (obj.parent.nested) { //parents in top of our respectives SVGs
+        obj = obj.parent;
+        obj.parent.childContainer.node.appendChild(obj.container.node);
       }
     }
   },
@@ -252,5 +196,15 @@ BB.attachToEls = function(els, eventName, func) {
   for (i = 0; i < len; i++) {
     PolymerGestures.removeEventListener(els[i].node, eventName, func);
     PolymerGestures.addEventListener(els[i].node, eventName, func);
+  }
+};
+
+// attach a event handler to an array of svg.js elements
+BB.runCallbacks = function(callbacks, scope, args, avoid) {
+  var i;
+  var len = callbacks.length;
+  for (i = 0; i < len; i++) {
+    if (avoid == undefined || avoid != i)
+      callbacks[i].apply(scope, args);
   }
 };

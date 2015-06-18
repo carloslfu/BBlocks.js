@@ -19,7 +19,6 @@ BB.Block = BB.Component.prototype.create({
     this.height = 20;
     this.container = null; // contains attached elements(border) and SVG document
     this.childContainer = null; // svg group that contains all children
-    this.statement = true;
     this.root = null;
     this.nested = true; // Blocks are nested by default
     this.fields = [];
@@ -32,6 +31,8 @@ BB.Block = BB.Component.prototype.create({
     this.selectable = true;
     this.draggable_ = true;
     this.disabled_ = false;
+    this.topConnection_ = null;
+    this.bottomConnection_ = null;
     
     this.metrics = {
       borderRadius: 2,
@@ -83,6 +84,19 @@ BB.Block = BB.Component.prototype.create({
     this.fields.push(field);
     return field;
   },
+  addContainer: function(container) {
+    this.children.push(container);
+    container.workspace = this;
+    container.index_ = this.children.length - 1;
+    return this;
+  },
+
+  setTopConnection: function(bool) {
+    this.topConnection_ = bool;
+  },
+  setBottomConnection: function(bool) {
+    this.bottomConnection_ = bool;
+  },
 
   newRow: function() {
       this.fields.push('newRow');
@@ -102,7 +116,7 @@ BB.Block = BB.Component.prototype.create({
 
   render: function() {
     if (!this.workspace) {
-      throw 'Blocks must have a workspace to be rendered';
+      throw 'Block must have a workspace to be rendered';
       return;
     }
     if (!this.rendered_) {
@@ -160,6 +174,7 @@ BB.Block = BB.Component.prototype.create({
       }
       this.rendered_ = true;
     }
+    return this;
   },
 
   attachEvents: function(child) {
@@ -193,13 +208,13 @@ BB.Block = BB.Component.prototype.create({
     BB.attachToEls(this.attachDraggable, 'down', this.toTopClosure);
   },
 
-  dragstart: function() {
+  dragstart: [function() {
     this.root.addClass('BBComponentBlockDragging');
-  },
-
-  dragend: function() {
+  }],
+  dragmove: [],
+  dragend: [function() {
     this.root.removeClass('BBComponentBlockDragging');
-  },
+  }],
 
   setDraggable: function(bool) {
     this.draggable_ = bool;

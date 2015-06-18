@@ -1,83 +1,101 @@
+'use strict';
+
 // Block sequence container
 
-BB.BlockSequence = ObjJS.prototype.create({
+BB.BlockSequence = BB.Component.prototype.create({
   constructor: function(name, workspace) {
+    BB.Component.prototype.constructor.call(this, 'BlockSequence');
     this.name = name;
     this.workspace = workspace;
     this.children = [];
     this.parent = workspace;
+    this.width = 0;
+    this.height = 0;
+    this.nested = true;
+    this.blockDistance = 0.5; // 1px distance between blocks
+    this.x = 0;
+    this.y = 0;
 
     this.selectable = true;
     this.selected_ = false;
+    this.rendered_ = false;
   },
+
+  render: function() {
+    if (!this.workspace) {
+      throw 'BlockSequence container must have a workspace to be rendered';
+      return;
+    }
+    if (!this.rendered_) {
+      this.container = this.workspace.childContainer.group();
+      this.root = this.container;
+      this.childContainer = this.container;
+      this.container.move(this.x, this.y);
+      this.rendered_ = true;
+    }
+    return this;
+  },
+
   addBlock: function(block) {
-    if (block.workspace == this.workspace) {
-      // if is the first block
-      if (this.children.length == 0) {
-        this.x = block.x;
-        this.y = block.y;
-      }
-      this.children.push(block);
-      block.parent = this;
-      block.workspace.removeChild(block.index_);
-    } else {
+    if (block.workspace != this.workspace) {
       throw 'Move a block from a diferent workspace are not implemented'; // TODO: Move a block from a diferent workspace
     }
-  },
-  setSelected: function(bool) {
-    if (this.selectable && this.selected_ != bool) { // performance optimization and avoids infinite loops
-      this.selected_ = bool;
-      if (this.selected_) {
-        this.toTop();
-        if (this.onSelect) {
-          this.onSelect();
-        }
-      } else {
-        if (this.onBlur) {
-          this.onBlur();
-        }
-        if (!this.preserveChildsOnUnselect) {
-          this.unselectChilds();
-        }
-      }
-      if (this.onSelectedChange) {
-        this.onSelectedChange();
-      }
-      // Notify parent about this change
-      if (this.parent) {
-        if (this.selected_ && this.parent.childSelected) {
-          this.parent.childSelected(this);
-        }
-        if (!this.selected_ && this.parent.childUnselected) {
-          this.parent.childUnselected(this);
-        }
-      }
+    if (block.rendered_ == false || this.rendered_ == false) {
+      throw 'Headless BlockSequence are not implemented, you must render the BlockSequence and block before using this method'; // TODO: Headless BBlocks
     }
-  },
-
-  childSelected: function(child) {
-    this.setSelected(true);
-    var i, len = this.children.length;
-    for (i = 0; i < len; i++) {
-      // unselect all childrens except 'child'
-      if (this.children[i] != child && this.children[i].setSelected) {
-        this.children[i].setSelected(false);
-      }
+    // if is the first block
+    if (this.children.length == 0) {
+      this.x = block.x;
+      this.y = block.y;
+      this.container.move(this.x, this.y);
     }
+    block.move(this.width, this.height);
+    this.height += block.height + this.blockDistance;
+  
+    this.children.push(block);
+    block.workspace.removeChild(block.index_);
+    this.container.add(block.container);
+    block.parent = this;
+  
+    var this_ = this;
+    var length_dragstart = block.dragstart.length;
+    block.dragstart.push(function() {
+      this_.dragstart(this, length_dragstart);
+    });
+    var length_dragmove = block.dragmove.length;
+    block.dragmove.push(function(ddx, ddy) {
+      this_.dragmove(this, length_dragmove, ddx, ddy);
+    });
+    var length_dragend = block.dragend.length;
+    block.dragend.push(function() {
+      this_.dragend(this, length_dragend);
+    });
+    return this;
   },
 
-  unselectChilds: function() {
-    var i, len = this.children.length;
-    for (i = 0; i < len; i++) {
-      if (this.children[i].setSelected) {
-        this.children[i].setSelected(false);
+  dragstart: function(block, length, ddx, ddy) {
+    for (var i = 0, len = this.children.length; i < len; i++) {
+      if (this.children[i] != block) {
+        BB.runCallbacks(this.children[i].dragstart, this.children[i], [], length);
       }
     }
   },
-  //this object to top of this parent Workspace
-  toTop: function() {
-    if (this.nested) {
-      this.workspace.childContainer.node.appendChild(this.container.node); // this in top of SVG
+  dragmove: function(block, length, ddx, ddy) {
+    this.x += ddx;
+    this.y += ddy;
+    this.container.dmove(ddx, ddy);
+    block.dmove(-ddx, -ddy); // revert duplicated behaviour
+    for (var i = 0, len = this.children.length; i < len; i++) {
+      if (this.children[i] != block) { // avoids infinite loop
+        BB.runCallbacks(this.children[i].dragmove, this.children[i], [], length);
+      }
     }
-  }
+  },
+  dragend: function(block, length, ddx, ddy) {
+    for (var i = 0, len = this.children.length; i < len; i++) {
+      if (this.children[i] != block) {
+        BB.runCallbacks(this.children[i].dragend, this.children[i], [], length);
+      }
+    }
+  },
 });

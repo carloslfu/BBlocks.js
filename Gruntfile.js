@@ -22,6 +22,7 @@ module.exports = function (grunt) {
                     'core/BB.js',
                     'themes/default/color_palettes.js',
                     'core/block_sequence.js',
+                    'core/connection.js',
                     'core/block.js',
                     'core/workspace.js',
                     'core/field.js',
