@@ -1,7 +1,7 @@
 'use strict';
 
 // global variables for debugging
-var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2, block3, blockBlue;
+var mainWorkspace, nested1, nested11, nested12, nested121, nested2, nested21, nested22, nested221, block1, block2, block3, blockBlue, taskBlock;
 var seqContainer1, seqBlock1, seqBlock2, seqBlock3;
 
 var main = function() {
@@ -19,6 +19,8 @@ var main = function() {
   blockBlue.render();
   blockBlue.setColor('#2870b7');
   blockBlue.move(30, 20);
+  taskBlock = mainWorkspace.addBlock('taskBlock', test_blocks.task);
+  taskBlock.render().move(350, 300);
   // test block sequence container
   seqBlock1 = mainWorkspace.addBlock('seqBlock1', test_blocks.task);
   seqBlock1.render().move(350, 50);
@@ -26,7 +28,7 @@ var main = function() {
   seqBlock2.render();
   seqBlock3 = mainWorkspace.addBlock('seqBlock3', test_blocks.task);
   seqBlock3.render();
-  var seqContainer1 = mainWorkspace.addBlockSequence('seqContainer1')
+  seqContainer1 = mainWorkspace.addBlockSequence('seqContainer1')
     .addBlock(seqBlock1)
     .addBlock(seqBlock2)
     .addBlock(seqBlock3);

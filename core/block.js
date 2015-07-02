@@ -5,6 +5,7 @@
 //  All block prototypes live in blocks folder or create your own using the Block API
 //  Block can be instantiable from workspaces with addBlock method, see the basic-demo
 // TODOs:
+//  - dragMode_ attribute for implement drag radius like Blockly (useful for touchscreens, and the same in workspaces)
 //  - delete a block with remove method and delete key when selected (methods and animation).
 //  - documentation for Block API
 
@@ -17,6 +18,7 @@ BB.Block = BB.Component.prototype.create({
     this.y = 0;
     this.width = 20;
     this.height = 20;
+    this.dragRadius = 5;
     this.container = null; // contains attached elements(border) and SVG document
     this.childContainer = null; // svg group that contains all children
     this.root = null;
@@ -59,7 +61,9 @@ BB.Block = BB.Component.prototype.create({
                        'stylingFunction',
                        'colorPalette',
                        'metrics',
-                       'selectable'];
+                       'selectable',
+                       'dragRadius',
+                      ];
     for (var i = 0,el; el = this.optionList[i]; i++) {
       if (options.hasOwnProperty(el)) {
         this[el] = options[el];
@@ -92,11 +96,25 @@ BB.Block = BB.Component.prototype.create({
   },
 
   setTopConnection: function(bool) {
-    this.topConnection_ = bool;
+    if (bool && this.topConnection_ || !bool && !this.topConnection_) {
+      return false; // don't changed
+    }
+    if (bool) {
+      this.topConnection_ = new BB.Connection('topConnection', this, {x: 0, y: 0, detectionRadius: 15});
+      this.topConnection_.index_ = this.connections.length;
+      this.connections.push(this.topConnection_);
+    } else {
+      this.connections.slice(this.topConnection_.index_, 1); // remove from connection array
+      this.topConnection_ = null;
+    }
+    if (this.rendered_) {
+      this.render();
+    }
+    return true; // has changed
   },
-  setBottomConnection: function(bool) {
+  /*setBottomConnection: function(bool) {
     this.bottomConnection_ = bool;
-  },
+  },*/
 
   newRow: function() {
       this.fields.push('newRow');
@@ -133,7 +151,7 @@ BB.Block = BB.Component.prototype.create({
         this.init(this.customOptions); // attributes of custom Block
         this.initialized_ = true;
       } else {
-        this.root.remove();
+        this.root.remove(); // for rerendering
       }
       //needs create container before initSVG, because it render the fields
       this.container = this.workspace.root.group();
@@ -155,6 +173,7 @@ BB.Block = BB.Component.prototype.create({
           this.fields[i].toTop();
         }
       }
+      this.renderConnections();
       this.attachDraggable.push(this.root);
       this.updateDraggable();
       this.workspace.childContainer.add(this.container);
@@ -175,6 +194,11 @@ BB.Block = BB.Component.prototype.create({
       this.rendered_ = true;
     }
     return this;
+  },
+  renderConnections: function() {
+    if (this.topConnection_) {
+      this.connections.push()
+    }
   },
 
   attachEvents: function(child) {
@@ -208,10 +232,10 @@ BB.Block = BB.Component.prototype.create({
     BB.attachToEls(this.attachDraggable, 'down', this.toTopClosure);
   },
 
-  dragstart: [function() {
+  dragstart: [],
+  dragmove: [function() {
     this.root.addClass('BBComponentBlockDragging');
   }],
-  dragmove: [],
   dragend: [function() {
     this.root.removeClass('BBComponentBlockDragging');
   }],
@@ -429,5 +453,5 @@ BB.Block = BB.Component.prototype.create({
         this.fields[i].unRender();
       }
     }
-  }
+  },
 });

@@ -19,7 +19,7 @@ test_blocks.task = {
   init: function() {
     this.id = 0;
     this.appendField(new BB.FieldText('Do anything ...', this));
-    //this.setTopConnection(true);
+    this.setTopConnection(true);
     //this.setBottomConnection(true);
   }
 };

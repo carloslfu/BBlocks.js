@@ -4,7 +4,7 @@
 
 BB.BlockSequence = BB.Component.prototype.create({
   constructor: function(name, workspace) {
-    BB.Component.prototype.constructor.call(this, 'BlockSequence');
+    BB.Component.prototype.constructor.call(this, 'BlockSequence'); // super
     this.name = name;
     this.workspace = workspace;
     this.children = [];
@@ -97,5 +97,16 @@ BB.BlockSequence = BB.Component.prototype.create({
         BB.runCallbacks(this.children[i].dragend, this.children[i], [], length);
       }
     }
+  },
+
+  getAllBlocks: function(exceptions) {
+    var blocks = [];
+    for (var i = 0, child; child = this.children[i]; i++) {
+      if (exceptions && exceptions.indexOf(child) != -1) {
+        continue;
+      }
+      blocks.push(child);
+    }
+    return blocks;
   },
 });

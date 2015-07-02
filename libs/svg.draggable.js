@@ -10,7 +10,7 @@
     draggable: function(context, constraint, attachToEls) {
       var startDrag, drag, endDrag
         , element = this
-        , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested);
+        , parent  = this._parent(SVG.Doc) || this.parent._parent(SVG.Nested), dragMode = null;
 
       if (!attachToEls) {
         attachToEls = [element];
@@ -20,17 +20,18 @@
         this.fixedDrag();
       
       /* ensure constraint object */
-      constraint = constraint || {}
+      constraint = constraint || {};
       
       /* start dragging */
       startDrag = function(event) {
-        event = event || window.event
+        event = event || window.event;
         element.startEventDrag = event;
 
         /* invoke any callbacks */
         if (context.dragstart)
           BB.runCallbacks(context.dragstart, context, []);
 
+        dragMode = 0;
         /* prevent selection dragging */
         event.preventDefault ? event.preventDefault() : event.returnValue = false;
         event.stopPropagation();
@@ -48,48 +49,65 @@
             y: element.y()
           };
           var zoom = context.workspace.absoluteScale * context.workspace.scale;
-          var ddx = (event.ddx * Math.cos(rotation) + event.ddy * Math.sin(rotation)) / zoom;
-          var ddy = (event.ddy * Math.cos(rotation) + event.ddx * Math.sin(-rotation)) / zoom;
-          /* caculate new position [with rotation correction] */
-          x = bbox.x + ddx;
-          y = bbox.y + ddy;
-          if (typeof constraint === 'function') {
-            var coord = constraint(x, y)
+          if (dragMode == 0) {
+            var dx = (event.dx * Math.cos(rotation) + event.dy * Math.sin(rotation)) / zoom;
+            var dy = (event.dy * Math.cos(rotation) + event.dx * Math.sin(-rotation)) / zoom;
+            var radius = Math.sqrt(event.dx*event.dx + event.dy*event.dy);
+            if (!context.hasOwnProperty('dragRadius') || radius >= context.dragRadius) {
+              dragMode = 1;
+              x = bbox.x + dx;
+              y = bbox.y + dy;
+              element.move(x, y);
+              // update context
+              context.x = x;
+              context.y = y;
+              /* invoke any callbacks */
+              if (context.dragmove)
+                BB.runCallbacks(context.dragmove, context, [dx, dy]); // fisrt dragmove after dragstart
+            }
+          } else { // dragMode == 1
+            var ddx = (event.ddx * Math.cos(rotation) + event.ddy * Math.sin(rotation)) / zoom;
+            var ddy = (event.ddy * Math.cos(rotation) + event.ddx * Math.sin(-rotation)) / zoom;
+            /* caculate new position [with rotation correction] */
+            x = bbox.x + ddx;
+            y = bbox.y + ddy;
+            if (typeof constraint === 'function') {
+              var coord = constraint(x, y);
 
-            if (typeof coord === 'object') {
-              if (typeof coord.x != 'boolean' || coord.x)
-                element.x(typeof coord.x === 'number' ? coord.x : x)
-              if (typeof coord.y != 'boolean' || coord.y)
-                element.y(typeof coord.y === 'number' ? coord.y : y)
+              if (typeof coord === 'object') {
+                if (typeof coord.x != 'boolean' || coord.x)
+                  element.x(typeof coord.x === 'number' ? coord.x : x);
+                if (typeof coord.y != 'boolean' || coord.y)
+                  element.y(typeof coord.y === 'number' ? coord.y : y);
 
-            } else if (typeof coord === 'boolean' && coord) {
+              } else if (typeof coord === 'boolean' && coord) {
+                element.move(x, y);
+                // update context
+                context.x = x;
+                context.y = y;
+              }
+
+            } else if (typeof constraint === 'object') {
+              /* keep element within constrained box */
+              if (constraint.minX != null && x < constraint.minX)
+                x = constraint.minX;
+              else if (constraint.maxX != null && x > constraint.maxX - width)
+                x = constraint.maxX - width;
+
+              if (constraint.minY != null && y < constraint.minY)
+                y = constraint.minY;
+              else if (constraint.maxY != null && y > constraint.maxY - height)
+                y = constraint.maxY - height;
+
               element.move(x, y)
               // update context
               context.x = x;
               context.y = y;
             }
-
-          } else if (typeof constraint === 'object') {
-            /* keep element within constrained box */
-            if (constraint.minX != null && x < constraint.minX)
-              x = constraint.minX
-            else if (constraint.maxX != null && x > constraint.maxX - width)
-              x = constraint.maxX - width
-            
-            if (constraint.minY != null && y < constraint.minY)
-              y = constraint.minY
-            else if (constraint.maxY != null && y > constraint.maxY - height)
-              y = constraint.maxY - height
-
-            element.move(x, y)
-            // update context
-            context.x = x;
-            context.y = y;
+            /* invoke any callbacks */
+            if (context.dragmove)
+              BB.runCallbacks(context.dragmove, context, [ddx, ddy]);
           }
-
-          /* invoke any callbacks */
-          if (context.dragmove)
-            BB.runCallbacks(context.dragmove, context, [ddx, ddy]);
         }
         event.stopPropagation();
       }
@@ -101,6 +119,7 @@
         /* reset store */
         element.startEventDrag    = null
         element.startPositionDrag = null
+        dragMode = null;
 
         /* invoke any callbacks */
         if (context.dragend)
@@ -127,7 +146,7 @@
           PolymerGestures.removeEventListener(el.node, 'trackend', endDrag);
         });
         
-        startDrag = drag = endDrag = null
+        dragMode = startDrag = drag = endDrag = null
         
         return element
       }

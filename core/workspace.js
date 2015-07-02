@@ -63,7 +63,7 @@ BB.Workspace = BB.Component.prototype.create({
                        'title',
                        'preserveChildsOnSelect'];
     for (var i = 0,el; el = this.optionList[i]; i++) {
-      if (options[el]) {
+      if (options.hasOwnProperty(el)) {
         this[el] = options[el];
       }
     }
@@ -303,5 +303,20 @@ BB.Workspace = BB.Component.prototype.create({
       this.childAdded(this.children[this.children.length - 1]); //callback
     }
     return this.children[this.children.length - 1];
+  },
+
+  getAllBlocks: function(exceptions) {
+    var blocks = [];
+    for (var i = 0, child; child = this.children[i]; i++) {
+      if (exceptions && exceptions.indexOf(child) != -1) {
+        continue;
+      }
+      if (child.type == 'Block') {
+        blocks.push(child);
+      } else if (child.type == 'BlockSequence') {
+        blocks = blocks.concat(child.getAllBlocks(exceptions));
+      }
+    }
+    return blocks;
   },
 });

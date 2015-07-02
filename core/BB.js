@@ -18,7 +18,10 @@ var BB = {};
 //  - Dialog box
 //  - Tab (for tabs handling)
 //  - Anything awesome component :)
-// TODO: documentation for Component API
+// TODOs:
+//  - implement delegate events functionality (this allows to BlockSequence or any container moving childs more easly)
+//      For example: in line 87 of block_sequence.js won't have necesary revert duplicated behaviour.
+//  - documentation for Component API
 
 BB.Component = ObjJS.prototype.create({
   constructor: function(type) {
@@ -186,7 +189,15 @@ BB.Component = ObjJS.prototype.create({
       this.root.remove();
     }
     this.rendered_ = false;
-  }
+  },
+
+  getAbsoluteXY: function() {
+    var absParentPosition = {x: 0, y: 0}
+    if (this.parent.type != 'Workspace') {
+      absParentPosition = this.parent.getAbsoluteXY();
+    }
+    return {x: absParentPosition.x + this.x, y: absParentPosition.y + this.y};
+  },
 });
 
 // attach a event handler to an array of svg.js elements

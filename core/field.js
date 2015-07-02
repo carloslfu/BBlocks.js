@@ -9,7 +9,7 @@ BB.Field = BB.Component.prototype.create({
   constructor: function(type){
     BB.Component.prototype.constructor.call(this, type);
     this.rendered_ = false;
-    this.index_ = null; // index of field in it parent
+    this.index_ = null; // index of the field in it parent
   },
 
 // get viewbox of element, override this if is necesary
