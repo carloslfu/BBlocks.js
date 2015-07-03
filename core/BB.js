@@ -2,6 +2,7 @@
 
 // GLOBAL TODOs:
 //  - All code documentation following JSDOC
+//  - Use commonJS in a whole proyect
 
 // namespace for BBlocks (BB)
 var BB = {};
