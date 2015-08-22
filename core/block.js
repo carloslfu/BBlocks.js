@@ -96,12 +96,26 @@ BB.Block = BB.Component.prototype.create({
     return this;
   },
 
+  connectionValidator: function(connection1, connection2) {
+    if (connection1.name == 'topConnection' && connection2.name == 'bottomConnection'
+        || connection2.name == 'topConnection' && connection1.name == 'bottomConnection') {
+      return true;
+    } else {
+      return false;
+    }
+  },
+
   setTopConnection: function(bool) {
     if (bool && this.topConnection_ || !bool && !this.topConnection_) {
       return false; // don't changed
     }
     if (bool) {
-      this.topConnection_ = new BB.Connection('topConnection', this, {x: 0, y: 0, detectionRadius: 15});
+      this.topConnection_ = new BB.Connection('topConnection', this, {
+        x: 0,
+        y: 0,
+        detectionRadius: 15,
+        validator: this.connectionValidator
+      });
       this.topConnection_.index_ = this.connections.length;
       this.connections.push(this.topConnection_);
     } else {
@@ -113,9 +127,28 @@ BB.Block = BB.Component.prototype.create({
     }
     return true; // has changed
   },
-  /*setBottomConnection: function(bool) {
-    this.bottomConnection_ = bool;
-  },*/
+  setBottomConnection: function(bool) {
+    if (bool && this.bottomConnection_ || !bool && !this.bottomConnection_) {
+      return false; // don't changed
+    }
+    if (bool) {
+      this.bottomConnection_ = new BB.Connection('bottomConnection', this, {
+        x: 0,
+        y: this.height,
+        detectionRadius: 15,
+        validator: this.connectionValidator
+      });
+      this.bottomConnection_.index_ = this.connections.length;
+      this.connections.push(this.bottomConnection_);
+    } else {
+      this.connections.slice(this.bottomConnection_.index_, 1); // remove from connection array
+      this.bottomConnection_ = null;
+    }
+    if (this.rendered_) {
+      this.render();
+    }
+    return true; // has changed
+  },
 
   newRow: function() {
       this.fields.push('newRow');
@@ -242,12 +275,13 @@ BB.Block = BB.Component.prototype.create({
     this.root.removeClass('BBComponentBlockDragging');
     if (this.detectedConnections_) {
       this.detectedConnections_.root.connect(this.detectedConnections_.target);
+      this.detectedConnections_ = null;
     }
   }],
 
   detectConnections: function() {
     var connections = null;
-    if (this.topConnection_) {
+    if (this.topConnection_ && !this.topConnection_.targetConnection_) {
       var closest = this.topConnection_.closest();
       if (closest[1] != -1) {
         connections = {

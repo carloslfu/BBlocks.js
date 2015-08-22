@@ -8,13 +8,15 @@ BB.Connection = ObjJS.prototype.create({
     this.index_ = null; // index of the connection in it parent
     this.optionList = ['x', // this position is relative to the parent
                        'y',
-                       'detectionRadius'];
+                       'detectionRadius',
+                       'validator'];
     for (var i = 0,el; el = this.optionList[i]; i++) {
       if (options.hasOwnProperty(el)) {
         this[el] = options[el];
       }
     }
     this.parent = parent;
+    this.targetConnection_ = null;
   },
   getAbsoluteXY: function() {
     var absParentPosition = this.parent.getAbsoluteXY();
@@ -33,12 +35,14 @@ BB.Connection = ObjJS.prototype.create({
     var absPos = this.getAbsoluteXY(), absPosConn;
     for (var i = 0, numChildren = blocks.length; i < numChildren; i++) {
       for (var j = 0, connection; connection = blocks[i].connections[j]; j++) {
-        absPosConn = connection.getAbsoluteXY();
-        distance = this.computeDistance(absPos.x, absPos.y, absPosConn.x, absPosConn.y);
-        if (this.detectionRadius > distance) {
-          if (minDistance == -1 || minDistance > distance) {
-            minDistance = distance;
-            closestConnection = connection;
+        if (this.validator && this.validator(this, connection) || !this.validator){
+          absPosConn = connection.getAbsoluteXY();
+          distance = this.computeDistance(absPos.x, absPos.y, absPosConn.x, absPosConn.y);
+          if (this.detectionRadius > distance) {
+            if (minDistance == -1 || minDistance > distance) {
+              minDistance = distance;
+              closestConnection = connection;
+            }
           }
         }
       }
@@ -51,9 +55,18 @@ BB.Connection = ObjJS.prototype.create({
   },
 
   connect: function(connection) {
-    if (connection.parent.parent.type == 'BlockSequence') {
-      connection.parent.parent.addBlock(this.parent);
+    var condition = this.validator && this.validator(this, connection) || !this.validator;
+    if (condition) {
+      if (connection.parent.parent.type == 'BlockSequence') {
+        connection.parent.parent.addBlock(this.parent, connection.parent);
+      } else if (connection.parent.parent.type == 'Workspace') {
+        var seqContainer = connection.parent.parent.addBlockSequence('seqContainer');
+        seqContainer
+          .addBlock(connection.parent)
+          .addBlock(this.parent);
+      }
+      this.targetConnection_ = connection;
+      connection.targetConnection_ = this;
     }
-    console.log(connection);
   }
 });

@@ -18,9 +18,9 @@ test_blocks.test = {
 test_blocks.task = {
   init: function() {
     this.id = 0;
-    this.appendField(new BB.FieldText('Do anything ...', this));
+    this.appendField(new BB.FieldText('Stack me! please :)', this));
     this.setTopConnection(true);
-    //this.setBottomConnection(true);
+    this.setBottomConnection(true);
   }
 };
 

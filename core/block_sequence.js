@@ -36,27 +36,41 @@ BB.BlockSequence = BB.Component.prototype.create({
     return this;
   },
 
-  addBlock: function(block) {
+  addBlock: function(block, targetBlock) {
     if (block.workspace != this.workspace) {
       throw 'Move a block from a diferent workspace are not implemented'; // TODO: Move a block from a diferent workspace
     }
     if (block.rendered_ == false || this.rendered_ == false) {
       throw 'Headless BlockSequence are not implemented, you must render the BlockSequence and block before using this method'; // TODO: Headless BBlocks
     }
-    // if is the first block
-    if (this.children.length == 0) {
-      this.x = block.x;
-      this.y = block.y;
-      this.container.move(this.x, this.y);
+    if (!targetBlock) {
+      // if is the first block
+      if (this.children.length == 0) {
+        this.x = block.x;
+        this.y = block.y;
+        this.container.move(this.x, this.y);
+      }
+      block.move(this.width, this.height);
+      this.height += block.height + this.blockDistance;
+    } else {
+      block.move(0, targetBlock.y + targetBlock.height + this.blockDistance);
+      this.height = targetBlock.y + targetBlock.height + block.height + 2 * this.blockDistance;
+      if (targetBlock.bottomConnection_.targetConnection_) {
+        var nextBlock = targetBlock.bottomConnection_.targetConnection_.parent;
+        nextBlock.topConnection_.targetConnection_ = block.bottomConnection_;
+        block.bottomConnection_.targetConnection_ = nextBlock.topConnection_;
+        do {
+          nextBlock.move(0, this.height);
+          this.height += nextBlock.height + this.blockDistance;
+        } while (nextBlock.bottomConnection_.targetConnection_
+                  && (nextBlock = nextBlock.bottomConnection_.targetConnection_.parent));
+      }
+      console.log(targetBlock);
     }
-    block.move(this.width, this.height);
-    this.height += block.height + this.blockDistance;
-  
     this.children.push(block);
     block.workspace.removeChild(block.index_);
     this.container.add(block.container);
     block.parent = this;
-  
     var this_ = this;
     var length_dragstart = block.dragstart.length;
     block.dragstart.push(function() {
@@ -70,6 +84,7 @@ BB.BlockSequence = BB.Component.prototype.create({
     block.dragend.push(function() {
       this_.dragend(this, length_dragend);
     });
+    this.setSelected(true);
     return this;
   },
 
@@ -108,5 +123,5 @@ BB.BlockSequence = BB.Component.prototype.create({
       blocks.push(child);
     }
     return blocks;
-  },
+  }
 });
