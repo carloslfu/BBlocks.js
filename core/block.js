@@ -35,7 +35,8 @@ BB.Block = BB.Component.prototype.create({
     this.disabled_ = false;
     this.topConnection_ = null;
     this.bottomConnection_ = null;
-    
+    this.detectedConnections_ = null;
+
     this.metrics = {
       borderRadius: 2,
       borderWidth: 1,
@@ -51,7 +52,7 @@ BB.Block = BB.Component.prototype.create({
     if (customOptions) { //options of a custom blocks
       this.customOptions = customOptions;
     }
-    
+
     if (!options) {
       return;
     }
@@ -160,7 +161,7 @@ BB.Block = BB.Component.prototype.create({
       //render block - render fields and all block svg
       this.renderBlock_();
       // render children
-      this.childContainer = this.workspace.root.group(); 
+      this.childContainer = this.workspace.root.group();
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].render();
         this.childContainer.add(this.children[i].container);
@@ -235,10 +236,28 @@ BB.Block = BB.Component.prototype.create({
   dragstart: [],
   dragmove: [function() {
     this.root.addClass('BBComponentBlockDragging');
+    this.detectedConnections_ = this.detectConnections();
   }],
   dragend: [function() {
     this.root.removeClass('BBComponentBlockDragging');
+    if (this.detectedConnections_) {
+      this.detectedConnections_.root.connect(this.detectedConnections_.target);
+    }
   }],
+
+  detectConnections: function() {
+    var connections = null;
+    if (this.topConnection_) {
+      var closest = this.topConnection_.closest();
+      if (closest[1] != -1) {
+        connections = {
+          root: this.topConnection_,
+          target: closest[0]
+        };
+      }
+    }
+    return connections;
+  },
 
   setDraggable: function(bool) {
     this.draggable_ = bool;
