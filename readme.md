@@ -57,6 +57,24 @@ See the demos folder. All documentation is in construction... (github wiki comin
 - Pugins API.
 - Styling API.
 
+## Future
+
+Last year I learned a lot about web development. I developed web applications with fascinating and very promising technologies. My aim now is to apply this knowledge in the project, build a simple and powerful tool that meets all the objectives of this project. It will simplify their development and much of the complexity associated to the construction of this tool.
+
+This will be done in a new branch and when it has the same functionality of the current branch will replace the master. Here are some advances in architecture to be implemented:
+
+- Architecture: [redux][redux-page]
+- UI construction: [react][react-page]
+- UI debugging: [react-hot-loader][react-hot-page]
+- Developer experience: [redux-dev-tools][redux-dev-tools-page]
+- Packaging tools: [webpack][webpack-page]
+
+[redux-page]: http://rackt.github.io/redux/
+[redux-dev-tools-page]: https://github.com/gaearon/redux-devtools
+[webpack-page]: https://webpack.github.io/
+[react-page]: http://facebook.github.io/react/
+[react-hot-page]: http://gaearon.github.io/react-hot-loader/
+
 ## Development
 
 Feel free to suggest anything or submit a pull request. Visit the [contributing page][Contributing-guide] and the [documentation page][docs-page].
