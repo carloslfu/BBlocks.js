@@ -63,17 +63,13 @@ Last year I learned a lot about web development. I developed web applications wi
 
 This will be done in a new branch and when it has the same functionality of the current branch will replace the master. Here are some advances in architecture to be implemented:
 
-- Architecture: [redux][redux-page]
-- UI construction: [react][react-page]
-- UI debugging: [react-hot-loader][react-hot-page]
-- Developer experience: [redux-dev-tools][redux-dev-tools-page]
+- Architecture: [cycle][cycle-page]
+- Developer experience: [cycle-time-travel][cycle-time-travel-page]
 - Packaging tools: [webpack][webpack-page]
 
-[redux-page]: http://rackt.github.io/redux/
-[redux-dev-tools-page]: https://github.com/gaearon/redux-devtools
+[cycle-page]: http://cycle.js.org/
+[cycle-time-travel-page]: https://github.com/cyclejs/cycle-time-travel
 [webpack-page]: https://webpack.github.io/
-[react-page]: http://facebook.github.io/react/
-[react-hot-page]: http://gaearon.github.io/react-hot-loader/
 
 ## Development
 
